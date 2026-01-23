@@ -7,8 +7,6 @@
 
 package frc.robot.subsystems.vision;
 
-import static frc.robot.subsystems.vision.VisionConstants.*;
-
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,18 +17,23 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.vision.VisionIOInputsAutoLogged;
+import frc.robot.subsystems.vision.VisionIO.PoseObservation;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
+
+import static frc.robot.subsystems.vision.VisionConstants.*;
+
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
-public class Vision extends SubsystemBase {
+public class VisionSubsystem extends SubsystemBase {
   private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
-  public Vision(VisionConsumer consumer, VisionIO... io) {
+  public VisionSubsystem(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
     this.io = io;
 

@@ -48,7 +48,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Drive extends SubsystemBase {
+public class DriveSubsystem extends SubsystemBase {
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY = TunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
   public static final double DRIVE_BASE_RADIUS =
@@ -98,18 +98,14 @@ public class Drive extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
-  public Drive(
+  public DriveSubsystem(
       GyroIO gyroIO,
-      ModuleIO flModuleIO,
-      ModuleIO frModuleIO,
-      ModuleIO blModuleIO,
-      ModuleIO brModuleIO) {
+      ModuleIO... moduleIOs) {
     this.gyroIO = gyroIO;
-    modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
-    modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
-    modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
-    modules[3] = new Module(brModuleIO, 3, TunerConstants.BackRight);
-
+    modules[0] = new Module(moduleIOs[0], 0, TunerConstants.FrontLeft);
+    modules[1] = new Module(moduleIOs[1], 1, TunerConstants.FrontRight);
+    modules[2] = new Module(moduleIOs[2], 2, TunerConstants.BackLeft);
+    modules[3] = new Module(moduleIOs[3], 3, TunerConstants.BackRight);
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
 
