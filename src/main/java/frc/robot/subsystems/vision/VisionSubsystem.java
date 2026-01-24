@@ -21,7 +21,7 @@ import frc.robot.subsystems.vision.VisionIOInputsAutoLogged;
 import frc.robot.subsystems.vision.VisionIO.PoseObservation;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 
-import static frc.robot.subsystems.vision.VisionConstants.*;
+import static frc.robot.Constants.Vision.*;
 
 import java.util.LinkedList;
 import java.util.List;
