@@ -98,9 +98,7 @@ public class DriveSubsystem extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
-  public DriveSubsystem(
-      GyroIO gyroIO,
-      ModuleIO... moduleIOs) {
+  public DriveSubsystem(GyroIO gyroIO, ModuleIO... moduleIOs) {
     this.gyroIO = gyroIO;
     modules[0] = new Module(moduleIOs[0], 0, TunerConstants.FrontLeft);
     modules[1] = new Module(moduleIOs[1], 1, TunerConstants.FrontRight);

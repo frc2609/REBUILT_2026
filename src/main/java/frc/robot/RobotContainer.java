@@ -27,58 +27,58 @@ import frc.robot.subsystems.vision.VisionSubsystem;
  */
 public class RobotContainer {
 
-    private final CommandXboxController driverController =
-	new CommandXboxController(Constants.Controls.DRIVER_CONTROLLER_PORT);
-    private final Trigger xTrigger = driverController.x();
-    private final Trigger resetGyroTrigger = driverController.b();
-	private final Trigger holdShooterTrigger = driverController.rightBumper();
+  private final CommandXboxController driverController =
+      new CommandXboxController(Constants.Controls.DRIVER_CONTROLLER_PORT);
+  private final Trigger xTrigger = driverController.x();
+  private final Trigger resetGyroTrigger = driverController.b();
+  private final Trigger holdShooterTrigger = driverController.rightBumper();
 
-	private final RobotFactory robotFactory = new RobotFactory();
-	private final ShooterSubsystem shooterSubsystem = robotFactory.getShooterSubsystem();
-    private final DriveSubsystem driveSubsystem = robotFactory.getDriveSubsystem();
-    private final VisionSubsystem visionSubsystem = robotFactory.getVisionSubsystem();
+  private final RobotFactory robotFactory = new RobotFactory();
+  private final ShooterSubsystem shooterSubsystem = robotFactory.getShooterSubsystem();
+  private final DriveSubsystem driveSubsystem = robotFactory.getDriveSubsystem();
+  private final VisionSubsystem visionSubsystem = robotFactory.getVisionSubsystem();
 
-    // Dashboard inputs (later)
-    //private final LoggedDashboardChooser<Command> autoChooser;
-	
-	private final Command holdShooterCommand =
-		new HoldShooterSpeed(shooterSubsystem, Constants.Controls.SHOOTER_HOLD_RPS);
+  // Dashboard inputs (later)
+  // private final LoggedDashboardChooser<Command> autoChooser;
 
-	public RobotContainer() {
-		configureBindings();
-	}
+  private final Command holdShooterCommand =
+      new HoldShooterSpeed(shooterSubsystem, Constants.Controls.SHOOTER_HOLD_RPS);
 
-	/** Robot-wide init hook (called from {@link Robot#robotInit()}). */
-	public void robotInit() {
-		// Avoid syncing absolute encoders during construction; do it at a predictable time during boot.
-		// armSubsystem.resetPositionToAbsolute();
-	}
+  public RobotContainer() {
+    configureBindings();
+  }
 
-	private void configureBindings() {
-		holdShooterTrigger.whileTrue(holdShooterCommand);
+  /** Robot-wide init hook (called from {@link Robot#robotInit()}). */
+  public void robotInit() {
+    // Avoid syncing absolute encoders during construction; do it at a predictable time during boot.
+    // armSubsystem.resetPositionToAbsolute();
+  }
 
-        // Default command, normal field-relative drive
-        driveSubsystem.setDefaultCommand(
-            DriveCommands.joystickDrive(
-                driveSubsystem,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> -driverController.getRightX()));
+  private void configureBindings() {
+    holdShooterTrigger.whileTrue(holdShooterCommand);
 
-        // Switch to X pattern when X button is pressed
-        xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
+    // Default command, normal field-relative drive
+    driveSubsystem.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            driveSubsystem,
+            () -> -driverController.getLeftY(),
+            () -> -driverController.getLeftX(),
+            () -> -driverController.getRightX()));
 
-        // Reset gyro to 0° when B button is pressed
-        resetGyroTrigger.onTrue(
-                Commands.runOnce(
-                        () ->
-                            driveSubsystem.setPose(
-                                new Pose2d(driveSubsystem.getPose().getTranslation(), Rotation2d.kZero)),
-                        driveSubsystem)
-                    .ignoringDisable(true));
-    }
+    // Switch to X pattern when X button is pressed
+    xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
 
-    public Command getAutonomousCommand() {
-		return Commands.print("No autonomous command configured");
-	}
+    // Reset gyro to 0° when B button is pressed
+    resetGyroTrigger.onTrue(
+        Commands.runOnce(
+                () ->
+                    driveSubsystem.setPose(
+                        new Pose2d(driveSubsystem.getPose().getTranslation(), Rotation2d.kZero)),
+                driveSubsystem)
+            .ignoringDisable(true));
+  }
+
+  public Command getAutonomousCommand() {
+    return Commands.print("No autonomous command configured");
+  }
 }

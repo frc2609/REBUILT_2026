@@ -4,14 +4,14 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 
 public class WpiDutyCycleEncoderIO implements AbsEncoderIO {
-    private final DutyCycleEncoder encoder;
+  private final DutyCycleEncoder encoder;
 
-    public WpiDutyCycleEncoderIO(DutyCycleEncoder encoder) {
-        this.encoder = encoder;
-    }
+  public WpiDutyCycleEncoderIO(DutyCycleEncoder encoder) {
+    this.encoder = encoder;
+  }
 
-    @Override
-    public double getAbsolutePositionRotations() {
-        return encoder.get();
-    }
+  @Override
+  public double getAbsolutePositionRotations() {
+    return encoder.get();
+  }
 }
