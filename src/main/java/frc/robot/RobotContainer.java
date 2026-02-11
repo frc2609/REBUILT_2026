@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldShooterSpeed;
+import frc.robot.subsystems.AgitatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -38,6 +39,7 @@ public class RobotContainer {
   private final IntakeSubsystem intakeSubsystem = robotFactory.getIntakeSubsystem();
   private final DriveSubsystem driveSubsystem = robotFactory.getDriveSubsystem();
   private final VisionSubsystem visionSubsystem = robotFactory.getVisionSubsystem();
+  private final AgitatorSubsystem agitatorSubsystem = robotFactory.getAgitatorSubsystem();
 
   // Dashboard inputs (later)
   // private final LoggedDashboardChooser<Command> autoChooser;

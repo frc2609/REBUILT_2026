@@ -1,8 +1,12 @@
 package frc.robot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.AgitatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -30,19 +34,37 @@ public class RobotFactory {
   private final IntakeSubsystem intakeSubsystem;
   private final DriveSubsystem driveSubsystem;
   private final VisionSubsystem visionSubsystem;
+  private final AgitatorSubsystem agitatorSubsystem;
 
   private final Mode currentMode;
 
-  public RobotFactory() {
-    currentMode = Constants.currentMode;
-    shooterSubsystem = new ShooterSubsystem(buildShooterMotorIO());
-    driveSubsystem = new DriveSubsystem(buildGyroIO(), buildModuleIO());
-    visionSubsystem = new VisionSubsystem(driveSubsystem::addVisionMeasurement, buildVisionIO());
-    intakeSubsystem =
-        new IntakeSubsystem(buildIntakeEncoderIO(), buildIntakeDeployIO(), buildIntakeRollerIO());
-  }
+    public RobotFactory() {
+        currentMode = Constants.currentMode;
+        shooterSubsystem = new ShooterSubsystem(buildShooterMotorIO());
+        driveSubsystem = new DriveSubsystem(buildGyroIO(), buildModuleIO());
+        visionSubsystem = new VisionSubsystem(driveSubsystem::addVisionMeasurement, buildVisionIO());
+        intakeSubsystem =
+            new IntakeSubsystem(buildIntakeEncoderIO(), buildIntakeDeployIO(), buildIntakeRollerIO());
+        agitatorSubsystem = new AgitatorSubsystem(buildAgitatorIO());
+    }
 
-  // SHOOTER
+    //AGITATOR
+
+    private VelocityMotorIO buildAgitatorIO() {
+        switch (Constants.SHOOTER_VELOCITY_MOTOR_TYPE) {
+        case CTRE_TALON_FX:
+            return new CtreTalonFxVelocityIO(Constants.Agitator.MotorConfig);
+        default:
+            throw new IllegalStateException("Unsupported agitator motor type");
+        }
+    }
+
+    public AgitatorSubsystem getAgitatorSubsystem()
+    {
+        return this.agitatorSubsystem;
+    }
+
+    // SHOOTER
 
   public ShooterSubsystem getShooterSubsystem() {
     return shooterSubsystem;

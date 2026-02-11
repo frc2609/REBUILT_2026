@@ -97,6 +97,21 @@ public final class Constants {
                 "inverted", false));
   }
 
+  public static final class Agitator {
+    public static final double Agitator_INERTIA = 0.01;
+    public static final double Agitator_GEAR_RATIO = 1.0;
+
+    public static final Map<String, Object> MotorConfig =
+        new HashMap<>(
+            Map.of(
+                "id", 62,
+                "kP", 0.15,
+                "kI", 0.0,
+                "kD", 0.0,
+                "kV", 0.12,
+                "inverted", false));
+    }
+
   public static final class Intake {
     public static final int EncoderChannel = 0;
 
