@@ -4,8 +4,12 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
+
 import frc.robot.Constants;
 import frc.robot.Constants.NeutralMode;
+import frc.robot.Constants.SimMotor;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -27,6 +31,7 @@ public class CtreTalonFxIO {
     // Maps input config to TalonFx config but doesn't set it
 
     setters.put("leaderId", value -> this.motorId = (int) value);
+
     setters.put("kP", value -> this.config.Slot0.kP = (double) value);
     setters.put("kI", value -> this.config.Slot0.kI = (double) value);
     setters.put("kD", value -> this.config.Slot0.kD = (double) value);
@@ -44,10 +49,22 @@ public class CtreTalonFxIO {
         "forwardLimitRotations",
         value -> this.config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = (double) value);
     setters.put(
-        "forwardLimitRotations",
+        "reverseLimitRotations",
         value -> this.config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = (double) value);
+    setters.put(
+        "inverted",
+        value -> this.config.MotorOutput.withInverted(toPhoenixInverted((Boolean) value)));
+    setters.put(
+        "neutralMode",
+        value -> this.config.MotorOutput.withNeutralMode(toPhoenixNeutralMode((NeutralMode) value)));
+    
+    setters.put("followerId", value -> this.followerId = (int) value);
+    setters.put(
+        "followerAlignment",
+        value -> this.followerAligned = toPhoenixFollowerAlignment((Boolean) value));
 
-    //
+    // NOT IMPLEMENTED
+    
     // config.MotionMagic.MotionMagicCruiseVelocity = cfg.cruiseVelocityRps();
     // config.MotionMagic.MotionMagicAcceleration = cfg.accelerationRpsSq();
     // config.MotionMagic.MotionMagicJerk = cfg.jerk();
@@ -57,18 +74,6 @@ public class CtreTalonFxIO {
     // config.CurrentLimits.StatorCurrentLimit = cfg.statorCurrentLimit();
     // config.CurrentLimits.StatorCurrentLimitEnable = cfg.statorCurrentLimitEnabled();
 
-    setters.put(
-        "inverted",
-        value -> this.config.MotorOutput.withInverted(toPhoenixInverted((Boolean) value)));
-    setters.put(
-        "neutralMode",
-        value ->
-            this.config.MotorOutput.withNeutralMode(toPhoenixNeutralMode((NeutralMode) value)));
-
-    setters.put("followerId", value -> this.followerId = (int) value);
-    setters.put(
-        "followerAlignment",
-        value -> this.followerAligned = toPhoenixFollowerAlignment((Boolean) value));
     motor = new TalonFX(this.motorId, Constants.CANBUS);
 
     setConfiguration(cfg);

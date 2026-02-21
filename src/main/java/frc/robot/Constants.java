@@ -22,7 +22,6 @@ import java.util.Map;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-
     // public static final String CANBUS = "CANivore";
     public static final CANBus CANBUS = CANBus.roboRIO();
 
@@ -65,6 +64,12 @@ public final class Constants {
         SIM
     }
 
+    public enum SimMotor
+    {
+        KRAKEN_X60,
+        KRAKEN_X44
+    }
+
     public static final VelocityMotorType SHOOTER_VELOCITY_MOTOR_TYPE =
         VelocityMotorType.CTRE_TALON_FX;
     public static final VelocityMotorType INTAKE_ROLLER_VELOCITY_MOTOR_TYPE =
@@ -92,40 +97,40 @@ public final class Constants {
         public static final double INERTIA = 1.0;
         public static final double GEAR_RATIO = 1.0;
         public static final double ENCODER_RATIO = 1.0;
+        public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 
         // NOTE: Cuts off at 10 key-value pairs
-        public static final Map<String, Object> MotorConfig =
-            new HashMap<>(
-                Map.of(
-                    "id", 62,
-                    "kP", 0.15,
-                    "kI", 0.0,
-                    "kD", 0.0,
-                    "kV", 0.12,
-                    "kS", 0.05,
-                    "forwardLimitEnabled", false,
-                    "forwardLimitRotations", 100,
-                    "reverseLimitEnabled", false,
-                    "reverseLimitRotations", 100
-                    // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
-                    // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
-                    // public static final double STATOR_CURRENT_LIMIT = 80.0;
-                    // public static final boolean STATOR_CURRENT_LIMIT_ENABLED = true;
-                    ));
-
+        public static final Map<String, Object> Config = new HashMap<>(
+            Map.of(
+                "motorId", 49,
+                "kP", 0.15,
+                "kI", 0.0,
+                "kD", 0.0,
+                "kV", 0.12,
+                "kS", 0.05,
+                "forwardLimitEnabled", false,
+                "forwardLimitRotations", 100.0,
+                "reverseLimitEnabled", false,
+                "reverseLimitRotations", 100.0
+                // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
+                // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
+                // public static final double STATOR_CURRENT_LIMIT = 80.0;
+                // public static final boolean STATOR_CURRENT_LIMIT_ENABLED = true;
+        ));
         static {
-        MotorConfig.put("inverted", false);
+            Config.put("inverted", false);
         }
     }
 
     public static final class Shooter {
         public static final double INERTIA = 0.01;
         public static final double GEAR_RATIO = 1.0;
+        public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 
         public static final Map<String, Object> Config =
             new HashMap<>(
                 Map.of(
-                    "motorId", 60,
+                    "motorId", 50,
                     "kP", 0.15,
                     "kI", 0.0,
                     "kD", 0.0,
@@ -134,13 +139,14 @@ public final class Constants {
     }
 
     public static final class Agitator {
-        public static final double Agitator_INERTIA = 0.01;
-        public static final double Agitator_GEAR_RATIO = 1.0;
+        public static final double INERTIA = 0.01;
+        public static final double GEAR_RATIO = 1.0;
+        public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 
         public static final Map<String, Object> MotorConfig =
             new HashMap<>(
                 Map.of(
-                    "motorId", 62,
+                    "motorId", 43,
                     "kP", 0.15,
                     "kI", 0.0,
                     "kD", 0.0,
@@ -153,15 +159,17 @@ public final class Constants {
 
         public static final double Roller_INERTIA = 0.01;
         public static final double Roller_GEAR_RATIO = 1.0;
+        public static final SimMotor Roller_SIM_MOTOR = SimMotor.KRAKEN_X60;
 
         public static final double Deploy_INERTIA = 1.0;
         public static final double Deploy_GEAR_RATIO = 1.0;
         public static final double Deploy_ENCODER_RATIO = 1.0;
+        public static final SimMotor Deploy_SIM_MOTOR = SimMotor.KRAKEN_X60;
 
         public static final Map<String, Object> RollerConfig =
             new HashMap<>(
                 Map.of(
-                    "motorId", 62,
+                    "motorId", 47,
                     "kP", 0.15,
                     "kI", 0.0,
                     "kD", 0.0,
@@ -171,24 +179,23 @@ public final class Constants {
         public static final Map<String, Object> DeployConfig =
             new HashMap<>(
                 Map.of(
-                    "motorId",62,
+                    "motorId",46,
                     "kP",0.15,
                     "kI",0.0,
                     "kD",0.0,
                     "kV",0.12,
                     "kS",0.05,
                     "forwardLimitEnabled",false,
-                    "forwardLimitRotations",100,
+                    "forwardLimitRotations",100.0,
                     "reverseLimitEnabled",false,
-                    "reverseLimitRotations",100
+                    "reverseLimitRotations",100.0
                     // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
                     // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
                     // public static final double STATOR_CURRENT_LIMIT = 80.0;
                     // public static final boolean STATOR_CURRENT_LIMIT_ENABLED = true;
-                    ));
-
+            ));
         static {
-        DeployConfig.put("inverted", false);
+            DeployConfig.put("inverted", false);
         }
     }
 

@@ -64,12 +64,18 @@ private AbsEncoderIO buildClimberEncoderIO() {
 
 private PositionMotorIO buildClimberMotorIO() {
     if (currentMode == Mode.SIM) {
-        return new SimPositionMotorIO();
+        return new SimPositionMotorIO(
+            Constants.Climber.Config,
+            Constants.Climber.INERTIA,
+            Constants.Climber.GEAR_RATIO,
+            Constants.Climber.ENCODER_RATIO, 
+            Constants.Climber.SIM_MOTOR, 
+            Constants.SIM_DELTA);
     }
     switch (Constants.CLIMBER_POSITION_MOTOR_TYPE) {
         case CTRE_TALON_FX:
             return new CtreTalonFxPositionIO(
-                Constants.Climber.MotorConfig,
+                Constants.Climber.Config,
                 Constants.Climber.GEAR_RATIO,
                 Constants.Climber.ENCODER_RATIO);
         default:
@@ -104,6 +110,7 @@ private VelocityMotorIO buildShooterMotorIO() {
         Constants.Shooter.Config,
         Constants.Shooter.INERTIA,
         Constants.Shooter.GEAR_RATIO,
+        Constants.Shooter.SIM_MOTOR, 
         Constants.SIM_DELTA);
     }
 
@@ -131,7 +138,13 @@ private AbsEncoderIO buildIntakeEncoderIO() {
 
 private PositionMotorIO buildIntakeDeployIO() {
     if (currentMode == Mode.SIM) {
-    return new SimPositionMotorIO();
+        return new SimPositionMotorIO(
+            Constants.Intake.DeployConfig,
+            Constants.Intake.Deploy_INERTIA,
+            Constants.Intake.Deploy_GEAR_RATIO,
+            Constants.Intake.Deploy_ENCODER_RATIO, 
+            Constants.Intake.Deploy_SIM_MOTOR, 
+            Constants.SIM_DELTA);
     }
     switch (Constants.INTAKE_DEPLOY_POSITION_MOTOR_TYPE) {
     case CTRE_TALON_FX:
@@ -146,11 +159,13 @@ private PositionMotorIO buildIntakeDeployIO() {
 
 private VelocityMotorIO buildIntakeRollerIO() {
     if (currentMode == Mode.SIM) {
-    return new SimVelocityMotorIO(
-        Constants.Intake.RollerConfig,
-        Constants.Intake.Roller_INERTIA,
-        Constants.Intake.Roller_GEAR_RATIO,
-        Constants.SIM_DELTA);
+        return new SimVelocityMotorIO(
+            Constants.Intake.RollerConfig,
+            Constants.Intake.Roller_INERTIA,
+            Constants.Intake.Roller_GEAR_RATIO,
+            Constants.Intake.Roller_SIM_MOTOR, 
+            Constants.SIM_DELTA
+        );
     }
     switch (Constants.INTAKE_ROLLER_VELOCITY_MOTOR_TYPE) {
     case CTRE_TALON_FX:
