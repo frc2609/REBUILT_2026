@@ -15,7 +15,7 @@ public class CtreTalonFxIO {
 
   public final TalonFX motor;
   private int motorId;
-  private TalonFXConfiguration config;
+  private TalonFXConfiguration config = new TalonFXConfiguration();
 
   public TalonFX followerMotor = null;
   private MotorAlignmentValue followerAligned;

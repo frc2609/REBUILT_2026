@@ -25,7 +25,7 @@ import frc.robot.subsystems.io.motor.VelocityMotorIO;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 public class RobotFactory {
 private final ShooterSubsystem shooterSubsystem;

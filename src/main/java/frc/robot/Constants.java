@@ -97,26 +97,16 @@ public final class Constants {
         public static final Map<String, Object> MotorConfig =
             new HashMap<>(
                 Map.of(
-                    "id",
-                    62,
-                    "kP",
-                    0.15,
-                    "kI",
-                    0.0,
-                    "kD",
-                    0.0,
-                    "kV",
-                    0.12,
-                    "kS",
-                    0.05,
-                    "forwardLimitEnabled",
-                    false,
-                    "forwardLimitRotations",
-                    100,
-                    "reverseLimitEnabled",
-                    false,
-                    "reverseLimitRotations",
-                    100
+                    "id", 62,
+                    "kP", 0.15,
+                    "kI", 0.0,
+                    "kD", 0.0,
+                    "kV", 0.12,
+                    "kS", 0.05,
+                    "forwardLimitEnabled", false,
+                    "forwardLimitRotations", 100,
+                    "reverseLimitEnabled", false,
+                    "reverseLimitRotations", 100
                     // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
                     // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
                     // public static final double STATOR_CURRENT_LIMIT = 80.0;
@@ -135,7 +125,7 @@ public final class Constants {
         public static final Map<String, Object> Config =
             new HashMap<>(
                 Map.of(
-                    "id", 60,
+                    "motorId", 60,
                     "kP", 0.15,
                     "kI", 0.0,
                     "kD", 0.0,
@@ -150,7 +140,7 @@ public final class Constants {
         public static final Map<String, Object> MotorConfig =
             new HashMap<>(
                 Map.of(
-                    "id", 62,
+                    "motorId", 62,
                     "kP", 0.15,
                     "kI", 0.0,
                     "kD", 0.0,
@@ -171,7 +161,7 @@ public final class Constants {
         public static final Map<String, Object> RollerConfig =
             new HashMap<>(
                 Map.of(
-                    "id", 62,
+                    "motorId", 62,
                     "kP", 0.15,
                     "kI", 0.0,
                     "kD", 0.0,
@@ -181,26 +171,16 @@ public final class Constants {
         public static final Map<String, Object> DeployConfig =
             new HashMap<>(
                 Map.of(
-                    "id",
-                    62,
-                    "kP",
-                    0.15,
-                    "kI",
-                    0.0,
-                    "kD",
-                    0.0,
-                    "kV",
-                    0.12,
-                    "kS",
-                    0.05,
-                    "forwardLimitEnabled",
-                    false,
-                    "forwardLimitRotations",
-                    100,
-                    "reverseLimitEnabled",
-                    false,
-                    "reverseLimitRotations",
-                    100
+                    "motorId",62,
+                    "kP",0.15,
+                    "kI",0.0,
+                    "kD",0.0,
+                    "kV",0.12,
+                    "kS",0.05,
+                    "forwardLimitEnabled",false,
+                    "forwardLimitRotations",100,
+                    "reverseLimitEnabled",false,
+                    "reverseLimitRotations",100
                     // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
                     // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
                     // public static final double STATOR_CURRENT_LIMIT = 80.0;
