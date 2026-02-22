@@ -1,5 +1,7 @@
 package frc.robot.subsystems.io.motor.Sim;
 
+import java.util.Map;
+
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
@@ -12,7 +14,6 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.SimMotor;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxVelocityIO;
-import java.util.Map;
 
 public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
     private DCMotorSim motorSim;
@@ -22,28 +23,38 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
 
     private double kGearRatio;
     private double kSimDelta;
-    private int id;
 
     public SimVelocityMotorIO(
-        Map<String, Object> cfg, double inertia, double gearRatio, SimMotor simMotor, 
-        double simDelta
+        Map<String, Object> cfg, double inertia, double gearRatio,  
+        SimMotor simMotor, double simDelta
     ) {
         super(cfg); // create the motor from CTRE implementation
-        kGearRatio = gearRatio;
-        id = (int) cfg.get("motorId");
-        kSimDelta = simDelta;
 
-        gearbox = DCMotor.getKrakenX60Foc(1); // NOTE: currently this is tailored to Kraken X60s
-        motorSim =
-            new DCMotorSim(LinearSystemId.createDCMotorSystem(gearbox, inertia, gearRatio), gearbox);
+        kGearRatio = gearRatio;
+        kSimDelta = simDelta;
+        MotorType controllerType;
+
+        switch (simMotor) {
+            case KRAKEN_X60:
+                gearbox = DCMotor.getKrakenX60Foc(1);
+                controllerType = MotorType.KrakenX60;
+                break;
+            case KRAKEN_X44:
+                gearbox = DCMotor.getKrakenX44Foc(1);
+                controllerType = MotorType.KrakenX44;
+                break;
+            default:
+                throw new Error("Unknown Sim Motor Type id="+motorId);
+        }
+        
+        motorSim = new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(gearbox, inertia, gearRatio), 
+            gearbox
+        );
 
         talonFXSim = super.motor.getSimState();
         talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
-            talonFXSim.setMotorType((
-            simMotor == SimMotor.KRAKEN_X60
-                ? MotorType.KrakenX60
-                : MotorType.KrakenX44
-        ));
+        talonFXSim.setMotorType(controllerType);
 
         simNotifier = new Notifier(this::updateSim);
         simNotifier.startPeriodic(kSimDelta);
@@ -66,9 +77,9 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
         talonFXSim.setRawRotorPosition(motorSim.getAngularPosition().times(kGearRatio));
         talonFXSim.setRotorVelocity(motorSim.getAngularVelocity().times(kGearRatio));
 
-        SmartDashboard.putNumber("Velocity/" + id + " Setpoint (RPM)", super.setpointRps * 60.0);
-        SmartDashboard.putNumber("Velocity/" + id + " PIDOutput (V)", motorVoltage);
-        SmartDashboard.putNumber("Velocity/" + id + " Measure (RPM)", motorSim.getAngularVelocityRPM());
+        SmartDashboard.putNumber("Velocity/" + motorId + " Setpoint (RPM)", super.setpointRps * 60.0);
+        SmartDashboard.putNumber("Velocity/" + motorId + " PIDOutput (V)", motorVoltage);
+        SmartDashboard.putNumber("Velocity/" + motorId + " Measure (RPM)", motorSim.getAngularVelocityRPM());
     }
 
     @Override

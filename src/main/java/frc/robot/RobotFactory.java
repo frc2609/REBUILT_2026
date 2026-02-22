@@ -42,8 +42,9 @@ public RobotFactory() {
     shooterSubsystem = new ShooterSubsystem(buildShooterMotorIO());
     driveSubsystem = new DriveSubsystem(buildGyroIO(), buildModuleIO());
     visionSubsystem = new VisionSubsystem(driveSubsystem::addVisionMeasurement, buildVisionIO());
-    intakeSubsystem =
-        new IntakeSubsystem(buildIntakeEncoderIO(), buildIntakeDeployIO(), buildIntakeRollerIO());
+    intakeSubsystem = new IntakeSubsystem(
+        buildIntakeEncoderIO(), buildIntakeDeployIO(), buildIntakeRollerIO()
+    );
     agitatorSubsystem = new AgitatorSubsystem(buildAgitatorIO());
     climberSubsystem = new ClimberSubsystem(buildClimberEncoderIO(), buildClimberMotorIO());
 }
@@ -86,11 +87,20 @@ private PositionMotorIO buildClimberMotorIO() {
 // AGITATOR
 
 private VelocityMotorIO buildAgitatorIO() {
+    if (currentMode == Mode.SIM) {
+        return new SimVelocityMotorIO(
+            Constants.Agitator.Config,
+            Constants.Agitator.INERTIA,
+            Constants.Agitator.GEAR_RATIO,
+            Constants.Agitator.SIM_MOTOR, 
+            Constants.SIM_DELTA);
+    }
+
     switch (Constants.AGITATOR_VELOCITY_MOTOR_TYPE) {
-        case CTRE_TALON_FX:
-            return new CtreTalonFxVelocityIO(Constants.Agitator.MotorConfig);
-        default:
-            throw new IllegalStateException("Unsupported agitator motor type");
+    case CTRE_TALON_FX:
+        return new CtreTalonFxVelocityIO(Constants.Agitator.Config);
+    default:
+        throw new IllegalStateException("Unsupported agitator motor type");
     }
 }
 
@@ -106,12 +116,12 @@ public ShooterSubsystem getShooterSubsystem() {
 
 private VelocityMotorIO buildShooterMotorIO() {
     if (currentMode == Mode.SIM) {
-    return new SimVelocityMotorIO(
-        Constants.Shooter.Config,
-        Constants.Shooter.INERTIA,
-        Constants.Shooter.GEAR_RATIO,
-        Constants.Shooter.SIM_MOTOR, 
-        Constants.SIM_DELTA);
+        return new SimVelocityMotorIO(
+            Constants.Shooter.Config,
+            Constants.Shooter.INERTIA,
+            Constants.Shooter.GEAR_RATIO,
+            Constants.Shooter.SIM_MOTOR, 
+            Constants.SIM_DELTA);
     }
 
     switch (Constants.SHOOTER_VELOCITY_MOTOR_TYPE) {

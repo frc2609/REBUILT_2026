@@ -26,7 +26,7 @@ public final class Constants {
     public static final CANBus CANBUS = CANBus.roboRIO();
 
     public static final Mode simMode = Mode.SIM;
-    public static final double SIM_DELTA = 0.02;
+    public static final double SIM_DELTA = 0.001;
 
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
@@ -84,17 +84,18 @@ public final class Constants {
     public static final class Controls {
         public static final int DRIVER_CONTROLLER_PORT = 0;
 
-        // Example bindings / demo setpoints
-        public static final double SIMPLE_MOTOR_PERCENT = 0.3;
-        public static final double ARM_STOW_DEGREES = 0.0;
-        public static final double SHOOTER_HOLD_RPS = 75.0;
+        public static final double ARM_STOW_DEGREES = 0.0; // Example
+        public static final double SHOOTER_HOLD_RPS = 15.0; // 900RPM
+        public static final double INTAKE_HOLD_RPS = 8.0;   // 500RPM
+        public static final double AGITATOR_HOLD_RPS = 8.0;
+        public static final double FEED_HOLD_RPS = 16.0;    // 1000RPM
 
         private Controls() {}
     }
 
     public static final class Climber {
         public static final int EncoderChannel = 0;
-        public static final double INERTIA = 1.0;
+        public static final double INERTIA = 0.01;
         public static final double GEAR_RATIO = 1.0;
         public static final double ENCODER_RATIO = 1.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
@@ -103,22 +104,22 @@ public final class Constants {
         public static final Map<String, Object> Config = new HashMap<>(
             Map.of(
                 "motorId", 49,
-                "kP", 0.15,
+                "kP", 0.0,
                 "kI", 0.0,
                 "kD", 0.0,
-                "kV", 0.12,
-                "kS", 0.05,
+                "kV", 0.0,
+                "kS", 0.0,
                 "forwardLimitEnabled", false,
                 "forwardLimitRotations", 100.0,
                 "reverseLimitEnabled", false,
                 "reverseLimitRotations", 100.0
-                // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
-                // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
-                // public static final double STATOR_CURRENT_LIMIT = 80.0;
-                // public static final boolean STATOR_CURRENT_LIMIT_ENABLED = true;
         ));
         static {
             Config.put("inverted", false);
+            // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
+            // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
+            // public static final double STATOR_CURRENT_LIMIT = 80.0;
+            // public static final boolean STATOR_CURRENT_LIMIT_ENABLED = true;
         }
     }
 
@@ -127,75 +128,70 @@ public final class Constants {
         public static final double GEAR_RATIO = 1.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 
-        public static final Map<String, Object> Config =
-            new HashMap<>(
-                Map.of(
-                    "motorId", 50,
-                    "kP", 0.15,
-                    "kI", 0.0,
-                    "kD", 0.0,
-                    "kV", 0.12,
-                    "inverted", false));
+        public static final Map<String, Object> Config = new HashMap<>(Map.of(
+            "motorId", 50,
+            "kP", 0.04,
+            "kI", 0.0,
+            "kD", 0.0,
+            "kV", 0.0097,
+            "inverted", false
+        ));
     }
 
     public static final class Agitator {
-        public static final double INERTIA = 0.01;
+        public static final double INERTIA = 0.001;
         public static final double GEAR_RATIO = 1.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 
-        public static final Map<String, Object> MotorConfig =
-            new HashMap<>(
-                Map.of(
-                    "motorId", 43,
-                    "kP", 0.15,
-                    "kI", 0.0,
-                    "kD", 0.0,
-                    "kV", 0.12,
-                    "inverted", false));
+        public static final Map<String, Object> Config = new HashMap<>(Map.of(
+            "motorId", 43,
+            "kP", 0.04,
+            "kI", 0.0,
+            "kD", 0.0,
+            "kV", 0.0097,
+            "inverted", false
+        ));
     }
 
     public static final class Intake {
         public static final int EncoderChannel = 0;
 
-        public static final double Roller_INERTIA = 0.01;
+        public static final double Roller_INERTIA = 0.001;
         public static final double Roller_GEAR_RATIO = 1.0;
         public static final SimMotor Roller_SIM_MOTOR = SimMotor.KRAKEN_X60;
 
-        public static final double Deploy_INERTIA = 1.0;
+        public static final double Deploy_INERTIA = 0.001;
         public static final double Deploy_GEAR_RATIO = 1.0;
         public static final double Deploy_ENCODER_RATIO = 1.0;
         public static final SimMotor Deploy_SIM_MOTOR = SimMotor.KRAKEN_X60;
 
-        public static final Map<String, Object> RollerConfig =
-            new HashMap<>(
-                Map.of(
-                    "motorId", 47,
-                    "kP", 0.15,
-                    "kI", 0.0,
-                    "kD", 0.0,
-                    "kV", 0.12,
-                    "inverted", false));
+        public static final Map<String, Object> RollerConfig = new HashMap<>(Map.of(
+            "motorId", 47,
+            "kP", 0.04,
+            "kI", 0.0,
+            "kD", 0.0,
+            "kV", 0.0097,
+            "inverted", false
+        ));
         // NOTE: Cuts off at 10 key-value pairs
-        public static final Map<String, Object> DeployConfig =
-            new HashMap<>(
-                Map.of(
-                    "motorId",46,
-                    "kP",0.15,
-                    "kI",0.0,
-                    "kD",0.0,
-                    "kV",0.12,
-                    "kS",0.05,
-                    "forwardLimitEnabled",false,
-                    "forwardLimitRotations",100.0,
-                    "reverseLimitEnabled",false,
-                    "reverseLimitRotations",100.0
-                    // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
-                    // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
-                    // public static final double STATOR_CURRENT_LIMIT = 80.0;
-                    // public static final boolean STATOR_CURRENT_LIMIT_ENABLED = true;
-            ));
+        public static final Map<String, Object> DeployConfig = new HashMap<>(Map.of(
+            "motorId",46,
+            "kP",0.0,
+            "kI",0.0,
+            "kD",0.0,
+            "kV",0.0,
+            "kS",0.0,
+            "forwardLimitEnabled",false,
+            "forwardLimitRotations",100.0,
+            "reverseLimitEnabled",false,
+            "reverseLimitRotations",100.0
+        ));
         static {
             DeployConfig.put("inverted", false);
+            // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
+            // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
+            // public static final double STATOR_CURRENT_LIMIT = 80.0;
+            // public static final boolean STATOR_CURRENT_LIMIT_ENABLED = true;
         }
     }
 

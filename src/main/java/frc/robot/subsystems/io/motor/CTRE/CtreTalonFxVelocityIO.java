@@ -6,38 +6,42 @@ import java.util.Map;
 
 public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMotorIO {
 
-  private VelocityDutyCycle control;
-  public double setpointRps = 0.0;
+    private VelocityDutyCycle control;
+    public double setpointRps = 0.0;
 
-  public CtreTalonFxVelocityIO(Map<String, Object> cfg) {
-    super(cfg);
-  }
-
-  @Override
-  public void setVelocityRps(double velocity) {
-    if (setpointRps != velocity) {
-      setpointRps = velocity;
-      control = control.withVelocity(setpointRps);
-      motor.setControl(control);
+    public CtreTalonFxVelocityIO(Map<String, Object> cfg) {
+        super(cfg);
+        control = new VelocityDutyCycle(0.0);
     }
-  }
 
-  @Override
-  public double getVelocityRps() {
-    return motor.getVelocity().getValueAsDouble();
-  }
-
-  @Override
-  public boolean isAtSpeed(double toleranceRps) {
-    return Math.abs(setpointRps - getVelocityRps()) <= toleranceRps;
-  }
-
-  @Override
-  public void stop() {
-    setpointRps = 0.0;
-    motor.stopMotor();
-    if (super.hasFollower) {
-      followerMotor.stopMotor();
+    @Override
+    public void setVelocityRps(double velocity) {
+        if (setpointRps != velocity) {
+            setpointRps = velocity;
+            control = control.withVelocity(setpointRps);
+            motor.setControl(control);
+            // if (hasFollower) {
+            //     followerMotor.setControl(control);
+            // }
+        }
     }
-  }
+
+    @Override
+    public double getVelocityRps() {
+        return motor.getVelocity().getValueAsDouble();
+    }
+
+    @Override
+    public boolean isAtSpeed(double toleranceRps) {
+        return Math.abs(setpointRps - getVelocityRps()) <= toleranceRps;
+    }
+
+    @Override
+    public void stop() {
+        setpointRps = 0.0;
+        motor.stopMotor();
+        // if (hasFollower) {
+        //     followerMotor.stopMotor();
+        // }
+    }
 }

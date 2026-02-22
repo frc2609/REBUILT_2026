@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Climber;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.HoldAgitatorSpeed;
+import frc.robot.commands.HoldIntakeSpeed;
 import frc.robot.commands.HoldShooterSpeed;
 import frc.robot.subsystems.AgitatorSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -33,8 +35,13 @@ public class RobotContainer {
     private final CommandXboxController driverController =
         new CommandXboxController(Constants.Controls.DRIVER_CONTROLLER_PORT);
     private final Trigger xTrigger = driverController.x();
-    private final Trigger resetGyroTrigger = driverController.b();
+    //private final Trigger resetGyroTrigger = driverController.b();
     private final Trigger holdShooterTrigger = driverController.rightBumper();
+    private final Trigger holdIntakeTrigger = driverController.a();
+    private final Trigger holdAgitatorTrigger = driverController.b();
+
+    // Dashboard inputs (later)
+    // private final LoggedDashboardChooser<Command> autoChooser;
 
     private final RobotFactory robotFactory = new RobotFactory();
     private final ShooterSubsystem shooterSubsystem = robotFactory.getShooterSubsystem();
@@ -43,18 +50,20 @@ public class RobotContainer {
     private final VisionSubsystem visionSubsystem = robotFactory.getVisionSubsystem();
     private final AgitatorSubsystem agitatorSubsystem = robotFactory.getAgitatorSubsystem();
     private final ClimberSubsystem climberSubsystem = robotFactory.getClimberSubsystem();
-    
-    // Dashboard inputs (later)
-    // private final LoggedDashboardChooser<Command> autoChooser;
 
     private final Command holdShooterCommand =
         new HoldShooterSpeed(shooterSubsystem, Constants.Controls.SHOOTER_HOLD_RPS);
 
-        public RobotContainer() {
-                configureBindings();
-        }
+    private final Command holdIntakeCommand = 
+        new HoldIntakeSpeed(intakeSubsystem, Constants.Controls.INTAKE_HOLD_RPS);
 
+    private final Command holdAgitatorCommand = 
+        new HoldAgitatorSpeed(agitatorSubsystem, Constants.Controls.AGITATOR_HOLD_RPS);
 
+    public RobotContainer() {
+        configureBindings();
+    }
+    
     /** Robot-wide init hook (called from {@link Robot#robotInit()}). */
     public void robotInit() {
         // Avoid syncing absolute encoders during construction; do it at a predictable time during boot.
@@ -63,6 +72,8 @@ public class RobotContainer {
 
     private void configureBindings() {
         holdShooterTrigger.whileTrue(holdShooterCommand);
+        holdIntakeTrigger.whileTrue(holdIntakeCommand);
+        holdAgitatorTrigger.whileTrue(holdAgitatorCommand);
 
         // Default command, normal field-relative drive
         driveSubsystem.setDefaultCommand(
@@ -76,13 +87,13 @@ public class RobotContainer {
         xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
 
         // Reset gyro to 0° when B button is pressed
-        resetGyroTrigger.onTrue(
-            Commands.runOnce(
-                    () ->
-                        driveSubsystem.setPose(
-                            new Pose2d(driveSubsystem.getPose().getTranslation(), Rotation2d.kZero)),
-                    driveSubsystem)
-                .ignoringDisable(true));
+        // resetGyroTrigger.onTrue(
+        //     Commands.runOnce(
+        //             () ->
+        //                 driveSubsystem.setPose(
+        //                     new Pose2d(driveSubsystem.getPose().getTranslation(), Rotation2d.kZero)),
+        //             driveSubsystem)
+        //         .ignoringDisable(true));
     }
 
     public Command getAutonomousCommand() {

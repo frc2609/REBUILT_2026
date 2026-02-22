@@ -23,15 +23,12 @@ public class SimPositionMotorIO extends CtreTalonFxPositionIO {
 
     private double kGearRatio;
     private double kSimDelta;
-    private int id;
 
     public SimPositionMotorIO(
         Map<String, Object> cfg, double inertia, double gearRatio, double encoderRatio, 
         SimMotor simMotor, double simDelta
     ) {
         super(cfg, gearRatio, encoderRatio); // create the motor from CTRE implementation
-        
-        id = (int) cfg.get("motorId");
         kGearRatio = gearRatio;
         kSimDelta = simDelta;   
 
@@ -68,9 +65,9 @@ public class SimPositionMotorIO extends CtreTalonFxPositionIO {
         talonFXSim.setRawRotorPosition(motorSim.getAngularPosition().times(kGearRatio));
         talonFXSim.setRotorVelocity(motorSim.getAngularVelocity().times(kGearRatio));
 
-        SmartDashboard.putNumber("Position/" + id + " Measure (deg)", getPositionDegrees());
-        SmartDashboard.putNumber("Position/" + id + " Setpoint (deg)", super.targetDegrees);
-        SmartDashboard.putNumber("Position/" + id + " PIDOutput (V)", motorVoltage);
+        SmartDashboard.putNumber("Position/" + motorId + " Measure (deg)", getPositionDegrees());
+        SmartDashboard.putNumber("Position/" + motorId + " Setpoint (deg)", super.targetDegrees);
+        SmartDashboard.putNumber("Position/" + motorId + " PIDOutput (V)", motorVoltage);
     }
 
     @Override
