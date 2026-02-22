@@ -21,7 +21,7 @@ public class CtreTalonFxIO {
 
     public TalonFX followerMotor = null;
     private MotorAlignmentValue followerAligned;
-    private int followerId = -1;
+    public int followerId = -1;
     public boolean hasFollower = false;
 
     public CtreTalonFxIO(Map<String, Object> cfg) {
@@ -32,7 +32,7 @@ public class CtreTalonFxIO {
 
         setters.put("motorId", value -> this.motorId = (int) value);
         setters.put("followerId", value -> this.followerId = (int) value);
-        setters.put("followerAlignment",
+        setters.put("followerAligned",
             value -> this.followerAligned = toPhoenixFollowerAlignment((Boolean) value));
 
         setters.put("kP", value -> this.config.Slot0.kP = (double) value);

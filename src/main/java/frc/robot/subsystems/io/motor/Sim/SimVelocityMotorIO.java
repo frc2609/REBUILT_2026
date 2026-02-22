@@ -77,9 +77,17 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
         talonFXSim.setRawRotorPosition(motorSim.getAngularPosition().times(kGearRatio));
         talonFXSim.setRotorVelocity(motorSim.getAngularVelocity().times(kGearRatio));
 
-        SmartDashboard.putNumber("Velocity/" + motorId + " Setpoint (RPM)", super.setpointRps * 60.0);
-        SmartDashboard.putNumber("Velocity/" + motorId + " PIDOutput (V)", motorVoltage);
-        SmartDashboard.putNumber("Velocity/" + motorId + " Measure (RPM)", motorSim.getAngularVelocityRPM());
+        logSim(motorId);
+
+        // Do not simulate the follower seperately
+        if (hasFollower) { logSim(followerId); }
+    }
+
+    public void logSim(int id)
+    {
+        SmartDashboard.putNumber("Motors/" + id + "/Setpoint (RPM)", super.setpointRps * 60.0);
+        SmartDashboard.putNumber("Motors/" + id + "/PIDOutput (V)", talonFXSim.getMotorVoltage());
+        SmartDashboard.putNumber("Motors/" + id + "/Measure (RPM)", motorSim.getAngularVelocityRPM());
     }
 
     @Override

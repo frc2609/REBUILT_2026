@@ -45,9 +45,6 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
 
         control = control.withPosition(targetRotations);
         motor.setControl(control);
-        if (hasFollower) {
-            followerMotor.setControl(control);
-        }
     }
 
     @Override
@@ -71,18 +68,18 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         offset *= encoderRatio;
 
         motor.setPosition(offset);
-        if (hasFollower) {
-            followerMotor.setPosition(offset);
-        }
+        // if (hasFollower) {
+        //     followerMotor.setPosition(offset);
+        // }
         targetDegrees = getPositionDegrees();
     }
 
     @Override
     public void stop() {
         motor.stopMotor();
-        if (hasFollower) {
-            followerMotor.stopMotor();
-        }
+        // if (hasFollower) {
+        //     followerMotor.stopMotor();
+        // }
         targetDegrees = getPositionDegrees();
     }
 

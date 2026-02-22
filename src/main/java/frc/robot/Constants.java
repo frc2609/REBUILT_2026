@@ -130,6 +130,8 @@ public final class Constants {
 
         public static final Map<String, Object> Config = new HashMap<>(Map.of(
             "motorId", 50,
+            "followerId", 51,
+            "followerAligned", true,
             "kP", 0.04,
             "kI", 0.0,
             "kD", 0.0,
