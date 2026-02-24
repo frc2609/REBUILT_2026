@@ -7,8 +7,10 @@ package frc.robot;
 import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import java.util.HashMap;
 import java.util.Map;
@@ -93,6 +95,12 @@ public final class Constants {
         PositionMotorType.CTRE_TALON_FX;
     public static final PositionMotorType CLIMBER_POSITION_MOTOR_TYPE =
         PositionMotorType.CTRE_TALON_FX;
+
+    public static final class Field
+    {
+        public static final Translation2d RED_HUB = new Translation2d(11.92, 4.033);
+        public static final Translation2d BLUE_HUB = new Translation2d(4.625, 4.033);
+    }
 
     public static final class Controls {
         public static final int DRIVER_CONTROLLER_PORT = 0;

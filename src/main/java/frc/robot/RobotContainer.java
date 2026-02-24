@@ -8,12 +8,12 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.Climber;
+import frc.robot.commands.AimTurretField;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldAgitatorSpeed;
 import frc.robot.commands.HoldIntakeSpeed;
@@ -22,8 +22,8 @@ import frc.robot.subsystems.AgitatorSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.drive.DriveSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -35,10 +35,10 @@ public class RobotContainer {
     private final CommandXboxController driverController =
         new CommandXboxController(Constants.Controls.DRIVER_CONTROLLER_PORT);
     private final Trigger xTrigger = driverController.x();
-    //private final Trigger resetGyroTrigger = driverController.b();
     private final Trigger holdShooterTrigger = driverController.rightBumper();
     private final Trigger holdIntakeTrigger = driverController.a();
     private final Trigger holdAgitatorTrigger = driverController.b();
+    private final Trigger aimTurretTrigger = driverController.leftBumper();
 
     // Dashboard inputs (later)
     // private final LoggedDashboardChooser<Command> autoChooser;
@@ -59,7 +59,7 @@ public class RobotContainer {
 
     private final Command holdAgitatorCommand = 
         new HoldAgitatorSpeed(agitatorSubsystem, Constants.Controls.AGITATOR_HOLD_RPS);
-
+    
     public RobotContainer() {
         configureBindings();
     }
@@ -74,6 +74,11 @@ public class RobotContainer {
         holdShooterTrigger.whileTrue(holdShooterCommand);
         holdIntakeTrigger.whileTrue(holdIntakeCommand);
         holdAgitatorTrigger.whileTrue(holdAgitatorCommand);
+
+        Translation2d HUB_POSITION = Constants.Field.BLUE_HUB;
+        aimTurretTrigger.whileTrue(new AimTurretField(
+            driveSubsystem::getPose, shooterSubsystem, HUB_POSITION
+        ));
 
         // Default command, normal field-relative drive
         driveSubsystem.setDefaultCommand(

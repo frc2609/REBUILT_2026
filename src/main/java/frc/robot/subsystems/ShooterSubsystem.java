@@ -5,25 +5,25 @@ import frc.robot.subsystems.io.motor.VelocityMotorIO;
 
 /** Shooter Subsystem using velocity control (rotations per second). */
 public class ShooterSubsystem extends SubsystemBase {
-  private final VelocityMotorIO shooterMotor;
+    private final VelocityMotorIO shooterMotor;
 
-  public ShooterSubsystem(VelocityMotorIO shooterMotor) {
-    this.shooterMotor = shooterMotor;
-  }
+    public ShooterSubsystem(VelocityMotorIO shooterMotor) {
+        this.shooterMotor = shooterMotor;
+    }
 
-  public void setSpeed(double rotationsPerSecond) {
-    shooterMotor.setVelocityRps(rotationsPerSecond);
-  }
+    public void setSpeed(double rotationsPerSecond) {
+        shooterMotor.setVelocityRps(rotationsPerSecond);
+    }
 
-  public boolean isAtSpeed(double tolerance) {
-    return shooterMotor.isAtSpeed(tolerance);
-  }
+    public boolean isAtSpeed(double tolerance) {
+        return shooterMotor.isAtSpeed(tolerance);
+    }
 
-  public boolean isReady() {
-    return isAtSpeed(2.0);
-  }
+    public boolean isReady() {
+        return isAtSpeed(2.0);
+    }
 
-  public void stop() {
-    shooterMotor.stop();
-  }
+    public void stop() {
+        shooterMotor.stop();
+    }
 }
