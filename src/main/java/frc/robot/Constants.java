@@ -26,7 +26,7 @@ public final class Constants {
     public static final CANBus CANBUS = CANBus.roboRIO();
 
     public static final Mode simMode = Mode.SIM;
-    public static final double SIM_DELTA = 0.001;
+    public static final double SIM_DELTA = 0.01;
 
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
@@ -69,6 +69,19 @@ public final class Constants {
         KRAKEN_X60,
         KRAKEN_X44
     }
+
+    public static final Map<Integer, String> MotorNames = 
+        Map.of(
+            43, "GDR/Spindexer",
+            44, "GDR/Feeder",
+            46, "Intake/Deploy",
+            47, "Intake/Drive",
+            49, "Climber",
+            50, "GDR/Flywheel",
+            51, "GDR/Flywheel(f)",
+            52, "GDR/Hood",
+            54, "GDR/Turret"
+        );
 
     public static final VelocityMotorType SHOOTER_VELOCITY_MOTOR_TYPE =
         VelocityMotorType.CTRE_TALON_FX;

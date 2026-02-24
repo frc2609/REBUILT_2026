@@ -122,7 +122,6 @@ public class CtreTalonFxIO {
 
     public void applyConfiguration()
     {
-        //System.out.println("APPLIED KP="+config.Slot0.kP);
         motor.getConfigurator().apply(config);
         if (hasFollower) {
             followerMotor.getConfigurator().apply(config);

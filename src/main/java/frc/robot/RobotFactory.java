@@ -39,14 +39,25 @@ private final Mode currentMode;
 
 public RobotFactory() {
     currentMode = Constants.currentMode;
-    shooterSubsystem = new ShooterSubsystem(buildShooterMotorIO());
-    driveSubsystem = new DriveSubsystem(buildGyroIO(), buildModuleIO());
-    visionSubsystem = new VisionSubsystem(driveSubsystem::addVisionMeasurement, buildVisionIO());
+
+    driveSubsystem = new DriveSubsystem(
+        buildGyroIO(), buildModuleIO()
+    );
+    visionSubsystem = new VisionSubsystem(
+        driveSubsystem::addVisionMeasurement, buildVisionIO()
+    );
+    shooterSubsystem = new ShooterSubsystem(
+        buildShooterMotorIO()
+    );
     intakeSubsystem = new IntakeSubsystem(
         buildIntakeEncoderIO(), buildIntakeDeployIO(), buildIntakeRollerIO()
     );
-    agitatorSubsystem = new AgitatorSubsystem(buildAgitatorIO());
-    climberSubsystem = new ClimberSubsystem(buildClimberEncoderIO(), buildClimberMotorIO());
+    climberSubsystem = new ClimberSubsystem(
+        buildClimberEncoderIO(), buildClimberMotorIO()
+    );
+    agitatorSubsystem = new AgitatorSubsystem(
+        buildAgitatorIO()
+    );
 }
 
 // CLIMBER
@@ -86,6 +97,10 @@ private PositionMotorIO buildClimberMotorIO() {
 
 // AGITATOR
 
+public AgitatorSubsystem getAgitatorSubsystem() {
+    return this.agitatorSubsystem;
+}
+
 private VelocityMotorIO buildAgitatorIO() {
     if (currentMode == Mode.SIM) {
         return new SimVelocityMotorIO(
@@ -102,10 +117,6 @@ private VelocityMotorIO buildAgitatorIO() {
     default:
         throw new IllegalStateException("Unsupported agitator motor type");
     }
-}
-
-public AgitatorSubsystem getAgitatorSubsystem() {
-    return this.agitatorSubsystem;
 }
 
 // SHOOTER
@@ -232,18 +243,24 @@ public VisionSubsystem getVisionSubsystem() {
 private VisionIO[] buildVisionIO() {
     switch (Constants.currentMode) {
     case SIM:
+        // PhotonSim needs the drive pose for the camera positions
         return new VisionIO[] {
-        new VisionIOPhotonVisionSim(
-            Constants.Vision.Left.name, Constants.Vision.Left.fromRobot, driveSubsystem::getPose),
-        new VisionIOPhotonVisionSim(
-            Constants.Vision.Right.name,
-            Constants.Vision.Right.fromRobot,
-            driveSubsystem::getPose)
+            new VisionIOPhotonVisionSim(
+                Constants.Vision.Left.name, 
+                Constants.Vision.Left.fromRobot, 
+                driveSubsystem::getPose
+            ),
+            new VisionIOPhotonVisionSim(
+                Constants.Vision.Right.name,
+                Constants.Vision.Right.fromRobot,
+                driveSubsystem::getPose
+            )
         };
     case REAL:
+        // Limelight needs gyro rotation for MegaTag2 
         return new VisionIO[] {
-        new VisionIOLimelight(Constants.Vision.Left.name, driveSubsystem::getRotation),
-        new VisionIOLimelight(Constants.Vision.Right.name, driveSubsystem::getRotation)
+            new VisionIOLimelight(Constants.Vision.Left.name, driveSubsystem::getRotation),
+            new VisionIOLimelight(Constants.Vision.Right.name, driveSubsystem::getRotation)
         };
     default:
         throw new IllegalStateException("Unsupported mode");
