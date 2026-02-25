@@ -3,6 +3,7 @@ package frc.robot.subsystems.io.motor.CTRE;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import java.util.Map;
+import frc.robot.util.Conversions;
 
 public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMotorIO {
     private MotionMagicDutyCycle control = new MotionMagicDutyCycle(0).withSlot(0);
@@ -28,9 +29,9 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         this.encoderRatio = encoderRatio;
     }
 
-    @Override
-    public void setTargetPositionDegrees(double degrees) {
-        double targetRotations = degreesToRotations(degrees);
+  @Override
+  public void setTargetPositionDegrees(double degrees) {
+    double targetRotations = Conversions.degreesToRotations(degrees,gearRatio);
 
         if (forwardLimitEnabled) {
             targetRotations = Math.min(targetRotations, forwardLimitRotations);
@@ -39,18 +40,18 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
             targetRotations = Math.max(targetRotations, reverseLimitRotations);
         }
 
-        // Keep a vendor-agnostic setpoint for consistent "at position" semantics across
-        // implementations.
-        targetDegrees = rotationsToDegrees(targetRotations);
+    // Keep a vendor-agnostic setpoint for consistent "at position" semantics across
+    // implementations.
+    targetDegrees = Conversions.rotationsToDegrees(targetRotations, gearRatio);
 
         control = control.withPosition(targetRotations);
         motor.setControl(control);
     }
 
-    @Override
-    public double getPositionDegrees() {
-        return rotationsToDegrees(motor.getPosition().getValueAsDouble());
-    }
+  @Override
+  public double getPositionDegrees() {
+    return Conversions.rotationsToDegrees(motor.getPosition().getValueAsDouble(),gearRatio);
+  }
 
     @Override
     public boolean isAtPosition(double toleranceDegrees) {
@@ -74,20 +75,12 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         targetDegrees = getPositionDegrees();
     }
 
-    @Override
-    public void stop() {
-        motor.stopMotor();
-        // if (hasFollower) {
-        //     followerMotor.stopMotor();
-        // }
-        targetDegrees = getPositionDegrees();
+  @Override
+  public void stop() {
+    motor.stopMotor();
+    if (hasFollower) {
+      followerMotor.stopMotor();
     }
-
-    private double degreesToRotations(double degrees) {
-        return degrees / (360.0 / gearRatio);
-    }
-
-    private double rotationsToDegrees(double rotations) {
-        return rotations * (360.0 / gearRatio);
-    }
+    targetDegrees = getPositionDegrees();
+  }
 }

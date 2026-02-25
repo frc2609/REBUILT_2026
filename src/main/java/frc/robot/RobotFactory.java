@@ -28,16 +28,16 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class RobotFactory {
-private final ShooterSubsystem shooterSubsystem;
+  private final ShooterSubsystem shooterSubsystem;
 private final IntakeSubsystem intakeSubsystem;
-private final DriveSubsystem driveSubsystem;
-private final VisionSubsystem visionSubsystem;
+  private final DriveSubsystem driveSubsystem;
+  private final VisionSubsystem visionSubsystem;
 private final AgitatorSubsystem agitatorSubsystem;
 private final ClimberSubsystem climberSubsystem;
 
-private final Mode currentMode;
+  private final Mode currentMode;
 
-public RobotFactory() {
+  public RobotFactory() {
     currentMode = Constants.currentMode;
 
     driveSubsystem = new DriveSubsystem(
@@ -71,7 +71,7 @@ private AbsEncoderIO buildClimberEncoderIO() {
         return new SimAbsEncoderIO(0);
     }
 
-    return new WpiDutyCycleEncoderIO(new DutyCycleEncoder(Constants.Climber.EncoderChannel));
+    return new WpiDutyCycleEncoderIO(Constants.Climber.EncoderChannel);
 }
 
 private PositionMotorIO buildClimberMotorIO() {
@@ -121,14 +121,14 @@ private VelocityMotorIO buildAgitatorIO() {
 
 // SHOOTER
 
-public ShooterSubsystem getShooterSubsystem() {
+  public ShooterSubsystem getShooterSubsystem() {
     return shooterSubsystem;
-}
+  }
 
-private VelocityMotorIO buildShooterMotorIO() {
+  private VelocityMotorIO buildShooterMotorIO() {
     if (currentMode == Mode.SIM) {
         return new SimVelocityMotorIO(
-            Constants.Shooter.Config,
+            Constants.Shooter.velocityConfig,
             Constants.Shooter.INERTIA,
             Constants.Shooter.GEAR_RATIO,
             Constants.Shooter.SIM_MOTOR, 
@@ -136,12 +136,12 @@ private VelocityMotorIO buildShooterMotorIO() {
     }
 
     switch (Constants.SHOOTER_VELOCITY_MOTOR_TYPE) {
-    case CTRE_TALON_FX:
-        return new CtreTalonFxVelocityIO(Constants.Shooter.Config);
-    default:
+      case CTRE_TALON_FX:
+        return new CtreTalonFxVelocityIO(Constants.Shooter.velocityConfig);
+      default:
         throw new IllegalStateException("Unsupported shooter motor type");
     }
-}
+  }
 
 // INTAKE
 
@@ -154,7 +154,7 @@ private AbsEncoderIO buildIntakeEncoderIO() {
     return new SimAbsEncoderIO(0);
     }
 
-    return new WpiDutyCycleEncoderIO(new DutyCycleEncoder(Constants.Intake.EncoderChannel));
+    return new WpiDutyCycleEncoderIO(Constants.Intake.EncoderChannel);
 }
 
 private PositionMotorIO buildIntakeDeployIO() {
@@ -198,49 +198,49 @@ private VelocityMotorIO buildIntakeRollerIO() {
 
 // DRIVE
 
-public DriveSubsystem getDriveSubsystem() {
+  public DriveSubsystem getDriveSubsystem() {
     return driveSubsystem;
-}
+  }
 
-private ModuleIO[] buildModuleIO() {
+  private ModuleIO[] buildModuleIO() {
     switch (Constants.currentMode) {
-    case SIM:
+      case SIM:
         return new ModuleIO[] {
-        new ModuleIOSim(TunerConstants.FrontLeft),
-        new ModuleIOSim(TunerConstants.FrontRight),
-        new ModuleIOSim(TunerConstants.BackLeft),
-        new ModuleIOSim(TunerConstants.BackRight)
+          new ModuleIOSim(TunerConstants.FrontLeft),
+          new ModuleIOSim(TunerConstants.FrontRight),
+          new ModuleIOSim(TunerConstants.BackLeft),
+          new ModuleIOSim(TunerConstants.BackRight)
         };
-    case REAL:
+      case REAL:
         return new ModuleIO[] {
-        new ModuleIOTalonFX(TunerConstants.FrontLeft),
-        new ModuleIOTalonFX(TunerConstants.FrontRight),
-        new ModuleIOTalonFX(TunerConstants.BackLeft),
-        new ModuleIOTalonFX(TunerConstants.BackRight)
+          new ModuleIOTalonFX(TunerConstants.FrontLeft),
+          new ModuleIOTalonFX(TunerConstants.FrontRight),
+          new ModuleIOTalonFX(TunerConstants.BackLeft),
+          new ModuleIOTalonFX(TunerConstants.BackRight)
         };
-    default:
+      default:
         throw new IllegalStateException("Unsupported mode");
     }
-}
+  }
 
-private GyroIO buildGyroIO() {
+  private GyroIO buildGyroIO() {
     switch (Constants.currentMode) {
-    case SIM:
+      case SIM:
         return new GyroIO() {};
-    case REAL:
+      case REAL:
         return new GyroIOPigeon2();
-    default:
+      default:
         throw new IllegalStateException("Unsupported mode");
     }
-}
+  }
 
 // VISION
 
-public VisionSubsystem getVisionSubsystem() {
+  public VisionSubsystem getVisionSubsystem() {
     return visionSubsystem;
-}
+  }
 
-private VisionIO[] buildVisionIO() {
+  private VisionIO[] buildVisionIO() {
     switch (Constants.currentMode) {
     case SIM:
         // PhotonSim needs the drive pose for the camera positions
@@ -262,8 +262,8 @@ private VisionIO[] buildVisionIO() {
             new VisionIOLimelight(Constants.Vision.Left.name, driveSubsystem::getRotation),
             new VisionIOLimelight(Constants.Vision.Right.name, driveSubsystem::getRotation)
         };
-    default:
+      default:
         throw new IllegalStateException("Unsupported mode");
     }
-}
+  }
 }

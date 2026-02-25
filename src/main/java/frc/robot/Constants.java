@@ -141,7 +141,7 @@ public final class Constants {
         public static final double GEAR_RATIO = 1.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 
-        public static final Map<String, Object> Config = new HashMap<>(Map.of(
+        public static final Map<String, Object> flywheelConfig = new HashMap<>(Map.of(
             "motorId", 50,
             "followerId", 51,
             "followerAligned", true,
@@ -151,6 +151,43 @@ public final class Constants {
             "kV", 0.0097,
             "inverted", false
         ));
+
+        public static final Map<String, Object> aimConfig =
+            new HashMap<>(
+                Map.of(
+                    "id", 62,
+                    "kP", 0.15,
+                    "kI", 0.0,
+                    "kD", 0.0,
+                    "kV", 0.12,
+                    "kS", 0.05,
+                    "forwardLimitEnabled", false,
+                    "forwardLimitRotations", 100,
+                    "reverseLimitEnabled", false,
+                    "reverseLimitRotations", 100
+                    // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
+                    // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
+                    // public static final double STATOR_CURRENT_LIMIT = 80.0;
+                    // public static final boolean STATOR_CURRENT_LIMIT_ENABLED = true;
+                    ));// the pid values are not correct, nor are the limits
+        public static final Map<String, Object> hoodConfig =
+            new HashMap<>(
+                Map.of(
+                    "id", 62,
+                    "kP", 0.15,
+                    "kI", 0.0,
+                    "kD", 0.0,
+                    "kV", 0.12,
+                    "kS", 0.05,
+                    "forwardLimitEnabled", false,
+                    "forwardLimitRotations", 100,
+                    "reverseLimitEnabled", false,
+                    "reverseLimitRotations", 100
+                    // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
+                    // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
+                    // public static final double STATOR_CURRENT_LIMIT = 80.0;
+                    // public static final boolean STATOR_CURRENT_LIMIT_ENABLED = true;
+                    ));// the pid values are not correct, nor are the limits
     }
 
     public static final class Agitator {
