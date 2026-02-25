@@ -39,7 +39,7 @@ private final ClimberSubsystem climberSubsystem;
 
   public RobotFactory() {
     currentMode = Constants.currentMode;
-    shooterSubsystem = new ShooterSubsystem(buildShooterMotorIO());
+    shooterSubsystem = new ShooterSubsystem(buildShooterMotorIO());// needs 2 more position motors, and encoder
     driveSubsystem = new DriveSubsystem(buildGyroIO(), buildModuleIO());
     visionSubsystem = new VisionSubsystem(driveSubsystem::addVisionMeasurement, buildVisionIO());
     intakeSubsystem =
@@ -59,7 +59,7 @@ private AbsEncoderIO buildClimberEncoderIO() {
         return new SimAbsEncoderIO(0);
     }
 
-    return new WpiDutyCycleEncoderIO(new DutyCycleEncoder(Constants.Climber.EncoderChannel));
+    return new WpiDutyCycleEncoderIO(Constants.Climber.EncoderChannel);
 }
 
 private PositionMotorIO buildClimberMotorIO() {
@@ -101,7 +101,7 @@ public AgitatorSubsystem getAgitatorSubsystem() {
   private VelocityMotorIO buildShooterMotorIO() {
     if (currentMode == Mode.SIM) {
     return new SimVelocityMotorIO(
-        Constants.Shooter.Config,
+        Constants.Shooter.velocityConfig,
         Constants.Shooter.INERTIA,
         Constants.Shooter.GEAR_RATIO,
         Constants.SIM_DELTA);
@@ -109,7 +109,7 @@ public AgitatorSubsystem getAgitatorSubsystem() {
 
     switch (Constants.SHOOTER_VELOCITY_MOTOR_TYPE) {
       case CTRE_TALON_FX:
-        return new CtreTalonFxVelocityIO(Constants.Shooter.Config);
+        return new CtreTalonFxVelocityIO(Constants.Shooter.velocityConfig);
       default:
         throw new IllegalStateException("Unsupported shooter motor type");
     }
@@ -126,7 +126,7 @@ private AbsEncoderIO buildIntakeEncoderIO() {
     return new SimAbsEncoderIO(0);
     }
 
-    return new WpiDutyCycleEncoderIO(new DutyCycleEncoder(Constants.Intake.EncoderChannel));
+    return new WpiDutyCycleEncoderIO(Constants.Intake.EncoderChannel);
 }
 
 private PositionMotorIO buildIntakeDeployIO() {

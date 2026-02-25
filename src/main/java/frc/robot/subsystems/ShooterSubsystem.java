@@ -37,9 +37,9 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
 
-  public void setturretPosition(double degrees){
-    turretEncoder.;
-  }
+  // public void setturretPosition(double degrees){
+  //   turretEncoder.;
+  // }
 
   public boolean turretisAtPosition(double toleranceDegrees) {
     return turretpositionMotor.isAtPosition(toleranceDegrees);

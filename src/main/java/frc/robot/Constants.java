@@ -122,7 +122,7 @@ public final class Constants {
         public static final double INERTIA = 0.01;
         public static final double GEAR_RATIO = 1.0;
 
-        public static final Map<String, Object> Config =
+        public static final Map<String, Object> velocityConfig =
             new HashMap<>(
                 Map.of(
                     "motorId", 60,
@@ -131,6 +131,43 @@ public final class Constants {
                     "kD", 0.0,
                     "kV", 0.12,
                     "inverted", false));
+
+        public static final Map<String, Object> aimConfig =
+            new HashMap<>(
+                Map.of(
+                    "id", 62,
+                    "kP", 0.15,
+                    "kI", 0.0,
+                    "kD", 0.0,
+                    "kV", 0.12,
+                    "kS", 0.05,
+                    "forwardLimitEnabled", false,
+                    "forwardLimitRotations", 100,
+                    "reverseLimitEnabled", false,
+                    "reverseLimitRotations", 100
+                    // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
+                    // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
+                    // public static final double STATOR_CURRENT_LIMIT = 80.0;
+                    // public static final boolean STATOR_CURRENT_LIMIT_ENABLED = true;
+                    ));// the pid values are not correct, nor are the limits
+        public static final Map<String, Object> hoodConfig =
+            new HashMap<>(
+                Map.of(
+                    "id", 62,
+                    "kP", 0.15,
+                    "kI", 0.0,
+                    "kD", 0.0,
+                    "kV", 0.12,
+                    "kS", 0.05,
+                    "forwardLimitEnabled", false,
+                    "forwardLimitRotations", 100,
+                    "reverseLimitEnabled", false,
+                    "reverseLimitRotations", 100
+                    // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
+                    // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
+                    // public static final double STATOR_CURRENT_LIMIT = 80.0;
+                    // public static final boolean STATOR_CURRENT_LIMIT_ENABLED = true;
+                    ));// the pid values are not correct, nor are the limits
     }
 
     public static final class Agitator {
