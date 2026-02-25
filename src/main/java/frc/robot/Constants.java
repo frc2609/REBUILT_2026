@@ -4,14 +4,16 @@
 
 package frc.robot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.ctre.phoenix6.CANBus;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.RobotBase;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -107,7 +109,7 @@ public final class Constants {
     }
 
     public static final class Climber {
-        public static final int EncoderChannel = 0;
+        public static final int EncoderChannel = 49;
         public static final double INERTIA = 0.01;
         public static final double GEAR_RATIO = 1.0;
         public static final double ENCODER_RATIO = 1.0;
@@ -137,9 +139,29 @@ public final class Constants {
     }
 
     public static final class Shooter {
-        public static final double INERTIA = 0.01;
-        public static final double GEAR_RATIO = 1.0;
-        public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
+        public static final int EncoderChannel = 49;
+
+        public static final class Flywheel {
+            public static final double INERTIA = 0.01;
+            public static final double GEAR_RATIO = 1.0;
+            public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
+        }
+        
+        public static final class Aim {
+            public static final double INERTIA = 0.01;
+            public static final double GEAR_RATIO = 1.0;
+            public static final double ENCODER_RATIO = 1.0;
+            public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
+        }
+
+        public static final class Hood {
+            public static final double INERTIA = 0.01;
+            public static final double GEAR_RATIO = 1.0;
+            public static final double ENCODER_RATIO = 1.0;
+            public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
+        }
+
+        
 
         public static final Map<String, Object> flywheelConfig = new HashMap<>(Map.of(
             "motorId", 50,
@@ -155,7 +177,7 @@ public final class Constants {
         public static final Map<String, Object> aimConfig =
             new HashMap<>(
                 Map.of(
-                    "id", 62,
+                    "id", 54,
                     "kP", 0.15,
                     "kI", 0.0,
                     "kD", 0.0,
@@ -173,7 +195,7 @@ public final class Constants {
         public static final Map<String, Object> hoodConfig =
             new HashMap<>(
                 Map.of(
-                    "id", 62,
+                    "id", 52,
                     "kP", 0.15,
                     "kI", 0.0,
                     "kD", 0.0,
@@ -187,7 +209,7 @@ public final class Constants {
                     // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
                     // public static final double STATOR_CURRENT_LIMIT = 80.0;
                     // public static final boolean STATOR_CURRENT_LIMIT_ENABLED = true;
-                    ));// the pid values are not correct, nor are the limits
+                    )); // the pid values are not correct, nor are the limits
     }
 
     public static final class Agitator {
@@ -206,7 +228,7 @@ public final class Constants {
     }
 
     public static final class Intake {
-        public static final int EncoderChannel = 0;
+        public static final int EncoderChannel = 48;
 
         public static final double Roller_INERTIA = 0.001;
         public static final double Roller_GEAR_RATIO = 1.0;
