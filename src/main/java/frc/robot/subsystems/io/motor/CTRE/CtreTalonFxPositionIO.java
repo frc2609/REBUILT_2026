@@ -29,9 +29,9 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         this.encoderRatio = encoderRatio;
     }
 
-  @Override
-  public void setTargetPositionDegrees(double degrees) {
-    double targetRotations = Conversions.degreesToRotations(degrees,gearRatio);
+    @Override
+    public void setTargetPositionDegrees(double degrees) {
+        double targetRotations = Conversions.degreesToRotations(degrees,gearRatio);
 
         if (forwardLimitEnabled) {
             targetRotations = Math.min(targetRotations, forwardLimitRotations);
@@ -40,18 +40,18 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
             targetRotations = Math.max(targetRotations, reverseLimitRotations);
         }
 
-    // Keep a vendor-agnostic setpoint for consistent "at position" semantics across
-    // implementations.
-    targetDegrees = Conversions.rotationsToDegrees(targetRotations, gearRatio);
+        // Keep a vendor-agnostic setpoint for consistent "at position" semantics across
+        // implementations.
+        targetDegrees = Conversions.rotationsToDegrees(targetRotations, gearRatio);
 
         control = control.withPosition(targetRotations);
         motor.setControl(control);
     }
 
-  @Override
-  public double getPositionDegrees() {
-    return Conversions.rotationsToDegrees(motor.getPosition().getValueAsDouble(),gearRatio);
-  }
+    @Override
+    public double getPositionDegrees() {
+        return Conversions.rotationsToDegrees(motor.getPosition().getValueAsDouble(),gearRatio);
+    }
 
     @Override
     public boolean isAtPosition(double toleranceDegrees) {
@@ -62,25 +62,21 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
 
     @Override
     public void resetToAbsolute(double absolutePositionRotations) {
-        double offset = absolutePositionRotations;
-        if (offset > 0.5) {
-            offset -= 1.0;
-        }
-        offset *= encoderRatio;
-
+        double offset = absolutePositionRotations * encoderRatio;
         motor.setPosition(offset);
+        targetDegrees = getPositionDegrees();
+
         // if (hasFollower) {
         //     followerMotor.setPosition(offset);
         // }
-        targetDegrees = getPositionDegrees();
     }
 
-  @Override
-  public void stop() {
-    motor.stopMotor();
-    if (hasFollower) {
-      followerMotor.stopMotor();
+    @Override
+    public void stop() {
+        motor.stopMotor();
+        if (hasFollower) {
+            followerMotor.stopMotor();
+        }
+        targetDegrees = getPositionDegrees();
     }
-    targetDegrees = getPositionDegrees();
-  }
 }

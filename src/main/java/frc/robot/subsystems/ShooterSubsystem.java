@@ -7,43 +7,60 @@ import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 
 /** Shooter Subsystem using velocity control (rotations per second). */
 public class ShooterSubsystem extends SubsystemBase {
-    private final VelocityMotorIO shooterMotor;
-    private final PositionMotorIO turretpositionMotor;
-    private final PositionMotorIO hoodPositionMotor;
-    private final AbsEncoderIO turretEncoder;
+    private final VelocityMotorIO flywheelMotor;
+    private final VelocityMotorIO feedMotor;
+    private final PositionMotorIO aimMotor;
+    private final PositionMotorIO hoodMotor;
+    private final AbsEncoderIO aimEncoder;
 
 
     public ShooterSubsystem(
-        VelocityMotorIO shooterMotor, PositionMotorIO turretpositionMotor, 
-        PositionMotorIO hoodPositionMotor, AbsEncoderIO turrretEncoder
-        ) {
-        this.shooterMotor = shooterMotor;
-        this.turretpositionMotor = turretpositionMotor;
-        this.hoodPositionMotor = hoodPositionMotor;
-        this.turretEncoder = turrretEncoder;
+        VelocityMotorIO flywheelMotor, VelocityMotorIO feedMotor, 
+        PositionMotorIO aimMotor, PositionMotorIO hoodMotor, 
+        AbsEncoderIO aimEncoder
+    ) {
+        this.flywheelMotor = flywheelMotor;
+        this.feedMotor = feedMotor;
+        this.aimMotor = aimMotor;
+        this.hoodMotor = hoodMotor;
+        this.aimEncoder = aimEncoder;
     }
 
-    public void setSpeed(double rotationsPerSecond) {
-        shooterMotor.setVelocityRps(rotationsPerSecond);
+    public void setFlywheelSpeed(double rotationsPerSecond) {
+        flywheelMotor.setVelocityRps(rotationsPerSecond);
     }
 
-    public boolean isAtSpeed(double tolerance) {
-        return shooterMotor.isAtSpeed(tolerance);
+    public boolean flywheelIsAtSpeed(double tolerance) {
+        return flywheelMotor.isAtSpeed(tolerance);
+    }
+
+    public void setFeedSpeed(double rotationsPerSecond) {
+        feedMotor.setVelocityRps(rotationsPerSecond);
+    }
+
+    public boolean feedIsAtSpeed(double tolerance) {
+        return feedMotor.isAtSpeed(tolerance);
     }
 
     public boolean isReady() {
-        return isAtSpeed(2.0);
+        return flywheelIsAtSpeed(2.0);
+    }
+
+    public void setAimPosition(double degrees) {
+        aimMotor.setTargetPositionDegrees(degrees);
+    }
+
+    public void resetAimPositionToAbsolute() {
+        aimMotor.resetToAbsolute(aimEncoder.getRotations());
+    }
+
+    public boolean aimIsAtPosition(double toleranceDegrees) {
+        return aimMotor.isAtPosition(toleranceDegrees);
     }
 
     public void stop() {
-        shooterMotor.stop();
-    }
-
-    // public void setturretPosition(double degrees){
-    //   turretEncoder.;
-    // }
-
-    public boolean turretisAtPosition(double toleranceDegrees) {
-        return turretpositionMotor.isAtPosition(toleranceDegrees);
+        aimMotor.stop();
+        hoodMotor.stop();
+        flywheelMotor.stop();
     }
 }

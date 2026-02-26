@@ -16,7 +16,7 @@ public class HoldShooterSpeed extends Command {
 
   @Override
   public void execute() {
-    shooter.setSpeed(rps);
+    shooter.setFlywheelSpeed(rps);
   }
 
   @Override

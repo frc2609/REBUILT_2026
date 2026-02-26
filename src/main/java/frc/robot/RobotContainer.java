@@ -7,13 +7,10 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.Climber;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldAgitatorSpeed;
 import frc.robot.commands.HoldIntakeSpeed;
@@ -23,7 +20,6 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -47,9 +43,9 @@ public class RobotContainer {
     private final ShooterSubsystem shooterSubsystem = robotFactory.getShooterSubsystem();
     private final IntakeSubsystem intakeSubsystem = robotFactory.getIntakeSubsystem();
     private final DriveSubsystem driveSubsystem = robotFactory.getDriveSubsystem();
-    private final VisionSubsystem visionSubsystem = robotFactory.getVisionSubsystem();
     private final AgitatorSubsystem agitatorSubsystem = robotFactory.getAgitatorSubsystem();
     private final ClimberSubsystem climberSubsystem = robotFactory.getClimberSubsystem();
+    // private final VisionSubsystem visionSubsystem = robotFactory.getVisionSubsystem();
 
     private final Command holdShooterCommand =
         new HoldShooterSpeed(shooterSubsystem, Constants.Controls.SHOOTER_HOLD_RPS);
@@ -67,7 +63,11 @@ public class RobotContainer {
     /** Robot-wide init hook (called from {@link Robot#robotInit()}). */
     public void robotInit() {
         // Avoid syncing absolute encoders during construction; do it at a predictable time during boot.
-        // armSubsystem.resetPositionToAbsolute();
+        climberSubsystem.resetPositionToAbsolute();
+        intakeSubsystem.resetDeployPositionToAbsolute();
+        shooterSubsystem.resetAimPositionToAbsolute();
+
+        //intakeSubsystem.setDeployPosition(Constants.Controls.INTAKE_DEPLOYED_ROTATIONS);
     }
 
     private void configureBindings() {

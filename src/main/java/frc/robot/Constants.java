@@ -105,6 +105,9 @@ public final class Constants {
         public static final double AGITATOR_HOLD_RPS = 8.0;
         public static final double FEED_HOLD_RPS = 16.0;    // 1000RPM
 
+        public static final double INTAKE_DEPLOYED_ROTATIONS = 1.0;
+        public static final double INTAKE_RETRACT_ROTATIONS = 0.0;
+
         private Controls() {}
     }
 
@@ -141,6 +144,12 @@ public final class Constants {
     public static final class Shooter {
         public static final int EncoderChannel = 49;
 
+        public static final class Feed {
+            public static final double INERTIA = 0.01;
+            public static final double GEAR_RATIO = 1.0;
+            public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
+        }
+
         public static final class Flywheel {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 1.0;
@@ -161,7 +170,14 @@ public final class Constants {
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
         }
 
-        
+        public static final Map<String, Object> feedConfig = new HashMap<>(Map.of(
+            "motorId", 16,
+            "kP", 0.04,
+            "kI", 0.0,
+            "kD", 0.0,
+            "kV", 0.0097,
+            "inverted", false
+        ));
 
         public static final Map<String, Object> flywheelConfig = new HashMap<>(Map.of(
             "motorId", 50,
@@ -217,7 +233,7 @@ public final class Constants {
         public static final double GEAR_RATIO = 1.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 
-        public static final Map<String, Object> Config = new HashMap<>(Map.of(
+        public static final Map<String, Object> config = new HashMap<>(Map.of(
             "motorId", 43,
             "kP", 0.04,
             "kI", 0.0,
@@ -239,7 +255,7 @@ public final class Constants {
         public static final double Deploy_ENCODER_RATIO = 1.0;
         public static final SimMotor Deploy_SIM_MOTOR = SimMotor.KRAKEN_X60;
 
-        public static final Map<String, Object> RollerConfig = new HashMap<>(Map.of(
+        public static final Map<String, Object> rollerConfig = new HashMap<>(Map.of(
             "motorId", 47,
             "kP", 0.04,
             "kI", 0.0,
@@ -248,7 +264,7 @@ public final class Constants {
             "inverted", false
         ));
         // NOTE: Cuts off at 10 key-value pairs
-        public static final Map<String, Object> DeployConfig = new HashMap<>(Map.of(
+        public static final Map<String, Object> deployConfig = new HashMap<>(Map.of(
             "motorId",46,
             "kP",0.0,
             "kI",0.0,
@@ -261,7 +277,7 @@ public final class Constants {
             "reverseLimitRotations",100.0
         ));
         static {
-            DeployConfig.put("inverted", false);
+            deployConfig.put("inverted", false);
             // public static final double SUPPLY_CURRENT_LIMIT = 60.0;
             // public static final boolean SUPPLY_CURRENT_LIMIT_ENABLED = true;
             // public static final double STATOR_CURRENT_LIMIT = 80.0;

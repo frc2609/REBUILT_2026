@@ -46,7 +46,8 @@ public class RobotFactory {
             driveSubsystem::addVisionMeasurement, buildVisionIO()
         );
         shooterSubsystem = new ShooterSubsystem(
-            buildShooterFlywheelIO(), buildShooterAimIO(), buildShooterHoodIO(), buildShooterEncoderIO()
+            buildShooterFeedIO(), buildShooterFlywheelIO(), buildShooterAimIO(), 
+            buildShooterHoodIO(), buildShooterEncoderIO()
         );
         intakeSubsystem = new IntakeSubsystem(
             buildIntakeEncoderIO(), buildIntakeDeployIO(), buildIntakeRollerIO()
@@ -103,7 +104,7 @@ public class RobotFactory {
     private VelocityMotorIO buildAgitatorIO() {
         if (currentMode == Mode.SIM) {
             return new SimVelocityMotorIO(
-                Constants.Agitator.Config,
+                Constants.Agitator.config,
                 Constants.Agitator.INERTIA,
                 Constants.Agitator.GEAR_RATIO,
                 Constants.Agitator.SIM_MOTOR, 
@@ -112,7 +113,7 @@ public class RobotFactory {
 
         switch (Constants.AGITATOR_VELOCITY_MOTOR_TYPE) {
         case CTRE_TALON_FX:
-            return new CtreTalonFxVelocityIO(Constants.Agitator.Config);
+            return new CtreTalonFxVelocityIO(Constants.Agitator.config);
         default:
             throw new IllegalStateException("Unsupported agitator motor type");
         }
@@ -123,6 +124,26 @@ public class RobotFactory {
     public ShooterSubsystem getShooterSubsystem() {
         return shooterSubsystem;
     }
+
+    private VelocityMotorIO buildShooterFeedIO() {
+        if (currentMode == Mode.SIM) {
+            return new SimVelocityMotorIO(
+                Constants.Shooter.feedConfig,
+                Constants.Shooter.Feed.INERTIA,
+                Constants.Shooter.Feed.GEAR_RATIO,
+                Constants.Shooter.Feed.SIM_MOTOR, 
+                Constants.SIM_DELTA
+            );
+        }
+
+        switch (Constants.SHOOTER_VELOCITY_MOTOR_TYPE) {
+            case CTRE_TALON_FX:
+                return new CtreTalonFxVelocityIO(Constants.Shooter.feedConfig);
+            default:
+                throw new IllegalStateException("Unsupported shooter motor type");
+        }
+    }
+
 
     private VelocityMotorIO buildShooterFlywheelIO() {
         if (currentMode == Mode.SIM) {
@@ -160,7 +181,7 @@ public class RobotFactory {
                     Constants.Shooter.Aim.GEAR_RATIO,
                     Constants.Shooter.Aim.ENCODER_RATIO);
             default:
-                throw new IllegalStateException("Unsupported intake deploy motor type");
+                throw new IllegalStateException("Unsupported shooter motor type");
         }
     }
 
@@ -181,7 +202,7 @@ public class RobotFactory {
                     Constants.Shooter.Hood.GEAR_RATIO,
                     Constants.Shooter.Hood.ENCODER_RATIO);
             default:
-                throw new IllegalStateException("Unsupported intake deploy motor type");
+                throw new IllegalStateException("Unsupported shooter motor type");
         }
     }
 
@@ -210,7 +231,7 @@ public class RobotFactory {
     private PositionMotorIO buildIntakeDeployIO() {
         if (currentMode == Mode.SIM) {
             return new SimPositionMotorIO(
-                Constants.Intake.DeployConfig,
+                Constants.Intake.deployConfig,
                 Constants.Intake.Deploy_INERTIA,
                 Constants.Intake.Deploy_GEAR_RATIO,
                 Constants.Intake.Deploy_ENCODER_RATIO, 
@@ -220,7 +241,7 @@ public class RobotFactory {
         switch (Constants.INTAKE_DEPLOY_POSITION_MOTOR_TYPE) {
         case CTRE_TALON_FX:
             return new CtreTalonFxPositionIO(
-                Constants.Intake.DeployConfig,
+                Constants.Intake.deployConfig,
                 Constants.Intake.Deploy_GEAR_RATIO,
                 Constants.Intake.Deploy_ENCODER_RATIO);
         default:
@@ -231,7 +252,7 @@ public class RobotFactory {
     private VelocityMotorIO buildIntakeRollerIO() {
         if (currentMode == Mode.SIM) {
             return new SimVelocityMotorIO(
-                Constants.Intake.RollerConfig,
+                Constants.Intake.rollerConfig,
                 Constants.Intake.Roller_INERTIA,
                 Constants.Intake.Roller_GEAR_RATIO,
                 Constants.Intake.Roller_SIM_MOTOR, 
@@ -240,7 +261,7 @@ public class RobotFactory {
         }
         switch (Constants.INTAKE_ROLLER_VELOCITY_MOTOR_TYPE) {
         case CTRE_TALON_FX:
-            return new CtreTalonFxVelocityIO(Constants.Intake.RollerConfig);
+            return new CtreTalonFxVelocityIO(Constants.Intake.rollerConfig);
         default:
             throw new IllegalStateException("Unsupported intake roller motor type");
         }
