@@ -1,27 +1,27 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.FeedSubsystem;
+import frc.robot.subsystems.FlywheelSubsystem;
 
 /** Holds the shooter at a requested speed (RPS) while scheduled. */
-public class HoldAgitatorSpeed extends Command {
-    private final FeedSubsystem feedSubsystem;
+public class HoldFlywheelSpeed extends Command {
+    private final FlywheelSubsystem flywheel;
     private final double rps;
 
-    public HoldAgitatorSpeed(FeedSubsystem feedSubsystem, double rps) {
-        this.feedSubsystem = feedSubsystem;
+    public HoldFlywheelSpeed(FlywheelSubsystem flywheel, double rps) {
+        this.flywheel = flywheel;
         this.rps = rps;
-        addRequirements(feedSubsystem);
+        addRequirements(flywheel);
     }
 
     @Override
     public void execute() {
-        feedSubsystem.setAgitatorSpeed(rps);
+        flywheel.setSpeed(rps);
     }
 
     @Override
     public void end(boolean interrupted) {
-        feedSubsystem.stop();
+        flywheel.stop();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.io.motor.Sim;
+package frc.robot.subsystems.io.motor.CTRE.Sim;
 
 import java.util.Map;
 
@@ -11,8 +11,6 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
 import frc.robot.Constants.SimMotor;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxVelocityIO;
 
@@ -21,6 +19,7 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
     private DCMotor gearbox;
     private TalonFXSimState talonFXSim;
     private Notifier simNotifier;
+    private double motorVoltage;
 
     private double kGearRatio;
     private double kSimDelta;
@@ -65,7 +64,7 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
 
     public void updateSim() {
         talonFXSim.setSupplyVoltage(RobotController.getBatteryVoltage());
-        var motorVoltage = talonFXSim.getMotorVoltage();
+        motorVoltage = talonFXSim.getMotorVoltage();
 
         // use the motor voltage to calculate new position and velocity
         // using WPILib's DCMotorSim class for physics simulation
@@ -77,23 +76,18 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
         // DCMotorSim returns mechanism position/velocity (after gear ratio)
         talonFXSim.setRawRotorPosition(motorSim.getAngularPosition().times(kGearRatio));
         talonFXSim.setRotorVelocity(motorSim.getAngularVelocity().times(kGearRatio));
-
-        logSim(motorId);
-
-        // Do not simulate the follower seperately
-        if (hasFollower) { logSim(followerId); }
-    }
-
-    public void logSim(int id)
-    {
-        SmartDashboard.putNumber(Constants.MotorNames.get(id) + "/Setpoint (RPM)", super.setpointRps * 60.0);
-        SmartDashboard.putNumber(Constants.MotorNames.get(id) + "/PIDOutput (V)", talonFXSim.getMotorVoltage());
-        SmartDashboard.putNumber(Constants.MotorNames.get(id) + "/Measure (RPM)", motorSim.getAngularVelocityRPM());
     }
 
     @Override
     public double getVelocityRps() {
         return motorSim.getAngularVelocityRPM() / 60.0;
+    }
+
+    @Override
+    public void logMotorPID() {
+        measuredLogged.set(getVelocityRps()*60.0);
+        setpointLogged.set(setpointRps*60.0);
+        voltageLogged.set(talonFXSim.getMotorVoltage());
     }
 
     @Override

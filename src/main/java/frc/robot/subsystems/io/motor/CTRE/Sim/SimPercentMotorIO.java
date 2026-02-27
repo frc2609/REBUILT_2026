@@ -1,4 +1,4 @@
-package frc.robot.subsystems.io.motor.Sim;
+package frc.robot.subsystems.io.motor.CTRE.Sim;
 
 import frc.robot.subsystems.io.motor.PercentMotorIO;
 

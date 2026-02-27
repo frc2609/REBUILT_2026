@@ -1,6 +1,7 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import java.util.Map;
 import frc.robot.util.Conversions;
@@ -66,9 +67,16 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         motor.setPosition(offset);
         targetDegrees = getPositionDegrees();
 
-        // if (hasFollower) {
-        //     followerMotor.setPosition(offset);
-        // }
+        if (hasFollower) {
+            followerMotor.setPosition(offset);
+        }
+    }
+
+    @Override
+    public void logMotorPID() {
+        measuredLogged.set(getPositionDegrees());
+        setpointLogged.set(targetDegrees);
+        voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
     }
 
     @Override
