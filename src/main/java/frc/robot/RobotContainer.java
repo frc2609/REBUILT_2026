@@ -14,11 +14,12 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.HoldAgitatorSpeed;
 import frc.robot.commands.HoldIntakeSpeed;
-import frc.robot.commands.HoldShooterSpeed;
-import frc.robot.subsystems.AgitatorSubsystem;
+import frc.robot.commands.HoldFlywheelSpeed;
+import frc.robot.subsystems.FeedSubsystem;
+import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 
 /**
@@ -40,15 +41,16 @@ public class RobotContainer {
     // private final LoggedDashboardChooser<Command> autoChooser;
 
     private final RobotFactory robotFactory = new RobotFactory();
-    private final ShooterSubsystem shooterSubsystem = robotFactory.getShooterSubsystem();
+    private final TurretSubsystem turretSubsystem = robotFactory.getTurretSubsystem();
+    private final FlywheelSubsystem flywheelSubsystem = robotFactory.getFlywheelSubsystem();
     private final IntakeSubsystem intakeSubsystem = robotFactory.getIntakeSubsystem();
     private final DriveSubsystem driveSubsystem = robotFactory.getDriveSubsystem();
-    private final AgitatorSubsystem agitatorSubsystem = robotFactory.getAgitatorSubsystem();
+    private final FeedSubsystem agitatorSubsystem = robotFactory.getFeedSubsystem();
     private final ClimberSubsystem climberSubsystem = robotFactory.getClimberSubsystem();
     // private final VisionSubsystem visionSubsystem = robotFactory.getVisionSubsystem();
 
     private final Command holdShooterCommand =
-        new HoldShooterSpeed(shooterSubsystem, Constants.Controls.SHOOTER_HOLD_RPS);
+        new HoldFlywheelSpeed(flywheelSubsystem, Constants.Controls.SHOOTER_HOLD_RPS);
 
     private final Command holdIntakeCommand = 
         new HoldIntakeSpeed(intakeSubsystem, Constants.Controls.INTAKE_HOLD_RPS);
@@ -65,9 +67,9 @@ public class RobotContainer {
         // Avoid syncing absolute encoders during construction; do it at a predictable time during boot.
         climberSubsystem.resetPositionToAbsolute();
         intakeSubsystem.resetDeployPositionToAbsolute();
-        shooterSubsystem.resetAimPositionToAbsolute();
+        turretSubsystem.resetAimPositionToAbsolute();
 
-        intakeSubsystem.setDeployPosition(Constants.Controls.INTAKE_DEPLOYED_ROTATIONS);
+        //intakeSubsystem.setDeployPosition(Constants.Controls.INTAKE_DEPLOYED_ROTATIONS);
     }
 
     private void configureBindings() {

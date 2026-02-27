@@ -1,4 +1,4 @@
-package frc.robot.subsystems.io.motor.Sim;
+package frc.robot.subsystems.io.motor.CTRE.Sim;
 
 import java.util.Map;
 
@@ -14,9 +14,9 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Constants.SimMotor;
-import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxVelocityIO;
+import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
 
-public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
+public class SimPositionMotorIO extends CtreTalonFxPositionIO {
     private DCMotorSim motorSim;
     private DCMotor gearbox;
     private TalonFXSimState talonFXSim;
@@ -26,11 +26,11 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
     private double kGearRatio;
     private double kSimDelta;
 
-    public SimVelocityMotorIO(
-        Map<String, Object> cfg, double inertia, double gearRatio,  
+    public SimPositionMotorIO(
+        Map<String, Object> cfg, double inertia, double gearRatio, double encoderRatio, 
         SimMotor simMotor, double simDelta
     ) {
-        super(cfg); // create the motor from CTRE implementation
+        super(cfg, gearRatio, encoderRatio); // create the motor from CTRE implementation
 
         kGearRatio = gearRatio;
         kSimDelta = simDelta;
@@ -54,7 +54,7 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
             gearbox
         );
 
-        talonFXSim = super.motor.getSimState();
+        talonFXSim = motor.getSimState();
         talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
         talonFXSim.setMotorType(controllerType);
 
@@ -81,19 +81,19 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
     }
 
     @Override
-    public double getVelocityRps() {
-        return motorSim.getAngularVelocityRPM() / 60.0;
+    public double getPositionDegrees() {
+        return motorSim.getAngularPositionRad() * (180.0 / Math.PI);
     }
 
     @Override
     public void logMotorPID() {
-        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Measure (deg)", getVelocityRps());
-        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Setpoint (deg)", setpointRps);
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Measure (deg)", getPositionDegrees());
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Setpoint (deg)", targetDegrees);
         SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/PIDOutput (V)", motorVoltage);
     }
 
     @Override
     public void stop() {
-        setVelocityRps(0.0);
+        // No-op for simple sim.
     }
 }
