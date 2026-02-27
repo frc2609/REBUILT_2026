@@ -29,4 +29,11 @@ public class ClimberSubsystem extends SubsystemBase {
     public void stop() {
         climberMotor.stop();
     }
+
+    @Override
+    public void periodic()
+    {
+        climberMotor.logMotorPID();
+        climberMotor.updateFromTunables();
+    }
 }

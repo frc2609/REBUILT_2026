@@ -11,8 +11,6 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
 import frc.robot.Constants.SimMotor;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
 
@@ -87,9 +85,9 @@ public class SimPositionMotorIO extends CtreTalonFxPositionIO {
 
     @Override
     public void logMotorPID() {
-        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Measure (deg)", getPositionDegrees());
-        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Setpoint (deg)", targetDegrees);
-        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/PIDOutput (V)", motorVoltage);
+        measuredLogged.set(getPositionDegrees());
+        setpointLogged.set(targetDegrees);
+        voltageLogged.set(talonFXSim.getMotorVoltage());
     }
 
     @Override

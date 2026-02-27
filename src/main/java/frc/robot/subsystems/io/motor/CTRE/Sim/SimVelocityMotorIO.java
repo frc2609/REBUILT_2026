@@ -11,8 +11,6 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants;
 import frc.robot.Constants.SimMotor;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxVelocityIO;
 
@@ -87,9 +85,9 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
 
     @Override
     public void logMotorPID() {
-        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Measure (deg)", getVelocityRps());
-        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Setpoint (deg)", setpointRps);
-        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/PIDOutput (V)", motorVoltage);
+        measuredLogged.set(getVelocityRps()*60.0);
+        setpointLogged.set(setpointRps*60.0);
+        voltageLogged.set(talonFXSim.getMotorVoltage());
     }
 
     @Override

@@ -47,4 +47,14 @@ public class TurretSubsystem extends SubsystemBase {
         aimMotor.stop();
         hoodMotor.stop();
     }
+    
+    @Override
+    public void periodic()
+    {
+        aimMotor.logMotorPID();
+        hoodMotor.logMotorPID();
+
+        aimMotor.updateFromTunables();
+        hoodMotor.updateFromTunables();
+    }
 }

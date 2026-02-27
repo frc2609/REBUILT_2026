@@ -33,4 +33,14 @@ public class FeedSubsystem extends SubsystemBase {
         agitatorMotor.stop();
         feedMotor.stop();
     }
+
+    @Override
+    public void periodic()
+    {
+        agitatorMotor.logMotorPID();
+        feedMotor.logMotorPID();
+
+        agitatorMotor.updateFromTunables();
+        feedMotor.updateFromTunables();
+    }
 }

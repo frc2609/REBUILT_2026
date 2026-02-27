@@ -24,4 +24,11 @@ public class FlywheelSubsystem extends SubsystemBase {
     public void stop() {
         flywheelMotor.stop();
     }
+
+    @Override
+    public void periodic()
+    {
+        flywheelMotor.logMotorPID();
+        flywheelMotor.updateFromTunables();
+    }
 }

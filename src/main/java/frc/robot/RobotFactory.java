@@ -60,7 +60,7 @@ public class RobotFactory {
             buildClimberEncoderIO(), buildClimberMotorIO()
         );
         feedSubsystem = new FeedSubsystem(
-            buildFeedIO(), buildAgitatorIO()
+            buildAgitatorIO(), buildFeedIO()
         );
     }
 
@@ -81,7 +81,7 @@ public class RobotFactory {
     private PositionMotorIO buildClimberMotorIO() {
         if (currentMode == Mode.SIM) {
             return new SimPositionMotorIO(
-                Constants.Climber.Config,
+                Constants.Climber.config,
                 Constants.Climber.INERTIA,
                 Constants.Climber.GEAR_RATIO,
                 Constants.Climber.ENCODER_RATIO, 
@@ -91,7 +91,7 @@ public class RobotFactory {
         switch (Constants.CLIMBER_POSITION_MOTOR_TYPE) {
             case CTRE_TALON_FX:
                 return new CtreTalonFxPositionIO(
-                    Constants.Climber.Config,
+                    Constants.Climber.config,
                     Constants.Climber.GEAR_RATIO,
                     Constants.Climber.ENCODER_RATIO);
             default:
@@ -134,7 +134,7 @@ public class RobotFactory {
             );
         }
 
-        switch (Constants.FLYWHEEL_VELOCITY_MOTOR_TYPE) {
+        switch (Constants.FEED_VELOCITY_MOTOR_TYPE) {
             case CTRE_TALON_FX:
                 return new CtreTalonFxVelocityIO(Constants.Feed.config);
             default:
@@ -184,7 +184,7 @@ public class RobotFactory {
                 Constants.Turret.Aim.SIM_MOTOR, 
                 Constants.SIM_DELTA);
         }
-        switch (Constants.CLIMBER_POSITION_MOTOR_TYPE) {
+        switch (Constants.TURRET_AIM_POSITION_MOTOR_TYPE) {
             case CTRE_TALON_FX:
                 return new CtreTalonFxPositionIO(
                     Constants.Turret.Aim.config,
@@ -205,7 +205,7 @@ public class RobotFactory {
                 Constants.Turret.Hood.SIM_MOTOR, 
                 Constants.SIM_DELTA);
         }
-        switch (Constants.CLIMBER_POSITION_MOTOR_TYPE) {
+        switch (Constants.TURRET_HOOD_POSITION_MOTOR_TYPE) {
             case CTRE_TALON_FX:
                 return new CtreTalonFxPositionIO(
                     Constants.Turret.Hood.config,
