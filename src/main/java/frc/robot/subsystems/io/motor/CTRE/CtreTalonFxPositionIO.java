@@ -1,6 +1,9 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import java.util.Map;
 import frc.robot.util.Conversions;
@@ -69,6 +72,13 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         // if (hasFollower) {
         //     followerMotor.setPosition(offset);
         // }
+    }
+
+    @Override
+    public void logMotorPID() {
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Measure (deg)", getPositionDegrees());
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Setpoint (deg)", targetDegrees);
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/PIDOutput (V)", motor.getMotorVoltage().getValueAsDouble());
     }
 
     @Override

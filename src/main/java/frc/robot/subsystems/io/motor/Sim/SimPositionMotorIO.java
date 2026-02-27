@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.Constants.SimMotor;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
 
@@ -20,6 +21,7 @@ public class SimPositionMotorIO extends CtreTalonFxPositionIO {
     private DCMotor gearbox;
     private TalonFXSimState talonFXSim;
     private Notifier simNotifier;
+    private double motorVoltage;
 
     private double kGearRatio;
     private double kSimDelta;
@@ -29,20 +31,32 @@ public class SimPositionMotorIO extends CtreTalonFxPositionIO {
         SimMotor simMotor, double simDelta
     ) {
         super(cfg, gearRatio, encoderRatio); // create the motor from CTRE implementation
+
         kGearRatio = gearRatio;
-        kSimDelta = simDelta;   
+        kSimDelta = simDelta;
+        MotorType controllerType;
 
-        gearbox = DCMotor.getKrakenX60Foc(1); // NOTE: currently this is tailored to Kraken X60s
-        motorSim =
-            new DCMotorSim(LinearSystemId.createDCMotorSystem(gearbox, inertia, gearRatio), gearbox);
+        switch (simMotor) {
+            case KRAKEN_X60:
+                gearbox = DCMotor.getKrakenX60Foc(1);
+                controllerType = MotorType.KrakenX60;
+                break;
+            case KRAKEN_X44:
+                gearbox = DCMotor.getKrakenX44Foc(1);
+                controllerType = MotorType.KrakenX44;
+                break;
+            default:
+                throw new Error("Unknown Sim Motor Type id="+motorId);
+        }
+        
+        motorSim = new DCMotorSim(
+            LinearSystemId.createDCMotorSystem(gearbox, inertia, gearRatio), 
+            gearbox
+        );
 
-        talonFXSim = super.motor.getSimState();
+        talonFXSim = motor.getSimState();
         talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
-        talonFXSim.setMotorType((
-            simMotor == SimMotor.KRAKEN_X60
-                ? MotorType.KrakenX60
-                : MotorType.KrakenX44
-        ));
+        talonFXSim.setMotorType(controllerType);
 
         simNotifier = new Notifier(this::updateSim);
         simNotifier.startPeriodic(kSimDelta);
@@ -52,7 +66,7 @@ public class SimPositionMotorIO extends CtreTalonFxPositionIO {
 
     public void updateSim() {
         talonFXSim.setSupplyVoltage(RobotController.getBatteryVoltage());
-        var motorVoltage = talonFXSim.getMotorVoltage();
+        motorVoltage = talonFXSim.getMotorVoltage();
 
         // use the motor voltage to calculate new position and velocity
         // using WPILib's DCMotorSim class for physics simulation
@@ -64,15 +78,18 @@ public class SimPositionMotorIO extends CtreTalonFxPositionIO {
         // DCMotorSim returns mechanism position/velocity (after gear ratio)
         talonFXSim.setRawRotorPosition(motorSim.getAngularPosition().times(kGearRatio));
         talonFXSim.setRotorVelocity(motorSim.getAngularVelocity().times(kGearRatio));
-
-        SmartDashboard.putNumber("Position/" + motorId + " Measure (deg)", getPositionDegrees());
-        SmartDashboard.putNumber("Position/" + motorId + " Setpoint (deg)", super.targetDegrees);
-        SmartDashboard.putNumber("Position/" + motorId + " PIDOutput (V)", motorVoltage);
     }
 
     @Override
     public double getPositionDegrees() {
         return motorSim.getAngularPositionRad() * (180.0 / Math.PI);
+    }
+
+    @Override
+    public void logMotorPID() {
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Measure (deg)", getPositionDegrees());
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Setpoint (deg)", targetDegrees);
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/PIDOutput (V)", motorVoltage);
     }
 
     @Override

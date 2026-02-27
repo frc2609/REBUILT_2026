@@ -1,6 +1,9 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
 import java.util.Map;
 
@@ -31,6 +34,13 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
     @Override
     public boolean isAtSpeed(double toleranceRps) {
         return Math.abs(setpointRps - getVelocityRps()) <= toleranceRps;
+    }
+
+    @Override
+    public void logMotorPID() {
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Measure (RPM)", getVelocityRps()*60.0);
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Setpoint (RPM)", setpointRps*60.0);
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/PIDOutput (V)", motor.getMotorVoltage().getValueAsDouble());
     }
 
     @Override

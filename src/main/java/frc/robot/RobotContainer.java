@@ -67,7 +67,7 @@ public class RobotContainer {
         intakeSubsystem.resetDeployPositionToAbsolute();
         shooterSubsystem.resetAimPositionToAbsolute();
 
-        //intakeSubsystem.setDeployPosition(Constants.Controls.INTAKE_DEPLOYED_ROTATIONS);
+        intakeSubsystem.setDeployPosition(Constants.Controls.INTAKE_DEPLOYED_ROTATIONS);
     }
 
     private void configureBindings() {

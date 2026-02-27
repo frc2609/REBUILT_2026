@@ -21,6 +21,7 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
     private DCMotor gearbox;
     private TalonFXSimState talonFXSim;
     private Notifier simNotifier;
+    private double motorVoltage;
 
     private double kGearRatio;
     private double kSimDelta;
@@ -65,7 +66,7 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
 
     public void updateSim() {
         talonFXSim.setSupplyVoltage(RobotController.getBatteryVoltage());
-        var motorVoltage = talonFXSim.getMotorVoltage();
+        motorVoltage = talonFXSim.getMotorVoltage();
 
         // use the motor voltage to calculate new position and velocity
         // using WPILib's DCMotorSim class for physics simulation
@@ -77,23 +78,18 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
         // DCMotorSim returns mechanism position/velocity (after gear ratio)
         talonFXSim.setRawRotorPosition(motorSim.getAngularPosition().times(kGearRatio));
         talonFXSim.setRotorVelocity(motorSim.getAngularVelocity().times(kGearRatio));
-
-        logSim(motorId);
-
-        // Do not simulate the follower seperately
-        if (hasFollower) { logSim(followerId); }
-    }
-
-    public void logSim(int id)
-    {
-        SmartDashboard.putNumber(Constants.MotorNames.get(id) + "/Setpoint (RPM)", super.setpointRps * 60.0);
-        SmartDashboard.putNumber(Constants.MotorNames.get(id) + "/PIDOutput (V)", talonFXSim.getMotorVoltage());
-        SmartDashboard.putNumber(Constants.MotorNames.get(id) + "/Measure (RPM)", motorSim.getAngularVelocityRPM());
     }
 
     @Override
     public double getVelocityRps() {
         return motorSim.getAngularVelocityRPM() / 60.0;
+    }
+
+    @Override
+    public void logMotorPID() {
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Measure (deg)", getVelocityRps());
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/Setpoint (deg)", setpointRps);
+        SmartDashboard.putNumber(Constants.MotorNames.get(motorId) + "/PIDOutput (V)", motorVoltage);
     }
 
     @Override

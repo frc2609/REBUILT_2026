@@ -12,6 +12,8 @@ public interface PositionMotorIO {
 
   void setConfiguration(Map<String, Object> cfg);
 
+  void logMotorPID();
+
   void resetToAbsolute(double absolutePositionRotations);
 
   void stop();

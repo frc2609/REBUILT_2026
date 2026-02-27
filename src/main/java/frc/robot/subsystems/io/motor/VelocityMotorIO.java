@@ -10,6 +10,8 @@ public interface VelocityMotorIO {
 
   void setConfiguration(Map<String, Object> cfg);
 
+  void logMotorPID();
+
   boolean isAtSpeed(double toleranceRps);
 
   void stop();
