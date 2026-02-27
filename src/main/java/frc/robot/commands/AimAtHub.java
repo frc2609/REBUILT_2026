@@ -4,13 +4,13 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 
 public class AimAtHub extends Command {
-    private final TurretSubsystem shooter;
+    private final ShooterSubsystem shooter;
     //private final Pose3d HUB_POSITION;
 
-    public AimAtHub(TurretSubsystem shooter) {
+    public AimAtHub(ShooterSubsystem shooter) {
         this.shooter = shooter;
         // if (DriverStation.getAlliance().get() == Alliance.Red)
         // {

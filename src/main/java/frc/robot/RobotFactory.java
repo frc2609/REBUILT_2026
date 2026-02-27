@@ -2,11 +2,10 @@ package frc.robot;
 
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.FeedSubsystem;
-import frc.robot.subsystems.FlywheelSubsystem;
+import frc.robot.subsystems.AgitatorSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.GyroIO;
@@ -21,19 +20,18 @@ import frc.robot.subsystems.io.motor.PositionMotorIO;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxVelocityIO;
-import frc.robot.subsystems.io.motor.CTRE.Sim.SimPositionMotorIO;
-import frc.robot.subsystems.io.motor.CTRE.Sim.SimVelocityMotorIO;
+import frc.robot.subsystems.io.motor.Sim.SimPositionMotorIO;
+import frc.robot.subsystems.io.motor.Sim.SimVelocityMotorIO;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 
 public class RobotFactory {
-    private final TurretSubsystem turretSubsystem;
-    private final FlywheelSubsystem flywheelSubsystem;
+    private final ShooterSubsystem shooterSubsystem;
     private final IntakeSubsystem intakeSubsystem;
     private final DriveSubsystem driveSubsystem;
     private final VisionSubsystem visionSubsystem;
-    private final FeedSubsystem feedSubsystem;
+    private final AgitatorSubsystem agitatorSubsystem;
     private final ClimberSubsystem climberSubsystem;
 
     private final Mode currentMode;
@@ -47,11 +45,9 @@ public class RobotFactory {
         visionSubsystem = new VisionSubsystem(
             driveSubsystem::addVisionMeasurement, buildVisionIO()
         );
-        turretSubsystem = new TurretSubsystem(
-            buildTurretAimIO(), buildTurretHoodIO(), buildTurretEncoderIO()
-        );
-        flywheelSubsystem = new FlywheelSubsystem(
-            buildFlywheelIO()
+        shooterSubsystem = new ShooterSubsystem(
+            buildShooterFeedIO(), buildShooterFlywheelIO(), buildShooterAimIO(), 
+            buildShooterHoodIO(), buildShooterEncoderIO()
         );
         intakeSubsystem = new IntakeSubsystem(
             buildIntakeEncoderIO(), buildIntakeDeployIO(), buildIntakeRollerIO()
@@ -59,8 +55,8 @@ public class RobotFactory {
         climberSubsystem = new ClimberSubsystem(
             buildClimberEncoderIO(), buildClimberMotorIO()
         );
-        feedSubsystem = new FeedSubsystem(
-            buildAgitatorIO(), buildFeedIO()
+        agitatorSubsystem = new AgitatorSubsystem(
+            buildAgitatorIO()
         );
     }
 
@@ -81,7 +77,7 @@ public class RobotFactory {
     private PositionMotorIO buildClimberMotorIO() {
         if (currentMode == Mode.SIM) {
             return new SimPositionMotorIO(
-                Constants.Climber.config,
+                Constants.Climber.Config,
                 Constants.Climber.INERTIA,
                 Constants.Climber.GEAR_RATIO,
                 Constants.Climber.ENCODER_RATIO, 
@@ -91,7 +87,7 @@ public class RobotFactory {
         switch (Constants.CLIMBER_POSITION_MOTOR_TYPE) {
             case CTRE_TALON_FX:
                 return new CtreTalonFxPositionIO(
-                    Constants.Climber.config,
+                    Constants.Climber.Config,
                     Constants.Climber.GEAR_RATIO,
                     Constants.Climber.ENCODER_RATIO);
             default:
@@ -99,10 +95,10 @@ public class RobotFactory {
         }
     }
 
-    // FEED / AGITATOR
+    // AGITATOR
 
-    public FeedSubsystem getFeedSubsystem() {
-        return this.feedSubsystem;
+    public AgitatorSubsystem getAgitatorSubsystem() {
+        return this.agitatorSubsystem;
     }
 
     private VelocityMotorIO buildAgitatorIO() {
@@ -119,109 +115,103 @@ public class RobotFactory {
         case CTRE_TALON_FX:
             return new CtreTalonFxVelocityIO(Constants.Agitator.config);
         default:
-            throw new IllegalStateException("Unsupported feed motor type");
+            throw new IllegalStateException("Unsupported agitator motor type");
         }
     }
 
-    private VelocityMotorIO buildFeedIO() {
+    // SHOOTER
+
+    public ShooterSubsystem getShooterSubsystem() {
+        return shooterSubsystem;
+    }
+
+    private VelocityMotorIO buildShooterFeedIO() {
         if (currentMode == Mode.SIM) {
             return new SimVelocityMotorIO(
-                Constants.Feed.config,
-                Constants.Feed.INERTIA,
-                Constants.Feed.GEAR_RATIO,
-                Constants.Feed.SIM_MOTOR, 
+                Constants.Shooter.feedConfig,
+                Constants.Shooter.Feed.INERTIA,
+                Constants.Shooter.Feed.GEAR_RATIO,
+                Constants.Shooter.Feed.SIM_MOTOR, 
                 Constants.SIM_DELTA
             );
         }
 
-        switch (Constants.FEED_VELOCITY_MOTOR_TYPE) {
+        switch (Constants.SHOOTER_VELOCITY_MOTOR_TYPE) {
             case CTRE_TALON_FX:
-                return new CtreTalonFxVelocityIO(Constants.Feed.config);
+                return new CtreTalonFxVelocityIO(Constants.Shooter.feedConfig);
             default:
-                throw new IllegalStateException("Unsupported feed motor type");
+                throw new IllegalStateException("Unsupported shooter motor type");
         }
     }
 
-    // FLYWHEEL
 
-    public FlywheelSubsystem getFlywheelSubsystem()
-    {
-        return this.flywheelSubsystem;
-    }
-
-    private VelocityMotorIO buildFlywheelIO() {
+    private VelocityMotorIO buildShooterFlywheelIO() {
         if (currentMode == Mode.SIM) {
             return new SimVelocityMotorIO(
-                Constants.Flywheel.config,
-                Constants.Flywheel.INERTIA,
-                Constants.Flywheel.GEAR_RATIO,
-                Constants.Flywheel.SIM_MOTOR, 
+                Constants.Shooter.flywheelConfig,
+                Constants.Shooter.Flywheel.INERTIA,
+                Constants.Shooter.Flywheel.GEAR_RATIO,
+                Constants.Shooter.Flywheel.SIM_MOTOR, 
                 Constants.SIM_DELTA
             );
         }
 
-        switch (Constants.FLYWHEEL_VELOCITY_MOTOR_TYPE) {
+        switch (Constants.SHOOTER_VELOCITY_MOTOR_TYPE) {
             case CTRE_TALON_FX:
-                return new CtreTalonFxVelocityIO(Constants.Flywheel.config);
+                return new CtreTalonFxVelocityIO(Constants.Shooter.flywheelConfig);
             default:
                 throw new IllegalStateException("Unsupported shooter motor type");
         }
     }
 
-    // TURRET (AIM/HOOD)
-
-    public TurretSubsystem getTurretSubsystem() {
-        return turretSubsystem;
-    }
-
-    private PositionMotorIO buildTurretAimIO() {
+    private PositionMotorIO buildShooterAimIO() {
         if (currentMode == Mode.SIM) {
             return new SimPositionMotorIO(
-                Constants.Turret.Aim.config,
-                Constants.Turret.Aim.INERTIA,
-                Constants.Turret.Aim.GEAR_RATIO,
-                Constants.Turret.Aim.ENCODER_RATIO, 
-                Constants.Turret.Aim.SIM_MOTOR, 
+                Constants.Shooter.aimConfig,
+                Constants.Shooter.Aim.INERTIA,
+                Constants.Shooter.Aim.GEAR_RATIO,
+                Constants.Shooter.Aim.ENCODER_RATIO, 
+                Constants.Shooter.Aim.SIM_MOTOR, 
                 Constants.SIM_DELTA);
         }
-        switch (Constants.TURRET_AIM_POSITION_MOTOR_TYPE) {
+        switch (Constants.CLIMBER_POSITION_MOTOR_TYPE) {
             case CTRE_TALON_FX:
                 return new CtreTalonFxPositionIO(
-                    Constants.Turret.Aim.config,
-                    Constants.Turret.Aim.GEAR_RATIO,
-                    Constants.Turret.Aim.ENCODER_RATIO);
+                    Constants.Shooter.aimConfig,
+                    Constants.Shooter.Aim.GEAR_RATIO,
+                    Constants.Shooter.Aim.ENCODER_RATIO);
             default:
                 throw new IllegalStateException("Unsupported shooter motor type");
         }
     }
 
-    private PositionMotorIO buildTurretHoodIO() {
+    private PositionMotorIO buildShooterHoodIO() {
         if (currentMode == Mode.SIM) {
             return new SimPositionMotorIO(
-                Constants.Turret.Hood.config,
-                Constants.Turret.Hood.INERTIA,
-                Constants.Turret.Hood.GEAR_RATIO,
-                Constants.Turret.Hood.ENCODER_RATIO, 
-                Constants.Turret.Hood.SIM_MOTOR, 
+                Constants.Shooter.hoodConfig,
+                Constants.Shooter.Hood.INERTIA,
+                Constants.Shooter.Hood.GEAR_RATIO,
+                Constants.Shooter.Hood.ENCODER_RATIO, 
+                Constants.Shooter.Hood.SIM_MOTOR, 
                 Constants.SIM_DELTA);
         }
-        switch (Constants.TURRET_HOOD_POSITION_MOTOR_TYPE) {
+        switch (Constants.CLIMBER_POSITION_MOTOR_TYPE) {
             case CTRE_TALON_FX:
                 return new CtreTalonFxPositionIO(
-                    Constants.Turret.Hood.config,
-                    Constants.Turret.Hood.GEAR_RATIO,
-                    Constants.Turret.Hood.ENCODER_RATIO);
+                    Constants.Shooter.hoodConfig,
+                    Constants.Shooter.Hood.GEAR_RATIO,
+                    Constants.Shooter.Hood.ENCODER_RATIO);
             default:
                 throw new IllegalStateException("Unsupported shooter motor type");
         }
     }
 
-    private AbsEncoderIO buildTurretEncoderIO() {
+    private AbsEncoderIO buildShooterEncoderIO() {
         if (currentMode == Mode.SIM) {
             return new SimAbsEncoderIO(0);
         }
 
-        return new WpiDutyCycleEncoderIO(Constants.Turret.EncoderChannel);
+        return new WpiDutyCycleEncoderIO(Constants.Shooter.EncoderChannel);
     }
 
     // INTAKE
@@ -241,19 +231,19 @@ public class RobotFactory {
     private PositionMotorIO buildIntakeDeployIO() {
         if (currentMode == Mode.SIM) {
             return new SimPositionMotorIO(
-                Constants.Intake.Deploy.config,
-                Constants.Intake.Deploy.INERTIA,
-                Constants.Intake.Deploy.GEAR_RATIO,
-                Constants.Intake.Deploy.ENCODER_RATIO, 
-                Constants.Intake.Deploy.SIM_MOTOR, 
+                Constants.Intake.deployConfig,
+                Constants.Intake.Deploy_INERTIA,
+                Constants.Intake.Deploy_GEAR_RATIO,
+                Constants.Intake.Deploy_ENCODER_RATIO, 
+                Constants.Intake.Deploy_SIM_MOTOR, 
                 Constants.SIM_DELTA);
         }
         switch (Constants.INTAKE_DEPLOY_POSITION_MOTOR_TYPE) {
         case CTRE_TALON_FX:
             return new CtreTalonFxPositionIO(
-                Constants.Intake.Deploy.config,
-                Constants.Intake.Deploy.GEAR_RATIO,
-                Constants.Intake.Deploy.ENCODER_RATIO);
+                Constants.Intake.deployConfig,
+                Constants.Intake.Deploy_GEAR_RATIO,
+                Constants.Intake.Deploy_ENCODER_RATIO);
         default:
             throw new IllegalStateException("Unsupported intake deploy motor type");
         }
@@ -262,16 +252,16 @@ public class RobotFactory {
     private VelocityMotorIO buildIntakeRollerIO() {
         if (currentMode == Mode.SIM) {
             return new SimVelocityMotorIO(
-                Constants.Intake.Roller.config,
-                Constants.Intake.Roller.INERTIA,
-                Constants.Intake.Roller.GEAR_RATIO,
-                Constants.Intake.Roller.SIM_MOTOR, 
+                Constants.Intake.rollerConfig,
+                Constants.Intake.Roller_INERTIA,
+                Constants.Intake.Roller_GEAR_RATIO,
+                Constants.Intake.Roller_SIM_MOTOR, 
                 Constants.SIM_DELTA
             );
         }
         switch (Constants.INTAKE_ROLLER_VELOCITY_MOTOR_TYPE) {
         case CTRE_TALON_FX:
-            return new CtreTalonFxVelocityIO(Constants.Intake.Roller.config);
+            return new CtreTalonFxVelocityIO(Constants.Intake.rollerConfig);
         default:
             throw new IllegalStateException("Unsupported intake roller motor type");
         }

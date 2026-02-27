@@ -1,5 +1,7 @@
 package frc.robot.subsystems.io.motor;
 
+import java.util.Map;
+
 /** Hardware-agnostic position control (degrees). */
 public interface PositionMotorIO {
   void setTargetPositionDegrees(double degrees);
@@ -8,9 +10,7 @@ public interface PositionMotorIO {
 
   boolean isAtPosition(double toleranceDegrees);
 
-  void logMotorPID();
-
-  void updateFromTunables();
+  void setConfiguration(Map<String, Object> cfg);
 
   void resetToAbsolute(double absolutePositionRotations);
 

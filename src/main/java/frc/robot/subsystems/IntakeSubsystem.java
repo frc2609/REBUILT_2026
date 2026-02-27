@@ -42,14 +42,4 @@ public class IntakeSubsystem extends SubsystemBase {
     public void stop() {
         driveMotor.stop();
     }
-
-    @Override
-    public void periodic()
-    {
-        deployMotor.logMotorPID();
-        driveMotor.logMotorPID();
-
-        deployMotor.updateFromTunables();
-        driveMotor.updateFromTunables();
-    }
 }

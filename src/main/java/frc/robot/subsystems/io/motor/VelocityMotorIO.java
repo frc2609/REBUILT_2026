@@ -1,16 +1,16 @@
 package frc.robot.subsystems.io.motor;
 
+import java.util.Map;
+
 /** Hardware-agnostic velocity control (rotations per second). */
 public interface VelocityMotorIO {
-    void setVelocityRps(double rotationsPerSecond);
+  void setVelocityRps(double rotationsPerSecond);
 
-    double getVelocityRps();
+  double getVelocityRps();
 
-    void logMotorPID();
+  void setConfiguration(Map<String, Object> cfg);
 
-    void updateFromTunables();
+  boolean isAtSpeed(double toleranceRps);
 
-    boolean isAtSpeed(double toleranceRps);
-
-    void stop();
+  void stop();
 }
