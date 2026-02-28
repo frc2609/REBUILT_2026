@@ -6,6 +6,16 @@ public class SimVelocityMotorIO implements VelocityMotorIO {
   private double targetRotationsPerSecond = 0.0;
 
   @Override
+  public void updateFromTunables() {
+      // Leave this empty for now or add sim-specific tuning logic
+  }
+
+  @Override
+public void logMotorPID() {
+    // This satisfies the VelocityMotorIO interface
+}
+
+  @Override
   public void setVelocityRps(double rotationsPerSecond) {
     this.targetRotationsPerSecond = rotationsPerSecond;
   }

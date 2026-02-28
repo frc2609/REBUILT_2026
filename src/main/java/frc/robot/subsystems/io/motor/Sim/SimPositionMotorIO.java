@@ -13,6 +13,17 @@ public class SimPositionMotorIO implements PositionMotorIO {
   }
 
   @Override
+  public void updateFromTunables() {
+      // This satisfies the PositionMotorIO interface
+  }
+
+  @Override
+  public void logMotorPID() {
+      // This satisfies the VelocityMotorIO interface
+  }
+
+
+  @Override
   public double getPositionDegrees() {
     return positionDegrees;
   }
