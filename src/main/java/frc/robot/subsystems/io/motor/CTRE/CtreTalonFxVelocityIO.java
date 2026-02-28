@@ -1,89 +1,52 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
-import com.ctre.phoenix6.hardware.TalonFX;
-import frc.robot.Constants;
+
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
+import java.util.Map;
 
-public class CtreTalonFxVelocityIO implements VelocityMotorIO {
-  private final TalonFX motor;
-  private VelocityDutyCycle control = new VelocityDutyCycle(0).withSlot(0);
-  private final TalonFX followerMotor;
-  private final boolean hasFollower;
-  private double targetRotationsPerSecond = 0.0;
+public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMotorIO {
 
-  public CtreTalonFxVelocityIO(Constants.CtreTalonFxVelocityConfig cfg, int motorId) {
-    this(cfg, motorId, -1);
-  }
+    private VelocityDutyCycle control;
+    public double setpointRps = 0.0;
 
-  public CtreTalonFxVelocityIO(
-      Constants.CtreTalonFxVelocityConfig cfg, int motorId, int followerId) {
-    TalonFXConfiguration config = toPhoenixConfig(cfg);
-
-    motor = new TalonFX(motorId, Constants.CANBUS);
-    motor.getConfigurator().apply(config);
-    motor.setNeutralMode(toPhoenixNeutralMode(cfg.neutralMode()));
-
-    if (followerId != -1) {
-      followerMotor = new TalonFX(followerId, Constants.CANBUS);
-      followerMotor.getConfigurator().apply(config);
-      followerMotor.setNeutralMode(toPhoenixNeutralMode(cfg.neutralMode()));
-      hasFollower = true;
-    } else {
-      followerMotor = null;
-      hasFollower = false;
+    public CtreTalonFxVelocityIO(Map<String, Object> cfg) {
+        super(cfg);
+        control = new VelocityDutyCycle(0.0);
     }
-  }
 
-  @Override
-  public void setVelocityRps(double rotationsPerSecond) {
-    targetRotationsPerSecond = rotationsPerSecond;
-    control = control.withVelocity(rotationsPerSecond);
-    motor.setControl(control);
-    if (hasFollower) {
-      followerMotor.setControl(control);
+    @Override
+    public void setVelocityRps(double velocity) {
+        if (setpointRps != velocity) {
+            setpointRps = velocity;
+            control = control.withVelocity(setpointRps);
+            motor.setControl(control);
+        }
     }
-  }
 
-  @Override
-  public double getVelocityRps() {
-    return motor.getVelocity().getValueAsDouble();
-  }
-
-  @Override
-  public boolean isAtSpeed(double toleranceRps) {
-    return Math.abs(targetRotationsPerSecond - getVelocityRps()) <= toleranceRps;
-  }
-
-  @Override
-  public void stop() {
-    motor.stopMotor();
-    if (hasFollower) {
-      followerMotor.stopMotor();
+    @Override
+    public double getVelocityRps() {
+        return motor.getVelocity().getValueAsDouble();
     }
-    targetRotationsPerSecond = 0.0;
-  }
 
-  private static TalonFXConfiguration toPhoenixConfig(Constants.CtreTalonFxVelocityConfig cfg) {
-    TalonFXConfiguration config = new TalonFXConfiguration();
-    config.Slot0.kP = cfg.kP();
-    config.Slot0.kI = cfg.kI();
-    config.Slot0.kD = cfg.kD();
-    config.Slot0.kV = cfg.kV();
-    config.Slot0.kS = cfg.kS();
+    @Override
+    public boolean isAtSpeed(double toleranceRps) {
+        return Math.abs(setpointRps - getVelocityRps()) <= toleranceRps;
+    }
 
-    config.CurrentLimits.SupplyCurrentLimit = cfg.supplyCurrentLimit();
-    config.CurrentLimits.SupplyCurrentLimitEnable = cfg.supplyCurrentLimitEnabled();
-    config.CurrentLimits.StatorCurrentLimit = cfg.statorCurrentLimit();
-    config.CurrentLimits.StatorCurrentLimitEnable = cfg.statorCurrentLimitEnabled();
-    return config;
-  }
+    @Override
+    public void logMotorPID() {
+        measuredLogged.set(getVelocityRps()*60.0);
+        setpointLogged.set(setpointRps*60.0);
+        voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
+    }
 
-  private static com.ctre.phoenix6.signals.NeutralModeValue toPhoenixNeutralMode(
-      Constants.NeutralMode mode) {
-    return mode == Constants.NeutralMode.BRAKE
-        ? com.ctre.phoenix6.signals.NeutralModeValue.Brake
-        : com.ctre.phoenix6.signals.NeutralModeValue.Coast;
-  }
+    @Override
+    public void stop() {
+        setpointRps = 0.0;
+        motor.stopMotor();
+        if (hasFollower) {
+            followerMotor.stopMotor();
+        }
+    }
 }

@@ -2,11 +2,15 @@ package frc.robot.subsystems.io.motor;
 
 /** Hardware-agnostic velocity control (rotations per second). */
 public interface VelocityMotorIO {
-  void setVelocityRps(double rotationsPerSecond);
+    void setVelocityRps(double rotationsPerSecond);
 
-  double getVelocityRps();
+    double getVelocityRps();
 
-  boolean isAtSpeed(double toleranceRps);
+    void logMotorPID();
 
-  void stop();
+    void updateFromTunables();
+
+    boolean isAtSpeed(double toleranceRps);
+
+    void stop();
 }

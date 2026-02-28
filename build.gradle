@@ -109,7 +109,7 @@ test {
 // AdvantageKit log replay, which requires that all HAL
 // sim extensions be disabled.
 wpi.sim.addGui().defaultEnabled = false
-wpi.sim.addDriverstation()
+wpi.sim.addDriverstation().defaultEnabled = true
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib
@@ -178,41 +178,41 @@ createVersionFile.dependsOn(eventDeploy)
 // Spotless formatting
 project.compileJava.dependsOn(spotlessApply)
 spotless {
-    java {
-        target fileTree(".") {
-            include "**/*.java"
-            exclude "**/build/**", "**/build-*/**"
-        }
-        toggleOffOn()
-        googleJavaFormat()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    groovyGradle {
-        target fileTree(".") {
-            include "**/*.gradle"
-            exclude "**/build/**", "**/build-*/**"
-        }
-        greclipse()
-        indentWithSpaces(4)
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    json {
-        target fileTree(".") {
-            include "**/*.json"
-            exclude "**/build/**", "**/build-*/**", ".wpilib/**"
-        }
-        gson().indentWithSpaces(2)
-    }
-    format "misc", {
-        target fileTree(".") {
-            include "**/*.md", "**/.gitignore"
-            exclude "**/build/**", "**/build-*/**"
-        }
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
-        endWithNewline()
-    }
+    // java {
+    //     target fileTree(".") {
+    //         include "**/*.java"
+    //         exclude "**/build/**", "**/build-*/**"
+    //     }
+    //     toggleOffOn()
+    //     indentWithSpaces(2)
+    //     removeUnusedImports()
+    //     trimTrailingWhitespace()
+    //     endWithNewline()
+    // }
+    // groovyGradle {
+    //     target fileTree(".") {
+    //         include "**/*.gradle"
+    //         exclude "**/build/**", "**/build-*/**"
+    //     }
+    //     greclipse()
+    //     indentWithSpaces(4)
+    //     trimTrailingWhitespace()
+    //     endWithNewline()
+    // }
+    // json {
+    //     target fileTree(".") {
+    //         include "**/*.json"
+    //         exclude "**/build/**", "**/build-*/**", ".wpilib/**"
+    //     }
+    //     gson().indentWithSpaces(4)
+    // }
+    // format "misc", {
+    //     target fileTree(".") {
+    //         include "**/*.md", "**/.gitignore"
+    //         exclude "**/build/**", "**/build-*/**"
+    //     }
+    //     trimTrailingWhitespace()
+    //     indentWithSpaces(4)
+    //     endWithNewline()
+    // }
 }

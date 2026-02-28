@@ -8,6 +8,10 @@ public interface PositionMotorIO {
 
   boolean isAtPosition(double toleranceDegrees);
 
+  void logMotorPID();
+
+  void updateFromTunables();
+
   void resetToAbsolute(double absolutePositionRotations);
 
   void stop();
