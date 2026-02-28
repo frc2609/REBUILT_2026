@@ -14,11 +14,26 @@ public class ClimberSubsystem extends SubsystemBase {
         this.climberMotor = climberMotor;
     }
 
-    public void moveToClimberPosition(double degrees) {
+    public void setToPosition(double degrees) {
         climberMotor.setTargetPositionDegrees(degrees);
+    }
+
+    public void resetPositionToAbsolute() {
+        climberMotor.resetToAbsolute(climberEncoder.getRotations());
+    }
+
+    public boolean isAtPosition(double tolerance) {
+        return climberMotor.isAtPosition(tolerance);
     }
 
     public void stop() {
         climberMotor.stop();
+    }
+
+    @Override
+    public void periodic()
+    {
+        climberMotor.logMotorPID();
+        climberMotor.updateFromTunables();
     }
 }

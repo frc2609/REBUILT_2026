@@ -9,18 +9,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class AimTurretField extends Command {
-    private final ShooterSubsystem shooter;
+    private final TurretSubsystem turret;
     private final Supplier<Pose2d> poseSupplier;
     private final Translation2d target;
 
     public AimTurretField(
-        Supplier<Pose2d> poseSupplier, ShooterSubsystem shooter,
+        Supplier<Pose2d> poseSupplier, TurretSubsystem turret,
         Translation2d target
     ) {
-        this.shooter = shooter;
+        this.turret = turret;
         this.poseSupplier = poseSupplier;
         this.target = target;
     }

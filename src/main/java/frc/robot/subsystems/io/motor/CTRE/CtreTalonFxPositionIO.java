@@ -1,8 +1,10 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import java.util.Map;
+import frc.robot.util.Conversions;
 
 public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMotorIO {
     private MotionMagicDutyCycle control = new MotionMagicDutyCycle(0).withSlot(0);
@@ -30,7 +32,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
 
     @Override
     public void setTargetPositionDegrees(double degrees) {
-        double targetRotations = degreesToRotations(degrees);
+        double targetRotations = Conversions.degreesToRotations(degrees,gearRatio);
 
         if (forwardLimitEnabled) {
             targetRotations = Math.min(targetRotations, forwardLimitRotations);
@@ -41,7 +43,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
 
         // Keep a vendor-agnostic setpoint for consistent "at position" semantics across
         // implementations.
-        targetDegrees = rotationsToDegrees(targetRotations);
+        targetDegrees = Conversions.rotationsToDegrees(targetRotations, gearRatio);
 
         control = control.withPosition(targetRotations);
         motor.setControl(control);
@@ -49,7 +51,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
 
     @Override
     public double getPositionDegrees() {
-        return rotationsToDegrees(motor.getPosition().getValueAsDouble());
+        return Conversions.rotationsToDegrees(motor.getPosition().getValueAsDouble(),gearRatio);
     }
 
     @Override
@@ -61,33 +63,28 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
 
     @Override
     public void resetToAbsolute(double absolutePositionRotations) {
-        double offset = absolutePositionRotations;
-        if (offset > 0.5) {
-            offset -= 1.0;
-        }
-        offset *= encoderRatio;
-
+        double offset = absolutePositionRotations * encoderRatio;
         motor.setPosition(offset);
-        // if (hasFollower) {
-        //     followerMotor.setPosition(offset);
-        // }
         targetDegrees = getPositionDegrees();
+
+        if (hasFollower) {
+            followerMotor.setPosition(offset);
+        }
+    }
+
+    @Override
+    public void logMotorPID() {
+        measuredLogged.set(getPositionDegrees());
+        setpointLogged.set(targetDegrees);
+        voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
     }
 
     @Override
     public void stop() {
         motor.stopMotor();
-        // if (hasFollower) {
-        //     followerMotor.stopMotor();
-        // }
+        if (hasFollower) {
+            followerMotor.stopMotor();
+        }
         targetDegrees = getPositionDegrees();
-    }
-
-    private double degreesToRotations(double degrees) {
-        return degrees / (360.0 / gearRatio);
-    }
-
-    private double rotationsToDegrees(double rotations) {
-        return rotations * (360.0 / gearRatio);
     }
 }
