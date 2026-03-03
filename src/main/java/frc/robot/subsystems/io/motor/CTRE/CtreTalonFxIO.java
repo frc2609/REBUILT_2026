@@ -1,5 +1,6 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
+import static frc.robot.Constants.CANBUS;
 import static frc.robot.Constants.tunableKeys;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.function.Consumer;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -19,6 +21,7 @@ import frc.robot.Constants;
 public class CtreTalonFxIO {
     private final Map<String, Consumer<Object>> setters = new HashMap<>();
 
+    private boolean isRioCANBUS = false;
     public final TalonFX motor;
     public int motorId;
     private TalonFXConfiguration config;
@@ -95,18 +98,24 @@ public class CtreTalonFxIO {
             "statorCurrentLimitEnabled", 
             value -> config.CurrentLimits.StatorCurrentLimitEnable = (boolean) value);
 
+        setters.put(
+            "isRioCANBUS", 
+            value -> this.isRioCANBUS = (boolean) value);
+
         setConfiguration(cfg);
 
         // MotorID and Follower settings are now available
 
-        motor = new TalonFX(motorId, Constants.CANBUS);
+        CANBus CANBUS = isRioCANBUS ? Constants.RioCANBUS : Constants.CANBUS;
+        
+        motor = new TalonFX(motorId, CANBUS);
         if (followerId > -1) {
-            followerMotor = new TalonFX(followerId, Constants.CANBUS);
-            followerMotor.setControl(new Follower(this.motorId, followerAligned));
+            followerMotor = new TalonFX(followerId, CANBUS);
             followerMotor.getConfigurator().apply(config);
+            followerMotor.setControl(new Follower(this.motorId, followerAligned));
             hasFollower = true;
         }
-
+        
         applyConfiguration();
 
         // Set up tuning variables

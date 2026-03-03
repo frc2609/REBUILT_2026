@@ -17,6 +17,7 @@ public class HoldAgitatorSpeed extends Command {
     @Override
     public void execute() {
         feedSubsystem.setAgitatorSpeed(rps);
+        feedSubsystem.setFeedSpeed(rps);
     }
 
     @Override

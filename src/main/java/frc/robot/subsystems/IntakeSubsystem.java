@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
@@ -48,6 +49,7 @@ public class IntakeSubsystem extends SubsystemBase {
     {
         deployMotor.logMotorPID();
         driveMotor.logMotorPID();
+        SmartDashboard.putNumber("Deploy Encoder:", deployEncoder.getRotations());
 
         deployMotor.updateFromTunables();
         driveMotor.updateFromTunables();

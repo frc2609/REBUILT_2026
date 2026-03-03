@@ -15,6 +15,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
+import frc.robot.subsystems.io.encoder.impl.CANCoderIO;
 import frc.robot.subsystems.io.encoder.impl.SimAbsEncoderIO;
 import frc.robot.subsystems.io.encoder.impl.WpiDutyCycleEncoderIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
@@ -235,7 +236,7 @@ public class RobotFactory {
         return new SimAbsEncoderIO(0);
         }
 
-        return new WpiDutyCycleEncoderIO(Constants.Intake.EncoderChannel);
+        return new CANCoderIO(Constants.Intake.EncoderChannel);
     }
 
     private PositionMotorIO buildIntakeDeployIO() {

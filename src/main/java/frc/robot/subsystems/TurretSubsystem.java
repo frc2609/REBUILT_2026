@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
@@ -53,6 +54,9 @@ public class TurretSubsystem extends SubsystemBase {
     {
         aimMotor.logMotorPID();
         hoodMotor.logMotorPID();
+
+        SmartDashboard.putNumber("Turret Encoder:", aimEncoder.getRotations());
+
 
         aimMotor.updateFromTunables();
         hoodMotor.updateFromTunables();

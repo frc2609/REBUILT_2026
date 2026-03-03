@@ -24,8 +24,8 @@ import edu.wpi.first.wpilibj.RobotBase;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    // public static final String CANBUS = "CANivore";
-    public static final CANBus CANBUS = CANBus.roboRIO();
+    public static final CANBus CANBUS = new CANBus("CANivore");
+    public static final CANBus RioCANBUS = CANBus.roboRIO();
 
     public static final Mode simMode = Mode.SIM;
     public static final double SIM_DELTA = 0.01;
@@ -109,10 +109,10 @@ public final class Constants {
         public static final int DRIVER_CONTROLLER_PORT = 0;
 
         public static final double ARM_STOW_DEGREES = 0.0; // Example
-        public static final double SHOOTER_HOLD_RPS = 15.0; // 900RPM
-        public static final double INTAKE_HOLD_RPS = 8.0;   // 500RPM
-        public static final double AGITATOR_HOLD_RPS = 8.0;
-        public static final double FEED_HOLD_RPS = 16.0;    // 1000RPM
+        public static final double SHOOTER_HOLD_RPS = 16.0; // 900RPM
+        public static final double INTAKE_HOLD_RPS = 1.0;   // 500RPM
+        public static final double AGITATOR_HOLD_RPS = 1.0;
+        public static final double FEED_HOLD_RPS = 1.0;    // 1000RPM
 
         public static final double INTAKE_DEPLOYED_ROTATIONS = 1.0;
         public static final double INTAKE_RETRACT_ROTATIONS = 0.0;
@@ -123,7 +123,7 @@ public final class Constants {
     // NOTE: the pid values are not correct, nor are the limits
 
     public static final class Climber {
-        public static final int EncoderChannel = 0;
+        public static final int EncoderChannel = 15;
         public static final double INERTIA = 0.01;
         public static final double GEAR_RATIO = 1.0;
         public static final double ENCODER_RATIO = 1.0;
@@ -162,7 +162,7 @@ public final class Constants {
             "kI", 0.0,
             "kD", 0.0,
             "kV", 0.0097,
-            "inverted", false
+            "inverted", true
         ));
     }
 
@@ -173,7 +173,7 @@ public final class Constants {
         public static final Map<String, Object> config = new HashMap<>(Map.of(
             "motorId", 50,
             "followerId", 51,
-            "followerAligned", true,
+            "followerAligned", false,
             "kP", 0.04,
             "kI", 0.0,
             "kD", 0.0,
@@ -254,7 +254,7 @@ public final class Constants {
     }
 
     public static final class Intake {
-        public static final int EncoderChannel = 0;
+        public static final int EncoderChannel = 32;
 
         public static final class Roller {
             public static final double INERTIA = 0.001;
@@ -266,7 +266,8 @@ public final class Constants {
                 "kI", 0.0,
                 "kD", 0.0,
                 "kV", 0.0097,
-                "inverted", false
+                "inverted", true,
+                "isRioCANBUS",true
             ));
         }
 
@@ -283,7 +284,6 @@ public final class Constants {
                 "kI",0.0,
                 "kD",0.0,
                 "kV",0.0,
-                "kS",0.0,
                 "forwardLimitEnabled",false,
                 "forwardLimitRotations",100.0,
                 "reverseLimitEnabled",false,
