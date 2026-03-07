@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
@@ -20,24 +19,32 @@ public class TurretSubsystem extends SubsystemBase {
         this.aimEncoder = aimEncoder;
     }
 
+    public void setSetpoints(double aimDeg, double hoodDeg) {
+        aimMotor.setSetpoint(aimDeg);
+        hoodMotor.setSetpoint(hoodDeg);
+    }
+
+    public void setAimPosition() {
+        System.out.println("SET AIM POSITION: "+aimMotor.getSetpoint());
+        aimMotor.setTargetPositionDegrees(aimMotor.getSetpoint());
+    }
     public void setAimPosition(double degrees) {
         aimMotor.setTargetPositionDegrees(degrees);
     }
 
-    public void resetAimPositionToAbsolute() {
-        aimMotor.resetToAbsolute(aimEncoder.getRotations());
+    public void resetAimPositionToAbsolute(double offsetRotations) {
+        aimMotor.resetToAbsolute(aimEncoder.getRotations()-offsetRotations);
     }
 
     public boolean aimIsAtPosition(double toleranceDegrees) {
         return aimMotor.isAtPosition(toleranceDegrees);
     }
 
+    public void setHoodPosition() {
+        hoodMotor.setTargetPositionDegrees(hoodMotor.getSetpoint());
+    }
     public void setHoodPosition(double degrees) {
         hoodMotor.setTargetPositionDegrees(degrees);
-    }
-
-    public void resetHoodPositionToAbsolute() {
-        hoodMotor.resetToAbsolute(aimEncoder.getRotations());
     }
 
     public boolean hoodIsAtPosition(double toleranceDegrees) {
@@ -52,12 +59,8 @@ public class TurretSubsystem extends SubsystemBase {
     @Override
     public void periodic()
     {
-        aimMotor.logMotorPID();
+        aimMotor.logMotorPID(aimEncoder.getRotations());
         hoodMotor.logMotorPID();
-
-        SmartDashboard.putNumber("Turret Encoder:", aimEncoder.getRotations());
-
-
         aimMotor.updateFromTunables();
         hoodMotor.updateFromTunables();
     }

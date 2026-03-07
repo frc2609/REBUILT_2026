@@ -14,6 +14,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.util.Conversions;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -86,7 +87,7 @@ public final class Constants {
         );
 
     public static final String[] tunableKeys = 
-        {"kP", "kI", "kD", "kV", "kS"};
+        {"kP", "kI", "kD", "kA", "kV", "kS"};
 
     public static final VelocityMotorType FLYWHEEL_VELOCITY_MOTOR_TYPE =
         VelocityMotorType.CTRE_TALON_FX;
@@ -108,22 +109,27 @@ public final class Constants {
     public static final class Controls {
         public static final int DRIVER_CONTROLLER_PORT = 0;
 
-        public static final double ARM_STOW_DEGREES = 0.0; // Example
-        public static final double SHOOTER_HOLD_RPS = 16.0; // 900RPM
-        public static final double INTAKE_HOLD_RPS = 1.0;   // 500RPM
-        public static final double AGITATOR_HOLD_RPS = 1.0;
-        public static final double FEED_HOLD_RPS = 1.0;    // 1000RPM
+        // Raw Abs Encoder output
+        public static final double INTAKE_DEPLOYED_DEG = 0.8 * 360;
+        public static final double INTAKE_RETRACT_DEG  = 0.5 * 360;
+        public static final double INTAKE_RUN_RPM = 4500.0;
+        public static final double INTAKE_IDLE_RPM = 0.0;
 
-        public static final double INTAKE_DEPLOYED_ROTATIONS = 1.0;
-        public static final double INTAKE_RETRACT_ROTATIONS = 0.0;
+        public static final double CLIMBER_DEPLOYED_DEG = 360;
 
-        private Controls() {}
+        public static final double TURRET_AIM_DEG = 190.0;
+        public static final double TURRET_HOOD_DEG = 10;
+
+        public static final double AGITATOR_HOLD_RPM = 500.0;
+        public static final double FEED_HOLD_RPM = 1000.0; // max speed
+        public static final double FLYWHEEL_HOLD_RPM = 500.0;
+
     }
 
     // NOTE: the pid values are not correct, nor are the limits
 
     public static final class Climber {
-        public static final int EncoderChannel = 15;
+        public static final int EncoderChannel = 1;
         public static final double INERTIA = 0.01;
         public static final double GEAR_RATIO = 1.0;
         public static final double ENCODER_RATIO = 1.0;
@@ -149,6 +155,8 @@ public final class Constants {
             config.put("supplyCurrentLimitEnabled", true);
             config.put("statorCurrentLimit", 80.0);
             config.put("statorCurrentLimitEnabled", true);
+            config.put("MotionMagicCruiseVelocity", 2.0);
+            config.put("MotionMagicAcceleration", 1.0);
         }
     }
 
@@ -159,8 +167,6 @@ public final class Constants {
         public static final Map<String, Object> config = new HashMap<>(Map.of(
             "motorId", 21,
             "kP", 0.04,
-            "kI", 0.0,
-            "kD", 0.0,
             "kV", 0.0097,
             "inverted", true
         ));
@@ -175,8 +181,6 @@ public final class Constants {
             "followerId", 51,
             "followerAligned", false,
             "kP", 0.04,
-            "kI", 0.0,
-            "kD", 0.0,
             "kV", 0.0097,
             "inverted", false
         ));
@@ -187,22 +191,30 @@ public final class Constants {
 
         public static final class Aim {
             public static final double INERTIA = 0.01;
-            public static final double GEAR_RATIO = 1.0;
+            public static final double GEAR_RATIO = 5.0;
             public static final double ENCODER_RATIO = 1.0;
+            public static final double ZERO_OFFSET = Conversions.degreesToRotations(77.0, GEAR_RATIO);
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
                 "kP", 0.15,
                 "kI", 0.0,
                 "kD", 0.0,
+                "kA", 0.0,
                 "kV", 0.12,
-                "kS", 0.05,
-                "forwardLimitEnabled", false,
-                "forwardLimitRotations", 100.0,
-                "reverseLimitEnabled", false,
-                "reverseLimitRotations", 100.0
+                "kS", 0.05
             ));
             static {
+                config.put("MotionMagicCruiseVelocity", 2.0);
+                config.put("MotionMagicAcceleration", 1.0);
+
+                config.put("forwardLimitEnabled", true);
+                config.put("forwardLimitRotations",
+                    Conversions.degreesToRotations(200.0, GEAR_RATIO));
+                config.put("reverseLimitEnabled", true);
+                config.put("reverseLimitRotations",
+                    Conversions.degreesToRotations(-200.0, GEAR_RATIO));
+                
                 config.put("inverted", false);
                 config.put("supplyCurrentLimit", 60.0);
                 config.put("supplyCurrentLimitEnabled", true);
@@ -214,21 +226,27 @@ public final class Constants {
         public static final class Hood {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 1.0;
-            public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 52,
                 "kP", 0.15,
                 "kI", 0.0,
                 "kD", 0.0,
+                "kA", 0.0,
                 "kV", 0.12,
-                "kS", 0.05,
-                "forwardLimitEnabled", false,
-                "forwardLimitRotations", 100.0,
-                "reverseLimitEnabled", false,
-                "reverseLimitRotations", 100.0
+                "kS", 0.05
             ));
             static {
+                config.put("MotionMagicCruiseVelocity", 2.0);
+                config.put("MotionMagicAcceleration", 1.0);
+                config.put("forwardLimitEnabled", true);
+                config.put("reverseLimitEnabled", true);
+
+                config.put("forwardLimitRotations",
+                    Conversions.degreesToRotations(20.0, GEAR_RATIO));
+                config.put("reverseLimitRotations",
+                    Conversions.degreesToRotations(0.0, GEAR_RATIO));
+                
                 config.put("inverted", false);
                 config.put("supplyCurrentLimit", 60.0);
                 config.put("supplyCurrentLimitEnabled", true);
@@ -246,8 +264,6 @@ public final class Constants {
         public static final Map<String, Object> config = new HashMap<>(Map.of(
             "motorId", 20,
             "kP", 0.04,
-            "kI", 0.0,
-            "kD", 0.0,
             "kV", 0.0097,
             "inverted", false
         ));
@@ -262,12 +278,10 @@ public final class Constants {
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 31,
-                "kP", 0.04,
-                "kI", 0.0,
-                "kD", 0.0,
-                "kV", 0.0097,
+                "isRioCANBUS",true,
                 "inverted", true,
-                "isRioCANBUS",true
+                "kP", 0.04,
+                "kV", 0.0097
             ));
         }
 
@@ -280,16 +294,23 @@ public final class Constants {
             // NOTE: Cuts off at 10 key-value pairs
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId",30,
-                "kP",0.0,
-                "kI",0.0,
-                "kD",0.0,
-                "kV",0.0,
-                "forwardLimitEnabled",false,
-                "forwardLimitRotations",100.0,
-                "reverseLimitEnabled",false,
-                "reverseLimitRotations",100.0
+                "kP", 0.15,
+                "kI", 0.0,
+                "kD", 0.0,
+                "kA", 0.0,
+                "kV", 0.12,
+                "kS", 0.05
             ));
             static {
+                config.put("MotionMagicCruiseVelocity", 2.0);
+                config.put("MotionMagicAcceleration", 1.0);
+                config.put("forwardLimitEnabled", true);
+                config.put("reverseLimitEnabled", true);
+
+                // TalonFX outputted rotations
+                config.put("forwardLimitRotations", 0.836);
+                config.put("reverseLimitRotations", 0.45);
+                
                 config.put("inverted", false);
                 config.put("supplyCurrentLimit", 60.0);
                 config.put("supplyCurrentLimitEnabled", true);

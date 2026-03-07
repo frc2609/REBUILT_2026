@@ -2,6 +2,8 @@ package frc.robot.subsystems.io.motor.CTRE.Sim;
 
 import java.util.Map;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
@@ -13,6 +15,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants.SimMotor;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
+import frc.robot.util.Conversions;
 
 public class SimPositionMotorIO extends CtreTalonFxPositionIO {
     private DCMotorSim motorSim;
@@ -60,6 +63,13 @@ public class SimPositionMotorIO extends CtreTalonFxPositionIO {
         simNotifier.startPeriodic(kSimDelta);
     }
 
+    public SimPositionMotorIO(
+        Map<String, Object> cfg, double inertia, double gearRatio, 
+        SimMotor simMotor, double simDelta
+    ) {
+        this(cfg, inertia, gearRatio, 1.0, simMotor, simDelta);
+    }
+
     // https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/simulation/simulation-intro.html
 
     public void updateSim() {
@@ -78,16 +88,26 @@ public class SimPositionMotorIO extends CtreTalonFxPositionIO {
         talonFXSim.setRotorVelocity(motorSim.getAngularVelocity().times(kGearRatio));
     }
 
-    @Override
-    public double getPositionDegrees() {
-        return motorSim.getAngularPositionRad() * (180.0 / Math.PI);
-    }
+    // @Override
+    // public double getPositionDegrees() {
+    //     // Use the TalonFX simulated rotor position (set in updateSim) and
+    //     // convert from rotor rotations to mechanism degrees. Reading the
+    //     // TalonFX state ensures we match the same units/representation the
+    //     // CTRE implementation exposes (and matches the velocity sim path).
+    //     return Conversions.rotationsToDegrees(motor.getPosition().getValueAsDouble(), kGearRatio);
+    // }
 
     @Override
     public void logMotorPID() {
         measuredLogged.set(getPositionDegrees());
-        setpointLogged.set(targetDegrees);
+        rotationsLogged.set(motor.getPosition().getValueAsDouble());
         voltageLogged.set(talonFXSim.getMotorVoltage());
+    }
+
+    @Override
+    public void logMotorPID(double rotations) {
+        // Simulation doesn't have Abs Encoder
+        logMotorPID();
     }
 
     @Override

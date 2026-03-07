@@ -7,14 +7,17 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.HoldAgitatorSpeed;
-import frc.robot.commands.HoldIntakeSpeed;
-import frc.robot.commands.HoldFlywheelSpeed;
+import frc.robot.commands.FullShoot;
+import frc.robot.commands.SetClimbPos;
+import frc.robot.commands.SetIntakePos;
+import frc.robot.commands.SetIntakeSpeed;
 import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -32,10 +35,19 @@ public class RobotContainer {
     private final CommandXboxController driverController =
         new CommandXboxController(Constants.Controls.DRIVER_CONTROLLER_PORT);
     private final Trigger xTrigger = driverController.x();
-    //private final Trigger resetGyroTrigger = driverController.b();
-    private final Trigger holdShooterTrigger = driverController.rightBumper();
-    private final Trigger holdIntakeTrigger = driverController.a();
+    private final Trigger resetGyroTrigger = driverController.back();
+    private final Trigger shootTrigger = driverController.rightTrigger();
+
+    private final Trigger deployIntakeTrigger = driverController.povDown();
+    private final Trigger startIntakeTrigger = driverController.a();
+    private final Trigger stopIntakeTrigger = driverController.start();
+
     private final Trigger holdAgitatorTrigger = driverController.b();
+    private final Trigger holdFeedTrigger = driverController.y();
+    private final Trigger holdFlywheelTrigger = driverController.rightBumper();
+    private final Trigger setAimTrigger = driverController.povRight();
+    private final Trigger setHoodTrigger = driverController.povUp();
+    private final Trigger setClimberTrigger = driverController.povLeft();
 
     // Dashboard inputs (later)
     // private final LoggedDashboardChooser<Command> autoChooser;
@@ -45,22 +57,23 @@ public class RobotContainer {
     private final FlywheelSubsystem flywheelSubsystem = robotFactory.getFlywheelSubsystem();
     private final IntakeSubsystem intakeSubsystem = robotFactory.getIntakeSubsystem();
     private final DriveSubsystem driveSubsystem = robotFactory.getDriveSubsystem();
-    private final FeedSubsystem agitatorSubsystem = robotFactory.getFeedSubsystem();
+    private final FeedSubsystem feedSubsystem = robotFactory.getFeedSubsystem();
     private final ClimberSubsystem climberSubsystem = robotFactory.getClimberSubsystem();
     // private final VisionSubsystem visionSubsystem = robotFactory.getVisionSubsystem();
 
-    private final Command holdShooterCommand =
-        new HoldFlywheelSpeed(flywheelSubsystem, Constants.Controls.SHOOTER_HOLD_RPS);
-
-    private final Command holdIntakeCommand = 
-        new HoldIntakeSpeed(intakeSubsystem, Constants.Controls.INTAKE_HOLD_RPS);
-
-    private final Command holdAgitatorCommand = 
-        new HoldAgitatorSpeed(agitatorSubsystem, Constants.Controls.AGITATOR_HOLD_RPS);
-
-    // private final Command holdFeedCommand =
-    //     new HoldF(agitatorSubsystem, Constants.Controls.AGITATOR_HOLD_RPS);
-
+    private final Command fullShooterCommand =
+        new FullShoot(flywheelSubsystem, feedSubsystem, 
+            Constants.Controls.FEED_HOLD_RPM / 60.0, 
+            Constants.Controls.AGITATOR_HOLD_RPM / 60.0
+        );
+    private final Command startIntakeCommand = 
+        new SetIntakeSpeed(intakeSubsystem, Constants.Controls.INTAKE_RUN_RPM / 60.0);
+    private final Command intakeDefaultSpeed = 
+        new SetIntakeSpeed(intakeSubsystem, Constants.Controls.INTAKE_IDLE_RPM / 60.0);
+    private final Command deployIntakeCommand =
+        new SetIntakePos(intakeSubsystem, Constants.Controls.INTAKE_DEPLOYED_DEG);
+    private final Command setClimberCommand =
+        new SetClimbPos(climberSubsystem, Constants.Controls.CLIMBER_DEPLOYED_DEG);
 
     public RobotContainer() {
         configureBindings();
@@ -71,35 +84,57 @@ public class RobotContainer {
         // Avoid syncing absolute encoders during construction; do it at a predictable time during boot.
         climberSubsystem.resetPositionToAbsolute();
         intakeSubsystem.resetDeployPositionToAbsolute();
-        turretSubsystem.resetAimPositionToAbsolute();
+        turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
+
+        // Tuning default setpoints
+        feedSubsystem.setSetpoints(
+            Constants.Controls.FEED_HOLD_RPM / 60.0,
+            Constants.Controls.AGITATOR_HOLD_RPM / 60.0
+        );
+        flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_HOLD_RPM / 60.0);
+        turretSubsystem.setSetpoints(
+            Constants.Controls.TURRET_AIM_DEG,
+            Constants.Controls.TURRET_HOOD_DEG
+        );
 
         //intakeSubsystem.setDeployPosition(Constants.Controls.INTAKE_DEPLOYED_ROTATIONS);
     }
 
     private void configureBindings() {
-        holdShooterTrigger.whileTrue(holdShooterCommand);
-        holdIntakeTrigger.whileTrue(holdIntakeCommand);
-        holdAgitatorTrigger.whileTrue(holdAgitatorCommand);
 
-        // Default command, normal field-relative drive
+        shootTrigger.whileTrue(fullShooterCommand);
+
+        startIntakeTrigger.onTrue(startIntakeCommand);
+        stopIntakeTrigger.onTrue(intakeDefaultSpeed);
+        //intakeSubsystem.setDefaultCommand(intakeDefaultSpeed);
+        deployIntakeTrigger.onTrue(deployIntakeCommand);
+
+        setClimberTrigger.onTrue(setClimberCommand);
+
+        // Tuning commands
+
+        holdAgitatorTrigger.whileTrue(Commands.runEnd(feedSubsystem::setAgitatorSpeed,feedSubsystem::stop,feedSubsystem));
+        holdFeedTrigger.whileTrue(Commands.runEnd(feedSubsystem::setFeedSpeed,feedSubsystem::stop,feedSubsystem));
+        holdFlywheelTrigger.whileTrue(Commands.runEnd(flywheelSubsystem::setSpeed,flywheelSubsystem::stop,flywheelSubsystem));
+        setAimTrigger.onTrue(Commands.runOnce(turretSubsystem::setAimPosition,turretSubsystem));
+        setHoodTrigger.onTrue(Commands.runOnce(turretSubsystem::setHoodPosition,turretSubsystem));
+
+        // Drive commands
+
         driveSubsystem.setDefaultCommand(
             DriveCommands.joystickDrive(
                 driveSubsystem,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX()));
-
-        // Switch to X pattern when X button is pressed
         xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
-
-        // Reset gyro to 0° when B button is pressed
-        // resetGyroTrigger.onTrue(
-        //     Commands.runOnce(
-        //             () ->
-        //                 driveSubsystem.setPose(
-        //                     new Pose2d(driveSubsystem.getPose().getTranslation(), Rotation2d.kZero)),
-        //             driveSubsystem)
-        //         .ignoringDisable(true));
+        resetGyroTrigger.onTrue( 
+            Commands.runOnce(
+                    () ->
+                        driveSubsystem.setPose(
+                            new Pose2d(driveSubsystem.getPose().getTranslation(), Rotation2d.kZero)),
+                    driveSubsystem)
+                .ignoringDisable(true));
     }
 
     public Command getAutonomousCommand() {

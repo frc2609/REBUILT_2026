@@ -100,6 +100,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    robotContainer.robotInit();
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -122,6 +123,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    robotContainer.robotInit();
   }
 
   /** This function is called periodically during operator control. */
@@ -141,7 +143,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    robotContainer.robotInit();
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override

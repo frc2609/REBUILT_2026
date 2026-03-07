@@ -7,7 +7,6 @@ import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -18,18 +17,16 @@ import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 import frc.robot.subsystems.io.encoder.impl.CANCoderIO;
 import frc.robot.subsystems.io.encoder.impl.SimAbsEncoderIO;
 import frc.robot.subsystems.io.encoder.impl.WpiDutyCycleEncoderIO;
-import frc.robot.subsystems.io.motor.PercentMotorIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
-import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPercentIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxVelocityIO;
-import frc.robot.subsystems.io.motor.CTRE.Sim.SimPercentMotorIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimPositionMotorIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimVelocityMotorIO;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 public class RobotFactory {
     private final TurretSubsystem turretSubsystem;
@@ -205,7 +202,6 @@ public class RobotFactory {
                 Constants.Turret.Hood.config,
                 Constants.Turret.Hood.INERTIA,
                 Constants.Turret.Hood.GEAR_RATIO,
-                Constants.Turret.Hood.ENCODER_RATIO, 
                 Constants.Turret.Hood.SIM_MOTOR, 
                 Constants.SIM_DELTA);
         }
@@ -213,8 +209,7 @@ public class RobotFactory {
             case CTRE_TALON_FX:
                 return new CtreTalonFxPositionIO(
                     Constants.Turret.Hood.config,
-                    Constants.Turret.Hood.GEAR_RATIO,
-                    Constants.Turret.Hood.ENCODER_RATIO);
+                    Constants.Turret.Hood.GEAR_RATIO);
             default:
                 throw new IllegalStateException("Unsupported shooter motor type");
         }

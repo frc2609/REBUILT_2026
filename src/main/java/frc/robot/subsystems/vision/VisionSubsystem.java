@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.vision;
 
 import static frc.robot.Constants.Vision.*;
 
@@ -19,7 +19,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import frc.robot.subsystems.vision.VisionIOInputsAutoLogged;
 

@@ -33,7 +33,7 @@ public class ClimberSubsystem extends SubsystemBase {
     @Override
     public void periodic()
     {
-        climberMotor.logMotorPID();
+        climberMotor.logMotorPID(climberEncoder.getRotations());
         climberMotor.updateFromTunables();
     }
 }

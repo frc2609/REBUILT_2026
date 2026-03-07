@@ -4,6 +4,10 @@ import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import java.util.Map;
+
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+
 import frc.robot.util.Conversions;
 
 public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMotorIO {
@@ -13,10 +17,13 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
 
     public double targetDegrees = 0.0;
 
-    private final boolean forwardLimitEnabled;
-    private final boolean reverseLimitEnabled;
+    private boolean forwardLimitEnabled;
+    private boolean reverseLimitEnabled;
     private final double forwardLimitRotations;
     private final double reverseLimitRotations;
+
+    private final LoggedNetworkNumber absRotationsLogged;
+    public final LoggedNetworkNumber rotationsLogged;
 
     public CtreTalonFxPositionIO(Map<String, Object> cfg, double gearRatio, double encoderRatio) {
         super(cfg);
@@ -26,13 +33,20 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         forwardLimitRotations = (double) cfg.get("forwardLimitRotations");
         reverseLimitRotations = (double) cfg.get("reverseLimitRotations");
 
+        absRotationsLogged = new LoggedNetworkNumber(NTPath+"/AbsRotations");
+        rotationsLogged = new LoggedNetworkNumber(NTPath+"/Rotations");
+
         this.gearRatio = gearRatio;
         this.encoderRatio = encoderRatio;
     }
 
+    public CtreTalonFxPositionIO(Map<String, Object> cfg, double gearRatio) {
+        this(cfg, gearRatio, 1.0);
+    } 
+
     @Override
     public void setTargetPositionDegrees(double degrees) {
-        double targetRotations = Conversions.degreesToRotations(degrees,gearRatio);
+        double targetRotations = Conversions.degreesToRotations(degrees, gearRatio);
 
         if (forwardLimitEnabled) {
             targetRotations = Math.min(targetRotations, forwardLimitRotations);
@@ -44,6 +58,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         // Keep a vendor-agnostic setpoint for consistent "at position" semantics across
         // implementations.
         targetDegrees = Conversions.rotationsToDegrees(targetRotations, gearRatio);
+        System.out.println("POSITION COMMAND: "+degrees+" -> "+targetRotations);
 
         control = control.withPosition(targetRotations);
         motor.setControl(control);
@@ -63,28 +78,35 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
 
     @Override
     public void resetToAbsolute(double absolutePositionRotations) {
-        double offset = absolutePositionRotations * encoderRatio;
-        motor.setPosition(offset);
-        targetDegrees = getPositionDegrees();
-
+        System.out.println("ENCODER RESET: "+absolutePositionRotations);
+        motor.setPosition(absolutePositionRotations);
+        targetDegrees = getPositionDegrees(); // 0?
         if (hasFollower) {
-            followerMotor.setPosition(offset);
+            followerMotor.setPosition(absolutePositionRotations);
         }
     }
 
     @Override
     public void logMotorPID() {
         measuredLogged.set(getPositionDegrees());
-        setpointLogged.set(targetDegrees);
+        Logger.recordOutput(NTPath+"/Rotations", motor.getPosition().getValueAsDouble());
+        voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
+    }
+
+    @Override
+    public void logMotorPID(double absRotations) {
+        measuredLogged.set(getPositionDegrees());
+        absRotationsLogged.set(absRotations);
+        rotationsLogged.set(motor.getPosition().getValueAsDouble());
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
     }
 
     @Override
     public void stop() {
         motor.stopMotor();
-        if (hasFollower) {
-            followerMotor.stopMotor();
-        }
+        // if (hasFollower) {
+        //     followerMotor.stopMotor();
+        // }
         targetDegrees = getPositionDegrees();
     }
 }

@@ -41,7 +41,7 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
     @Override
     public void logMotorPID() {
         measuredLogged.set(getVelocityRps()*60.0);
-        setpointLogged.set(setpointRps*60.0);
+        //setpointLogged.set(setpointRps*60.0);
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
     }
 

@@ -55,6 +55,7 @@ public class CtreTalonFxIO {
         setters.put("kP", value -> this.config.Slot0.kP = (double) value);
         setters.put("kI", value -> this.config.Slot0.kI = (double) value);
         setters.put("kD", value -> this.config.Slot0.kD = (double) value);
+        setters.put("kA", value -> this.config.Slot0.kA = (double) value);
         setters.put("kV", value -> this.config.Slot0.kV = (double) value);
         setters.put("kS", value -> this.config.Slot0.kS = (double) value);
         setters.put("kG", value -> this.config.Slot0.kG = (double) value);
@@ -125,7 +126,7 @@ public class CtreTalonFxIO {
             if (cfg.get(key) != null)
             {
                 tunables.add(new LoggedNetworkNumber(
-                    NTPath + "/" + key, 
+                    NTPath + "/Tunables/" + key, 
                     (double) cfg.get(key)
                 ));
             }
@@ -202,5 +203,16 @@ public class CtreTalonFxIO {
             applyConfiguration();
             copyToOldTunables();
         }
+    }
+
+    public double getSetpoint() {
+        double input = setpointLogged.get();
+        // setpointLogged.set(input);
+        return input;
+    }
+
+    public void setSetpoint(double value) {
+        setpointLogged.set(value);
+        System.out.println(NTPath+": Set setpoint value to "+value);
     }
 }

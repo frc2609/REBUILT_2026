@@ -13,16 +13,26 @@ public class FeedSubsystem extends SubsystemBase {
         this.feedMotor = feedMotor;
     }
 
+    public void setSetpoints(double agitatorRPS, double feedRPS) {
+        agitatorMotor.setSetpoint(agitatorRPS);
+        feedMotor.setSetpoint(feedRPS);
+    }
+
+    public void setAgitatorSpeed() {
+        agitatorMotor.setVelocityRps(agitatorMotor.getSetpoint());
+    }
+    public void setFeedSpeed() {
+        feedMotor.setVelocityRps(feedMotor.getSetpoint());
+    }
     public void setAgitatorSpeed(double rotationsPerSecond) {
         agitatorMotor.setVelocityRps(rotationsPerSecond);
+    }
+    public void setFeedSpeed(double rotationsPerSecond) {
+        feedMotor.setVelocityRps(rotationsPerSecond);
     }
 
     public boolean agitatorIsAtSpeed(double toleranceDegrees) {
         return agitatorMotor.isAtSpeed(toleranceDegrees);
-    }
-    
-    public void setFeedSpeed(double rotationsPerSecond) {
-        feedMotor.setVelocityRps(rotationsPerSecond);
     }
 
     public boolean feedIsAtSpeed(double toleranceDegrees) {
@@ -39,7 +49,6 @@ public class FeedSubsystem extends SubsystemBase {
     {
         agitatorMotor.logMotorPID();
         feedMotor.logMotorPID();
-
         agitatorMotor.updateFromTunables();
         feedMotor.updateFromTunables();
     }

@@ -78,15 +78,15 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
         talonFXSim.setRotorVelocity(motorSim.getAngularVelocity().times(kGearRatio));
     }
 
-    @Override
-    public double getVelocityRps() {
-        return motorSim.getAngularVelocityRPM() / 60.0;
-    }
+    // @Override
+    // public double getVelocityRps() {
+    //     return motorSim.getAngularVelocityRPM() / 60.0;
+    // }
 
     @Override
     public void logMotorPID() {
         measuredLogged.set(getVelocityRps()*60.0);
-        setpointLogged.set(setpointRps*60.0);
+        //setpointLogged.set(setpointRps*60.0);
         voltageLogged.set(talonFXSim.getMotorVoltage());
     }
 

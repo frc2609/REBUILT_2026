@@ -19,15 +19,21 @@ public class IntakeSubsystem extends SubsystemBase {
         this.deployEncoder = deployEncoder;
     }
 
+    public void setDeploySetpoint(double deg) {
+        deployMotor.setSetpoint(deg);
+    }
+
     public void setRollerSpeed(double speed) {
         driveMotor.setVelocityRps(speed);
     }
 
-    public boolean rollerIsAtSpeed(double tolerance)
-    {
+    public boolean rollerIsAtSpeed(double tolerance) {
         return driveMotor.isAtSpeed(tolerance);
     }
 
+    public void setDeployPosition() {
+        deployMotor.setTargetPositionDegrees(deployMotor.getSetpoint());
+    }
     public void setDeployPosition(double degrees) {
         deployMotor.setTargetPositionDegrees(degrees);
     }
@@ -47,10 +53,8 @@ public class IntakeSubsystem extends SubsystemBase {
     @Override
     public void periodic()
     {
-        deployMotor.logMotorPID();
+        deployMotor.logMotorPID(deployEncoder.getRotations());
         driveMotor.logMotorPID();
-        SmartDashboard.putNumber("Deploy Encoder:", deployEncoder.getRotations());
-
         deployMotor.updateFromTunables();
         driveMotor.updateFromTunables();
     }

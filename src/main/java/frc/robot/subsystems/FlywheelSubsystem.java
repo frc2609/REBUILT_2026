@@ -13,6 +13,13 @@ public class FlywheelSubsystem extends SubsystemBase {
         this.flywheelMotor = flywheelMotor;
     }
 
+    public void setSetpoint(double rps) {
+        flywheelMotor.setSetpoint(rps);
+    }
+
+    public void setSpeed() {
+        flywheelMotor.setVelocityRps(flywheelMotor.getSetpoint());
+    }
     public void setSpeed(double rotationsPerSecond) {
         flywheelMotor.setVelocityRps(rotationsPerSecond);
     }
