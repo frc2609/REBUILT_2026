@@ -21,10 +21,10 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
             setpointRps = velocity;
             control = control.withVelocity(setpointRps);
             motor.setControl(control);
-            if (hasFollower)
-            {
-                followerMotor.setControl(control);
-            }
+            // if (hasFollower)
+            // {
+            //     followerMotor.setControl(control);
+            // }
         }
     }
 
@@ -49,8 +49,8 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
     public void stop() {
         setpointRps = 0.0;
         motor.stopMotor();
-        if (hasFollower) {
-            followerMotor.stopMotor();
-        }
+        // if (hasFollower) {
+        //     followerMotor.stopMotor();
+        // }
     }
 }

@@ -4,5 +4,7 @@ package frc.robot.subsystems.io.motor;
 public interface PercentMotorIO {
   void setPercent(double percent);
 
+  void logMotorPID();
+  
   void stop();
 }

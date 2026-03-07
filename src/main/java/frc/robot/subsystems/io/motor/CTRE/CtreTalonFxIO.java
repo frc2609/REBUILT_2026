@@ -1,8 +1,5 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
-import static frc.robot.Constants.CANBUS;
-import static frc.robot.Constants.tunableKeys;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -107,16 +104,17 @@ public class CtreTalonFxIO {
         // MotorID and Follower settings are now available
 
         CANBus CANBUS = isRioCANBUS ? Constants.RioCANBUS : Constants.CANBUS;
-        
+
         motor = new TalonFX(motorId, CANBUS);
+
+        applyConfiguration();   
+
         if (followerId > -1) {
             followerMotor = new TalonFX(followerId, CANBUS);
             followerMotor.getConfigurator().apply(config);
             followerMotor.setControl(new Follower(this.motorId, followerAligned));
             hasFollower = true;
         }
-        
-        applyConfiguration();
 
         // Set up tuning variables
 
