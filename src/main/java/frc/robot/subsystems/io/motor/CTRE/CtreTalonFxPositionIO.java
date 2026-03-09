@@ -1,6 +1,7 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import java.util.Map;
@@ -11,7 +12,8 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import frc.robot.util.Conversions;
 
 public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMotorIO {
-    private MotionMagicDutyCycle control = new MotionMagicDutyCycle(0).withSlot(0);
+    //private MotionMagicDutyCycle control = new MotionMagicDutyCycle(0).withSlot(0);
+    private PositionDutyCycle control = new PositionDutyCycle(0).withSlot(0);
     private final double gearRatio;
     private final double encoderRatio;
 
@@ -100,6 +102,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         rotationsLogged.set(motor.getPosition().getValueAsDouble());
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
     }
+
 
     @Override
     public void stop() {

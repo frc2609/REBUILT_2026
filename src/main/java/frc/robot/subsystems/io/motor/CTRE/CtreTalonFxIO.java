@@ -12,6 +12,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.System_StateValue;
 
 import frc.robot.Constants;
 
@@ -95,7 +96,7 @@ public class CtreTalonFxIO {
         setters.put(
             "statorCurrentLimitEnabled", 
             value -> config.CurrentLimits.StatorCurrentLimitEnable = (boolean) value);
-
+        
         setters.put(
             "isRioCANBUS", 
             value -> this.isRioCANBUS = (boolean) value);
@@ -194,12 +195,15 @@ public class CtreTalonFxIO {
             if (value != tunables_old[i])
             {   
                 setters.get(Constants.tunableKeys[i]).accept(value);
+                if (Constants.tunableKeys[i] == "kS") {
+                    System.out.println("kS SET TO: "+value);
+                }
                 changed = true;
             }
         }
 
         if (changed)
-        {
+        {   
             applyConfiguration();
             copyToOldTunables();
         }

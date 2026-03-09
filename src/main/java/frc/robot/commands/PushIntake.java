@@ -1,22 +1,24 @@
 package frc.robot.commands;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
 
-public class SetIntakePos extends Command {
+public class PushIntake extends Command {
     private final IntakeSubsystem intake;
-    private double degrees;
+    private Supplier<Double> triggerSupplier;
     
-    public SetIntakePos(IntakeSubsystem intake, double degrees){
+    public PushIntake(IntakeSubsystem intake, Supplier<Double> triggerSupplier){
         this.intake = intake; 
-        this.degrees = degrees;
+        this.triggerSupplier = triggerSupplier;
         addRequirements(intake);   
     }
     @Override
     public void execute() {
-        intake.setDeployPosition(degrees);
+        double triggerValue = triggerSupplier.get();
+        //intake.setDeployPosition(degrees);
     }
-
     @Override 
     public boolean isFinished(){
         return true;

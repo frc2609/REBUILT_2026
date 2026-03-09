@@ -17,7 +17,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FullShoot;
 import frc.robot.commands.SetClimbPos;
 import frc.robot.commands.SetIntakePos;
-import frc.robot.commands.SetIntakeSpeed;
+import frc.robot.commands.SetIntakeSpeedRPS;
 import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -39,6 +39,7 @@ public class RobotContainer {
     private final Trigger shootTrigger = driverController.rightTrigger();
 
     private final Trigger deployIntakeTrigger = driverController.povDown();
+
     private final Trigger startIntakeTrigger = driverController.a();
     private final Trigger stopIntakeTrigger = driverController.start();
 
@@ -67,40 +68,39 @@ public class RobotContainer {
             Constants.Controls.AGITATOR_HOLD_RPM / 60.0
         );
     private final Command startIntakeCommand = 
-        new SetIntakeSpeed(intakeSubsystem, Constants.Controls.INTAKE_RUN_RPM / 60.0);
+        new SetIntakeSpeedRPS(intakeSubsystem, Constants.Controls.INTAKE_RUN_RPM / 60.0);
     private final Command intakeDefaultSpeed = 
-        new SetIntakeSpeed(intakeSubsystem, Constants.Controls.INTAKE_IDLE_RPM / 60.0);
+        new SetIntakeSpeedRPS(intakeSubsystem, Constants.Controls.INTAKE_IDLE_RPM / 60.0);
+        
     private final Command deployIntakeCommand =
         new SetIntakePos(intakeSubsystem, Constants.Controls.INTAKE_DEPLOYED_DEG);
+    private final Command retractIntakeCommand =
+        new SetIntakePos(intakeSubsystem, Constants.Controls.INTAKE_RETRACT_DEG);
+
     private final Command setClimberCommand =
         new SetClimbPos(climberSubsystem, Constants.Controls.CLIMBER_DEPLOYED_DEG);
 
+
     public RobotContainer() {
-        configureBindings();
-    }
-    
-    /** Robot-wide init hook (called from {@link Robot#robotInit()}). */
-    public void robotInit() {
         // Avoid syncing absolute encoders during construction; do it at a predictable time during boot.
         climberSubsystem.resetPositionToAbsolute();
         intakeSubsystem.resetDeployPositionToAbsolute();
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
 
+        configureBindings();
+    }
+
+    private void configureBindings() {
         // Tuning default setpoints
         feedSubsystem.setSetpoints(
-            Constants.Controls.FEED_HOLD_RPM / 60.0,
-            Constants.Controls.AGITATOR_HOLD_RPM / 60.0
+            Constants.Controls.FEED_HOLD_RPM,
+            Constants.Controls.AGITATOR_HOLD_RPM
         );
-        flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_HOLD_RPM / 60.0);
+        flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_HOLD_RPM);
         turretSubsystem.setSetpoints(
             Constants.Controls.TURRET_AIM_DEG,
             Constants.Controls.TURRET_HOOD_DEG
         );
-
-        //intakeSubsystem.setDeployPosition(Constants.Controls.INTAKE_DEPLOYED_ROTATIONS);
-    }
-
-    private void configureBindings() {
 
         shootTrigger.whileTrue(fullShooterCommand);
 
@@ -108,6 +108,7 @@ public class RobotContainer {
         stopIntakeTrigger.onTrue(intakeDefaultSpeed);
         //intakeSubsystem.setDefaultCommand(intakeDefaultSpeed);
         deployIntakeTrigger.onTrue(deployIntakeCommand);
+        setHoodTrigger.onTrue(retractIntakeCommand);
 
         setClimberTrigger.onTrue(setClimberCommand);
 
@@ -117,7 +118,7 @@ public class RobotContainer {
         holdFeedTrigger.whileTrue(Commands.runEnd(feedSubsystem::setFeedSpeed,feedSubsystem::stop,feedSubsystem));
         holdFlywheelTrigger.whileTrue(Commands.runEnd(flywheelSubsystem::setSpeed,flywheelSubsystem::stop,flywheelSubsystem));
         setAimTrigger.onTrue(Commands.runOnce(turretSubsystem::setAimPosition,turretSubsystem));
-        setHoodTrigger.onTrue(Commands.runOnce(turretSubsystem::setHoodPosition,turretSubsystem));
+        //setHoodTrigger.onTrue(Commands.runOnce(turretSubsystem::setHoodPosition,turretSubsystem));
 
         // Drive commands
 

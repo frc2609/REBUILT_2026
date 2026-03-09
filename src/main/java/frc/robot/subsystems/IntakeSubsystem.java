@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
@@ -23,8 +22,8 @@ public class IntakeSubsystem extends SubsystemBase {
         deployMotor.setSetpoint(deg);
     }
 
-    public void setRollerSpeed(double speed) {
-        driveMotor.setVelocityRps(speed);
+    public void setRollerSpeed(double speedRPS) {
+        driveMotor.setVelocityRps(speedRPS);
     }
 
     public boolean rollerIsAtSpeed(double tolerance) {
@@ -44,6 +43,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public boolean deployIsAtPosition(double toleranceDegrees) {
         return deployMotor.isAtPosition(toleranceDegrees);
+    }
+    public void stopDeploy() {
+        deployMotor.stop();
     }
 
     public void stop() {

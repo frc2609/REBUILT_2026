@@ -34,6 +34,13 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
     }
 
     @Override
+    public double getSetpointRPM() {
+        double input = setpointLogged.get();
+        // setpointLogged.set(input);
+        return input;
+    }
+
+    @Override
     public boolean isAtSpeed(double toleranceRps) {
         return Math.abs(setpointRps - getVelocityRps()) <= toleranceRps;
     }
