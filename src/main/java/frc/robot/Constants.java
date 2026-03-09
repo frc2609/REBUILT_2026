@@ -241,7 +241,7 @@ public final class Constants {
                 config.put("reverseLimitEnabled", true);
 
                 config.put("forwardLimitRotations", 0.8);
-                config.put("reverseLimitRotations", 0);
+                config.put("reverseLimitRotations", 0.0);
                 
                 config.put("inverted", false);
                 config.put("supplyCurrentLimit", 60.0);
