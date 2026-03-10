@@ -9,6 +9,7 @@ package frc.robot.subsystems.vision;
 
 import static frc.robot.Constants.Vision.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import frc.robot.subsystems.vision.VisionIOInputsAutoLogged;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -31,6 +34,17 @@ public class VisionSubsystem extends SubsystemBase {
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
+
+  // ── Multi-camera cross-validation ───────────────────────────────────────────
+  // When two cameras both accept an observation within 30 ms of each other,
+  // |poseA - poseB|² is compared with the expected combined variance 2*(σA² + σB²).
+  // The ratio drives a per-camera adaptive scale factor (low-pass, α = 0.01).
+  private static final int CROSS_VAL_WINDOW = 50;
+  private final double[][] cvActualResidualSq;   // rolling window of |pA-pB|² per camera
+  private final double[][] cvExpectedResidualSq; // rolling window of 2*(σA²+σB²) per camera
+  private final int[] cvWriteIdx;                // circular-buffer write pointer
+  private final int[] cvCount;                   // valid samples in window (capped at WINDOW)
+  private final double[] adaptiveScale;          // per-camera linearStdDev multiplier
 
   public VisionSubsystem(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -49,6 +63,14 @@ public class VisionSubsystem extends SubsystemBase {
           new Alert(
               "Vision camera " + Integer.toString(i) + " is disconnected.", AlertType.kWarning);
     }
+
+    // Initialize cross-validation state
+    cvActualResidualSq   = new double[io.length][CROSS_VAL_WINDOW];
+    cvExpectedResidualSq = new double[io.length][CROSS_VAL_WINDOW];
+    cvWriteIdx           = new int[io.length];
+    cvCount              = new int[io.length];
+    adaptiveScale        = new double[io.length];
+    Arrays.fill(adaptiveScale, 1.0);
   }
 
   /**
@@ -73,7 +95,11 @@ public class VisionSubsystem extends SubsystemBase {
     List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
     List<Pose3d> allRobotPosesRejected = new LinkedList<>();
 
-    // Loop over cameras
+    // Accepted observations collected this cycle for cross-validation (pass 2)
+    record AcceptedObs(int cam, double ts, Pose2d pose, double baseLinearStdDev) {}
+    List<AcceptedObs> thisFrameObs = new ArrayList<>();
+
+    // ── Pass 1: process each camera ─────────────────────────────────────────
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
       // Update disconnected alert
       disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
@@ -124,22 +150,33 @@ public class VisionSubsystem extends SubsystemBase {
         // Calculate standard deviations
         double stdDevFactor =
             Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
-        double linearStdDev = linearStdDevBaseline * stdDevFactor;
-        double angularStdDev = angularStdDevBaseline * stdDevFactor;
+        double baseLinearStdDev = linearStdDevBaseline * stdDevFactor;
+        double angularStdDev    = angularStdDevBaseline * stdDevFactor;
+
         if (observation.type() == PoseObservationType.MEGATAG_2) {
-          linearStdDev *= linearStdDevMegatag2Factor;
-          angularStdDev *= angularStdDevMegatag2Factor;
+          baseLinearStdDev *= linearStdDevMegatag2Factor;
+          angularStdDev    *= angularStdDevMegatag2Factor; // POSITIVE_INFINITY: gyro owns rotation
         }
         if (cameraIndex < cameraStdDevFactors.length) {
-          linearStdDev *= cameraStdDevFactors[cameraIndex];
-          angularStdDev *= cameraStdDevFactors[cameraIndex];
+          baseLinearStdDev *= cameraStdDevFactors[cameraIndex];
+          angularStdDev    *= cameraStdDevFactors[cameraIndex];
         }
 
-        // Send vision observation
+        // Apply adaptive scale from cross-validation (previous cycle's estimate)
+        double linearStdDev = baseLinearStdDev * adaptiveScale[cameraIndex];
+
+        // Send vision observation to pose estimator
         consumer.accept(
             observation.pose().toPose2d(),
             observation.timestamp(),
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+
+        // Record for cross-validation (store BASE std dev before adaptive scale)
+        thisFrameObs.add(new AcceptedObs(
+            cameraIndex,
+            observation.timestamp(),
+            observation.pose().toPose2d(),
+            baseLinearStdDev));
       }
 
       // Log camera metadata
@@ -168,6 +205,60 @@ public class VisionSubsystem extends SubsystemBase {
         "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
     Logger.recordOutput(
         "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
+
+    // ── Pass 2: multi-camera cross-validation ────────────────────────────────
+    // Compare every pair of accepted observations from DIFFERENT cameras that land
+    // within 30 ms of each other.
+    //
+    // For two independent 2D estimates with isotropic noise σA and σB:
+    //   E[|pA - pB|²] = 2·(σA² + σB²)
+    //
+    // We accumulate (actualResidual², expectedResidual²) in per-camera circular buffers.
+    // The ratio sqrt(ΣActual / ΣExpected) drives a multiplicative low-pass update to
+    // adaptiveScale[i].  ratio > 1 → cameras less accurate than assumed → inflate std dev.
+    for (int a = 0; a < thisFrameObs.size(); a++) {
+      for (int b = a + 1; b < thisFrameObs.size(); b++) {
+        AcceptedObs A = thisFrameObs.get(a);
+        AcceptedObs B = thisFrameObs.get(b);
+        if (A.cam() == B.cam()) continue;
+        if (Math.abs(A.ts() - B.ts()) > 0.030) continue; // 30 ms temporal window
+
+        double actualSq = Math.pow(
+            A.pose().getTranslation().getDistance(B.pose().getTranslation()), 2.0);
+
+        // Effective std devs (including the adaptive scale already applied)
+        double effA = A.baseLinearStdDev() * adaptiveScale[A.cam()];
+        double effB = B.baseLinearStdDev() * adaptiveScale[B.cam()];
+        double expectedSq = 2.0 * (effA * effA + effB * effB);
+
+        // Update circular buffer for both cameras
+        for (int cam : new int[]{A.cam(), B.cam()}) {
+          cvActualResidualSq[cam][cvWriteIdx[cam]]   = actualSq;
+          cvExpectedResidualSq[cam][cvWriteIdx[cam]] = expectedSq;
+          cvWriteIdx[cam] = (cvWriteIdx[cam] + 1) % CROSS_VAL_WINDOW;
+          cvCount[cam]    = Math.min(cvCount[cam] + 1, CROSS_VAL_WINDOW);
+        }
+      }
+    }
+
+    // Update adaptive scale factors and log them
+    for (int i = 0; i < io.length; i++) {
+      int n = cvCount[i];
+      if (n >= 10) {
+        double sumActual = 0.0, sumExpected = 0.0;
+        for (int j = 0; j < n; j++) {
+          sumActual   += cvActualResidualSq[i][j];
+          sumExpected += cvExpectedResidualSq[i][j];
+        }
+        // ratio > 1: actual residuals larger than expected → std dev was too small
+        double ratio = Math.sqrt(sumActual / Math.max(sumExpected, 1e-9));
+        // Multiplicative low-pass: α = 0.01 (≈100-sample time constant)
+        adaptiveScale[i] = MathUtil.clamp(
+            adaptiveScale[i] * (0.99 + 0.01 * ratio), 0.1, 5.0);
+      }
+      Logger.recordOutput("Vision/Camera" + i + "/CrossVal/AdaptiveScale", adaptiveScale[i]);
+      Logger.recordOutput("Vision/Camera" + i + "/CrossVal/SampleCount",   (double) cvCount[i]);
+    }
   }
 
   @FunctionalInterface

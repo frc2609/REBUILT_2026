@@ -13,6 +13,8 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.util.Conversions;
 
@@ -332,24 +334,48 @@ public final class Constants {
         public static double linearStdDevBaseline = 0.02; // Meters
         public static double angularStdDevBaseline = 0.06; // Radians
 
-        public static double[] cameraStdDevFactors = {1.0, 1.0};
+        public static double[] cameraStdDevFactors = {1.0, 1.0, 1.0};
 
-        // Multipliers to apply for MegaTag 2 observations
+        // Multipliers to apply for gyro-constrained (MEGATAG_2) observations
         public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
         public static double angularStdDevMegatag2Factor =
-            Double.POSITIVE_INFINITY; // No rotation data available
+            Double.POSITIVE_INFINITY; // Rotation provided by gyro, not vision
+
+        // Camera positions given in user frame (x=lateral/left+, y=forward+, z=up+).
+        // Converted to WPILib NWU (X=forward, Y=left, Z=up): wpiX=userY, wpiY=userX, wpiZ=userZ.
+        // Pitch is NEGATIVE for cameras tilted upward (WPILib right-hand-rule around Y).
 
         public static final class Left {
             public static final String name = "limelight-left";
-            public static Transform3d fromRobot =
-                new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI/2));
+            // User: x=13in(left), y=-10.5in(back), z=8in(up), pitch=10°up, yaw=left(90°)
+            public static final Transform3d robotToCamera = new Transform3d(
+                new Translation3d(
+                    Units.inchesToMeters(-10.5),  // WPILib X = user Y (forward)
+                    Units.inchesToMeters(13.0),   // WPILib Y = user X (left)
+                    Units.inchesToMeters(8.0)),   // WPILib Z = user Z (up)
+                new Rotation3d(0.0, Units.degreesToRadians(-10.0), Math.PI / 2.0));
         }
 
         public static final class Right {
             public static final String name = "limelight-right";
-            public static Transform3d fromRobot =
-            
-                new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, -Math.PI/2));
+            // User: x=-13in(right), y=-10.375in(back), z=6in(up), pitch=10°up, yaw=right(-90°)
+            public static final Transform3d robotToCamera = new Transform3d(
+                new Translation3d(
+                    Units.inchesToMeters(-10.375), // WPILib X = user Y (forward)
+                    Units.inchesToMeters(-13.0),   // WPILib Y = user X (left, negative=right)
+                    Units.inchesToMeters(6.0)),    // WPILib Z = user Z (up)
+                new Rotation3d(0.0, Units.degreesToRadians(-10.0), -Math.PI / 2.0));
+        }
+
+        public static final class Front {
+            public static final String name = "limelight-front";
+            // User: x=0(center), y=2.75in(forward), z=16.25in(up), pitch=0°, yaw=forward(0°)
+            public static final Transform3d robotToCamera = new Transform3d(
+                new Translation3d(
+                    Units.inchesToMeters(2.75),    // WPILib X = user Y (forward)
+                    0.0,                           // WPILib Y = user X (center)
+                    Units.inchesToMeters(16.25)),  // WPILib Z = user Z (up)
+                new Rotation3d(0.0, 0.0, 0.0));
         }
     }
 }

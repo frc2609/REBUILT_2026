@@ -326,21 +326,36 @@ public class RobotFactory {
             // PhotonSim needs the drive pose for the camera positions
             return new VisionIO[] {
                 new VisionIOPhotonVisionSim(
-                    Constants.Vision.Left.name, 
-                    Constants.Vision.Left.fromRobot, 
+                    Constants.Vision.Left.name,
+                    Constants.Vision.Left.robotToCamera,
                     driveSubsystem::getPose
                 ),
                 new VisionIOPhotonVisionSim(
                     Constants.Vision.Right.name,
-                    Constants.Vision.Right.fromRobot,
+                    Constants.Vision.Right.robotToCamera,
+                    driveSubsystem::getPose
+                ),
+                new VisionIOPhotonVisionSim(
+                    Constants.Vision.Front.name,
+                    Constants.Vision.Front.robotToCamera,
                     driveSubsystem::getPose
                 )
             };
         case REAL:
-            // Limelight needs gyro rotation for MegaTag2 
+            // Custom gyro-constrained localization; robotToCamera encodes exact mount geometry
             return new VisionIO[] {
-                new VisionIOLimelight(Constants.Vision.Left.name, driveSubsystem::getRotation),
-                new VisionIOLimelight(Constants.Vision.Right.name, driveSubsystem::getRotation)
+                new VisionIOLimelight(
+                    Constants.Vision.Left.name,
+                    Constants.Vision.Left.robotToCamera,
+                    driveSubsystem::getRotation),
+                new VisionIOLimelight(
+                    Constants.Vision.Right.name,
+                    Constants.Vision.Right.robotToCamera,
+                    driveSubsystem::getRotation),
+                new VisionIOLimelight(
+                    Constants.Vision.Front.name,
+                    Constants.Vision.Front.robotToCamera,
+                    driveSubsystem::getRotation)
             };
         default:
             throw new IllegalStateException("Unsupported mode");
