@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.ctre.phoenix6.CANBus;
@@ -12,7 +13,6 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
-import com.ctre.phoenix6.signals.System_StateValue;
 
 import frc.robot.Constants;
 
@@ -33,6 +33,7 @@ public class CtreTalonFxIO {
 
     public String NTPath;
     private ArrayList<LoggedNetworkNumber> tunables;
+    private ArrayList<String> usedTunableIDs;
     private double[] tunables_old;
 
     public CtreTalonFxIO(Map<String, Object> cfg) {
@@ -122,6 +123,7 @@ public class CtreTalonFxIO {
 
         NTPath = "/Tuning/"+Constants.motorNames.get(motorId);
         tunables = new ArrayList<LoggedNetworkNumber>();
+        usedTunableIDs = new ArrayList<String>();
         
         for (String key : Constants.tunableKeys) {
             if (cfg.get(key) != null)
@@ -130,6 +132,7 @@ public class CtreTalonFxIO {
                     NTPath + "/Tunables/" + key, 
                     (double) cfg.get(key)
                 ));
+                usedTunableIDs.add(key);
             }
         }
 
@@ -175,8 +178,10 @@ public class CtreTalonFxIO {
 
     public void applyConfiguration() {
         motor.getConfigurator().apply(config);
+        Logger.recordOutput(NTPath+"/Config", config.Slot0.toString());
         if (hasFollower) {
             followerMotor.getConfigurator().apply(config);
+            //followerMotor.setControl(new Follower(this.motorId, followerAligned));
         }
     }
 
@@ -192,12 +197,10 @@ public class CtreTalonFxIO {
 
         for (int i = 0; i < tunables.size(); i++) {
             double value = tunables.get(i).getAsDouble();
+            
             if (value != tunables_old[i])
             {   
-                setters.get(Constants.tunableKeys[i]).accept(value);
-                if (Constants.tunableKeys[i] == "kS") {
-                    System.out.println("kS SET TO: "+value);
-                }
+                setters.get(usedTunableIDs.get(i)).accept(value);
                 changed = true;
             }
         }

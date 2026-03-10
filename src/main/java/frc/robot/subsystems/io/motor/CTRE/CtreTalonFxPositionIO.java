@@ -60,7 +60,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         // Keep a vendor-agnostic setpoint for consistent "at position" semantics across
         // implementations.
         targetDegrees = Conversions.rotationsToDegrees(targetRotations, gearRatio);
-        System.out.println("POSITION COMMAND: "+degrees+" -> "+targetRotations);
+        //System.out.println("POSITION COMMAND: "+degrees+" -> "+targetRotations);
 
         control = control.withPosition(targetRotations);
         motor.setControl(control);
@@ -92,7 +92,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
     @Override
     public void logMotorPID() {
         measuredLogged.set(getPositionDegrees());
-        Logger.recordOutput(NTPath+"/Rotations", motor.getPosition().getValueAsDouble());
+        rotationsLogged.set(motor.getPosition().getValueAsDouble());
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
     }
 

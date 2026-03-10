@@ -121,17 +121,11 @@ public class RobotContainer {
         // Drive commands
 
         driveSubsystem.setDefaultCommand(
-            // DriveCommands.joystickDrive(
-            //     driveSubsystem,
-            //     () -> -driverController.getLeftY(),
-            //     () -> -driverController.getLeftX(),
-            //     () -> -driverController.getRightX()));
-            //     driveSubsystem.setDefaultCommand(
             DriveCommands.joystickDrive(
                 driveSubsystem,
-                () -> driverController.getLeftY(),
-                () -> driverController.getLeftX(),
-                () -> -driverController.getRawAxis(3)));
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX()));
 
         xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
         resetGyroTrigger.onTrue( 

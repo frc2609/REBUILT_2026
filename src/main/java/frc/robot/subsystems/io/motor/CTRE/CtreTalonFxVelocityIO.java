@@ -1,6 +1,5 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
@@ -24,10 +23,6 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
             setpointRps = velocity;
             control = control.withVelocity(setpointRps);
             motor.setControl(control);
-            // if (hasFollower)
-            // {
-            //     followerMotor.setControl(control);
-            // }
         }
     }
 
@@ -44,7 +39,6 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
     @Override
     public double getSetpointRPM() {
         double input = setpointLogged.get();
-        // setpointLogged.set(input);
         return input;
     }
 
@@ -56,7 +50,6 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
     @Override
     public void logMotorPID() {
         measuredLogged.set(getVelocityRps()*60.0);
-        //setpointLogged.set(setpointRps*60.0);
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
     }
 
@@ -64,8 +57,5 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
     public void stop() {
         setpointRps = 0.0;
         motor.stopMotor();
-        // if (hasFollower) {
-        //     followerMotor.stopMotor();
-        // }
     }
 }
