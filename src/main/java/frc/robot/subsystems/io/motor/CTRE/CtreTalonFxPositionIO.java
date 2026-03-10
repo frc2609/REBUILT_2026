@@ -2,6 +2,14 @@ package frc.robot.subsystems.io.motor.CTRE;
 
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.VoltageOut;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import java.util.Map;
@@ -13,7 +21,8 @@ import frc.robot.util.Conversions;
 
 public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMotorIO {
     //private MotionMagicDutyCycle control = new MotionMagicDutyCycle(0).withSlot(0);
-    private PositionDutyCycle control = new PositionDutyCycle(0).withSlot(0);
+    private PositionDutyCycle control = new PositionDutyCycle(0).withSlot(0).withEnableFOC(true);
+    private final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
     private final double gearRatio;
     private final double encoderRatio;
 
@@ -104,6 +113,54 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
     }
 
+
+    /**
+     * Drives the motor with raw voltage for SysID characterization.
+     * Respects forward and reverse soft limits (if enabled) in addition to
+     * the hardware-enforced limits already configured in TalonFXConfiguration.
+     */
+    public void runVolts(double volts) {
+        double currentRotations = motor.getPosition().getValueAsDouble();
+
+        if (forwardLimitEnabled && volts > 0 && currentRotations >= forwardLimitRotations) {
+            volts = 0;
+        }
+        if (reverseLimitEnabled && volts < 0 && currentRotations <= reverseLimitRotations) {
+            volts = 0;
+        }
+
+        motor.setControl(voltageOut.withOutput(volts));
+    }
+
+    /**
+     * Creates a SysIdRoutine for this motor.
+     *
+     * <p>Bind the returned quasistatic/dynamic commands to buttons in RobotContainer.
+     * Example usage in a subsystem:
+     * <pre>
+     *   public Command sysIdQuasistatic(SysIdRoutine.Direction dir) {
+     *       return io.getSysIdRoutine(this).quasistatic(dir);
+     *   }
+     *   public Command sysIdDynamic(SysIdRoutine.Direction dir) {
+     *       return io.getSysIdRoutine(this).dynamic(dir);
+     *   }
+     * </pre>
+     *
+     * @param subsystem the subsystem that owns this motor (used for command requirements)
+     */
+    public SysIdRoutine getSysIdRoutine(SubsystemBase subsystem) {
+        return new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null, null, null,
+                (state) -> Logger.recordOutput(NTPath + "/SysIdState", state.toString())),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> runVolts(voltage.in(Volts)),
+                (log) -> log.motor(NTPath)
+                    .voltage(Volts.of(motor.getMotorVoltage().getValueAsDouble()))
+                    .angularPosition(Rotations.of(motor.getPosition().getValueAsDouble()))
+                    .angularVelocity(RotationsPerSecond.of(motor.getVelocity().getValueAsDouble())),
+                subsystem));
+    }
 
     @Override
     public void stop() {
