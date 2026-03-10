@@ -25,7 +25,6 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void setAimPosition() {
-        System.out.println("SET AIM POSITION: "+aimMotor.getSetpoint());
         aimMotor.setTargetPositionDegrees(aimMotor.getSetpoint());
     }
     public void setAimPosition(double degrees) {
@@ -35,7 +34,6 @@ public class TurretSubsystem extends SubsystemBase {
     public void resetAimPositionToAbsolute(double offsetRotations) {
         aimMotor.resetToAbsolute(aimEncoder.getRotations()-offsetRotations);
     }
-
     public boolean aimIsAtPosition(double toleranceDegrees) {
         return aimMotor.isAtPosition(toleranceDegrees);
     }

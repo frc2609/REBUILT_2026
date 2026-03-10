@@ -1,5 +1,6 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
@@ -8,11 +9,13 @@ import java.util.Map;
 public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMotorIO {
 
     private VelocityDutyCycle control;
+    //private TorqueCurrentFOC torqueControl;
     public double setpointRps = 0.0;
 
     public CtreTalonFxVelocityIO(Map<String, Object> cfg) {
         super(cfg);
         control = new VelocityDutyCycle(0.0);
+        //torqueControl = new TorqueCurrentFOC(0.0);
     }
 
     @Override
@@ -26,6 +29,11 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
             //     followerMotor.setControl(control);
             // }
         }
+    }
+
+    @Override
+    public void set(double percent) {
+        motor.set(percent);
     }
 
     @Override

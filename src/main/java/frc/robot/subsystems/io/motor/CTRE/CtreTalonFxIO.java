@@ -211,12 +211,10 @@ public class CtreTalonFxIO {
 
     public double getSetpoint() {
         double input = setpointLogged.get();
-        // setpointLogged.set(input);
         return input;
     }
 
     public void setSetpoint(double value) {
         setpointLogged.set(value);
-        System.out.println(NTPath+": Set setpoint value to "+value);
     }
 }

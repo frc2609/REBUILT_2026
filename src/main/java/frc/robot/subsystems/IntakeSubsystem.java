@@ -37,8 +37,8 @@ public class IntakeSubsystem extends SubsystemBase {
         deployMotor.setTargetPositionDegrees(degrees);
     }
 
-    public void resetDeployPositionToAbsolute() {
-        deployMotor.resetToAbsolute(deployEncoder.getRotations());
+    public void resetDeployPositionToAbsolute(double offsetRotations) {
+        deployMotor.resetToAbsolute(deployEncoder.getRotations()-offsetRotations);
     }
 
     public boolean deployIsAtPosition(double toleranceDegrees) {

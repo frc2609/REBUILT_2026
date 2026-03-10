@@ -112,15 +112,17 @@ public final class Constants {
         // Rotation values are OUTPUT degrees
         // RPM values are INPUT RPM, will be geared down
 
-        public static final double INTAKE_DEPLOYED_DEG = 0.8*360.0;
-        public static final double INTAKE_RETRACT_DEG  = 0.5*360.0;
+        public static final double INTAKE_DEPLOYED_DEG = 0.0;
+        public static final double INTAKE_RETRACT_DEG  = -0.3*360.0;
+        
         public static final double INTAKE_RUN_RPM = 5000.0;
         public static final double INTAKE_IDLE_RPM = 0.0;
 
         public static final double CLIMBER_DEPLOYED_DEG = 360.0;
 
         public static final double TURRET_AIM_DEG = 45.0;
-        public static final double TURRET_HOOD_DEG = 10;
+
+        public static final double TURRET_HOOD_DEG = 10.0;
 
         public static final double AGITATOR_HOLD_RPM = 2000.0;
         public static final double FEED_HOLD_RPM = 3000.0; // max speed
@@ -240,8 +242,8 @@ public final class Constants {
                 config.put("forwardLimitEnabled", true);
                 config.put("reverseLimitEnabled", true);
 
-                config.put("forwardLimitRotations", 0.8);
-                config.put("reverseLimitRotations", 0);
+                config.put("forwardLimitRotations", 0.8*GEAR_RATIO);
+                config.put("reverseLimitRotations", 0.0);
                 
                 config.put("inverted", false);
                 config.put("supplyCurrentLimit", 60.0);
@@ -283,6 +285,7 @@ public final class Constants {
 
         public static final class Deploy {
             public static final double INERTIA = 0.001;
+            public static final double ZERO_OFFSET = 0.836;
             public static final double GEAR_RATIO = 27.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
@@ -302,8 +305,8 @@ public final class Constants {
                 config.put("reverseLimitEnabled", true);
 
                 // TalonFX outputted rotations
-                config.put("forwardLimitRotations", 0.83);
-                config.put("reverseLimitRotations", 0.45);
+                config.put("forwardLimitRotations", 0.0);
+                config.put("reverseLimitRotations", -0.38*GEAR_RATIO);
 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 
@@ -337,16 +340,16 @@ public final class Constants {
             Double.POSITIVE_INFINITY; // No rotation data available
 
         public static final class Left {
-        public static final String name = "limelight-left";
-        public static Transform3d fromRobot =
-            new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI/2));
+            public static final String name = "limelight-left";
+            public static Transform3d fromRobot =
+                new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI/2));
         }
 
         public static final class Right {
-        public static final String name = "limelight-right";
-        public static Transform3d fromRobot =
-        
-            new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, -Math.PI/2));
+            public static final String name = "limelight-right";
+            public static Transform3d fromRobot =
+            
+                new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, -Math.PI/2));
         }
     }
 }

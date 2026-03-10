@@ -11,6 +11,7 @@ public class FullShoot extends Command {
     private final FeedSubsystem agitator;
     private final double feedRPS;
     private final double agitatorRPS;
+    private double flywheelRPS;
 
     public FullShoot(
         FlywheelSubsystem flywheel, FeedSubsystem agitator, 
@@ -21,13 +22,14 @@ public class FullShoot extends Command {
 
         this.feedRPS = feedRPS;
         this.agitatorRPS = agitatorRPS;
+        flywheelRPS = flywheel.getSetpointRPS();
  
         addRequirements(flywheel, agitator);
     }
 
     @Override
     public void execute() {
-        flywheel.setSpeed(); // Variable
+        flywheel.bangBang(flywheelRPS, 0.1);
         agitator.setAgitatorSpeed(agitatorRPS);
         agitator.setFeedSpeed(feedRPS);
     }

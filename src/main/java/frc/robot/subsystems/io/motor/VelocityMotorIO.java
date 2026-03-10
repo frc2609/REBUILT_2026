@@ -13,6 +13,8 @@ public interface VelocityMotorIO {
     double getSetpointRPM();
     void setSetpoint(double value);
 
+    void set(double percent);
+
     boolean isAtSpeed(double toleranceRps);
 
     void stop();
