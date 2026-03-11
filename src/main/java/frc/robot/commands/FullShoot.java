@@ -30,7 +30,7 @@ public class FullShoot extends Command {
     @Override
     public void execute() {
         flywheelRPS = flywheel.getSetpointRPS();
-        flywheel.bangBang(flywheelRPS, 0.1);
+        flywheel.bangBang(flywheelRPS, 0.117);
         agitator.setAgitatorSpeed(agitatorRPS);
         agitator.setFeedSpeed(feedRPS);
     }

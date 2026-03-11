@@ -38,6 +38,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void resetDeployPositionToAbsolute(double offsetRotations) {
+        System.out.println("DEPLOY ZEROED, ENCODER: "+deployEncoder.getRotations()+" - OFFSET: "+offsetRotations);
         deployMotor.resetToAbsolute(deployEncoder.getRotations()-offsetRotations);
     }
 

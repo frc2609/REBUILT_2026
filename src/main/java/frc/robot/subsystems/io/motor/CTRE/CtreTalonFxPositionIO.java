@@ -81,12 +81,17 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
     @Override
     public void resetToAbsolute(double absRotations) {
         double motorRotations = absRotations * gearRatio;
-        System.out.println("ENCODER RESET, rotations="+motorRotations);
+        System.out.println(NTPath+": ENCODER RESET, rotations="+motorRotations);
         motor.setPosition(motorRotations);
         targetDegrees = getPositionDegrees(); // 0?
         if (hasFollower) {
             followerMotor.setPosition(motorRotations);
         }
+    }
+
+    @Override
+    public void resetToZero() {
+        motor.setPosition(0.0);
     }
 
     @Override

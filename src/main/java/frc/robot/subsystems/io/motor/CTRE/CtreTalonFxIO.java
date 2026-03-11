@@ -13,6 +13,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import frc.robot.Constants;
 
@@ -101,6 +102,10 @@ public class CtreTalonFxIO {
         setters.put(
             "isRioCANBUS", 
             value -> this.isRioCANBUS = (boolean) value);
+        setters.put(
+            "useClosedLoopFFSign", 
+            value -> this.config.Slot0.StaticFeedforwardSign = (((boolean) value) ? 
+            StaticFeedforwardSignValue.UseClosedLoopSign : StaticFeedforwardSignValue.UseVelocitySign));
 
         setConfiguration(cfg);
 

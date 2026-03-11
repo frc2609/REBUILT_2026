@@ -17,6 +17,9 @@ public class TurretSubsystem extends SubsystemBase {
         this.aimMotor = aimMotor;
         this.hoodMotor = hoodMotor;
         this.aimEncoder = aimEncoder;
+
+        System.out.println("RESET HOOD TO ZERO");
+        hoodMotor.resetToZero();
     }
 
     public void setSetpoints(double aimDeg, double hoodDeg) {

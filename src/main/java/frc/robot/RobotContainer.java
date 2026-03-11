@@ -109,6 +109,7 @@ public class RobotContainer {
 
         feedSubsystem.setSetpoints(Constants.Controls.FEED_HOLD_RPM,Constants.Controls.AGITATOR_HOLD_RPM);
         flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_HOLD_RPM);
+        intakeSubsystem.setDeploySetpoint(0);
         holdAgitatorTrigger.whileTrue(Commands.runEnd(feedSubsystem::setAgitatorSpeed,feedSubsystem::stop,feedSubsystem));
         holdFeedTrigger.whileTrue(Commands.runEnd(feedSubsystem::setFeedSpeed,feedSubsystem::stop,feedSubsystem));
         holdFlywheelTrigger.whileTrue(Commands.runEnd(flywheelSubsystem::setSpeed,flywheelSubsystem::stop,flywheelSubsystem));
@@ -116,7 +117,7 @@ public class RobotContainer {
         setIntakeTrigger.onTrue(Commands.runOnce(intakeSubsystem::setDeployPosition, intakeSubsystem));
         turretSubsystem.setSetpoints(Constants.Controls.TURRET_AIM_DEG,Constants.Controls.TURRET_HOOD_DEG);
         setHoodTrigger.onTrue(Commands.runOnce(turretSubsystem::setHoodPosition,turretSubsystem));
-        turretSubsystem.setDefaultCommand(Commands.run(turretSubsystem::setAimPosition, turretSubsystem));
+        //turretSubsystem.setDefaultCommand(Commands.run(turretSubsystem::setAimPosition, turretSubsystem));
         
         // Drive commands
 

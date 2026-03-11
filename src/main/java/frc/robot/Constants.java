@@ -121,7 +121,6 @@ public final class Constants {
         public static final double CLIMBER_DEPLOYED_DEG = 360.0;
 
         public static final double TURRET_AIM_DEG = 45.0;
-
         public static final double TURRET_HOOD_DEG = 10.0;
 
         public static final double AGITATOR_HOLD_RPM = 2000.0;
@@ -170,7 +169,7 @@ public final class Constants {
         public static final Map<String, Object> config = new HashMap<>(Map.of(
             "motorId", 21,
             "kP", 0.04,
-            "kV", 0.0097,
+            "kV", 0.0113,
             "inverted", true
         ));
     }
@@ -184,7 +183,7 @@ public final class Constants {
             "followerId", 51,
             "followerAligned", false,
             "kP", 0.04,
-            "kV", 0.0097,
+            "kV", 0.0117,
             "inverted", false
         ));
     }
@@ -222,6 +221,7 @@ public final class Constants {
                 config.put("supplyCurrentLimitEnabled", true);
                 config.put("statorCurrentLimit", 160.0);
                 config.put("statorCurrentLimitEnabled", true);
+                config.put("useClosedLoopFFSign", true);
             }
         }
 
@@ -229,27 +229,27 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 19.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
-            public static final double ZERO_OFFSET = -0.33;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 52,
-                "kP", 0.15,
+                "kP", 0.06,
                 "kD", 0.0,
-                "kS", 0.05
+                "kS", 0.035
             ));
             static {
                 // config.put("MotionMagicCruiseVelocity", 2.0);
                 // config.put("MotionMagicAcceleration", 1.0);
-                config.put("forwardLimitEnabled", true);
-                config.put("reverseLimitEnabled", true);
+                config.put("forwardLimitEnabled", false);
+                config.put("reverseLimitEnabled", false);
 
-                config.put("forwardLimitRotations", 0.8*GEAR_RATIO);
+                config.put("forwardLimitRotations", 0.92);
                 config.put("reverseLimitRotations", 0.0);
                 
-                config.put("inverted", false);
-                config.put("supplyCurrentLimit", 60.0);
+                config.put("inverted", true);
+                config.put("supplyCurrentLimit", 120.0);
                 config.put("supplyCurrentLimitEnabled", true);
-                config.put("statorCurrentLimit", 80.0);
+                config.put("statorCurrentLimit", 160.0);
                 config.put("statorCurrentLimitEnabled", true);
+                config.put("useClosedLoopFFSign", true);
             }
         }
     }
@@ -261,8 +261,8 @@ public final class Constants {
 
         public static final Map<String, Object> config = new HashMap<>(Map.of(
             "motorId", 20,
-            "kP", 0.04,
-            "kV", 0.0097,
+            "kP", 0.05,
+            "kV", 0.012,
             "inverted", false
         ));
     }
@@ -278,14 +278,14 @@ public final class Constants {
                 "motorId", 31,
                 "isRioCANBUS",true,
                 "inverted", true,
-                "kP", 0.025,
-                "kV", 0.001
+                "kP", 0.11,
+                "kV", 0.0112
             ));
         }
 
         public static final class Deploy {
             public static final double INERTIA = 0.001;
-            public static final double ZERO_OFFSET = 0.836;
+            public static final double ZERO_OFFSET = -0.165;
             public static final double GEAR_RATIO = 27.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
@@ -296,7 +296,7 @@ public final class Constants {
                 "kP", 0.15,
                 "kD", 0.0,
                 "kG", 0.0,
-                "kS", 0.05
+                "kS", 0.06
             ));
             static {
                 // config.put("MotionMagicCruiseVelocity", 2.0);
@@ -306,7 +306,7 @@ public final class Constants {
 
                 // TalonFX outputted rotations
                 config.put("forwardLimitRotations", 0.0);
-                config.put("reverseLimitRotations", -0.38*GEAR_RATIO);
+                config.put("reverseLimitRotations", 8.8);
 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 
