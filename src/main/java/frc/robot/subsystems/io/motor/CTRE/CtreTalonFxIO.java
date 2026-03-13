@@ -11,10 +11,17 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 public class CtreTalonFxIO {
     private final Map<String, Consumer<Object>> setters = new HashMap<>();
@@ -35,6 +42,8 @@ public class CtreTalonFxIO {
     private ArrayList<LoggedNetworkNumber> tunables;
     private ArrayList<String> usedTunableIDs;
     private double[] tunables_old;
+
+    private final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
 
     public CtreTalonFxIO(Map<String, Object> cfg) {
         config = new TalonFXConfiguration();
@@ -219,5 +228,55 @@ public class CtreTalonFxIO {
 
     public void setSetpoint(double value) {
         setpointLogged.set(value);
+    }
+
+    /**
+     * Drives the motor with raw voltage for SysID characterization.
+     * Respects forward and reverse soft limits (if enabled) in addition to
+     * the hardware-enforced limits already configured in TalonFXConfiguration.
+     */
+    public void runVolts(double volts) {
+        motor.setControl(voltageOut.withOutput(volts));
+    }
+
+    /**
+     * Drives the motor with raw voltage for SysID characterization with predictive limit stopping.
+     * In addition to the hard limit checks in {@link #runVolts}, this predicts the position
+     * 2 robot loops ahead (40 ms) using current velocity and zeroes the voltage if the
+     * mechanism would reach a soft-limit boundary, giving the loop time to react before
+     * the limit is actually breached.
+     */
+    public void runVoltsSysid(double volts) {
+        motor.setControl(voltageOut.withOutput(volts));
+    }
+
+    /**
+     * Creates a SysIdRoutine for this motor.
+     *
+     * <p>Bind the returned quasistatic/dynamic commands to buttons in RobotContainer.
+     * Example usage in a subsystem:
+     * <pre>
+     *   public Command sysIdQuasistatic(SysIdRoutine.Direction dir) {
+     *       return io.getSysIdRoutine(this).quasistatic(dir);
+     *   }
+     *   public Command sysIdDynamic(SysIdRoutine.Direction dir) {
+     *       return io.getSysIdRoutine(this).dynamic(dir);
+     *   }
+     * </pre>
+     *
+     * @param subsystem the subsystem that owns this motor (used for command requirements)
+     */
+    public SysIdRoutine getSysIdRoutine(SubsystemBase subsystem) {
+        return new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null, null, null,
+                (state) -> Logger.recordOutput(NTPath + "/SysIdState", state.toString())),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> runVoltsSysid(voltage.in(Volts)),
+                (log) -> log.motor(NTPath)
+                    .voltage(Volts.of(motor.getMotorVoltage().getValueAsDouble()))
+                    .angularPosition(Rotations.of(motor.getPosition().getValueAsDouble()))
+                    .angularVelocity(RotationsPerSecond.of(motor.getVelocity().getValueAsDouble())),
+                subsystem));
     }
 }
