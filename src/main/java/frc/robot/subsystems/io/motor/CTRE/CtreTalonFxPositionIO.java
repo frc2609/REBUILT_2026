@@ -8,8 +8,11 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import frc.robot.subsystems.io.motor.PositionMotorIO;
@@ -180,7 +183,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
     public SysIdRoutine getSysIdRoutine(SubsystemBase subsystem) {
         return new SysIdRoutine(
             new SysIdRoutine.Config(
-                null, null, null,
+                Volts.per(Seconds).of(0.5), Volts.of(4.0), null,
                 (state) -> SignalLogger.writeString("SysIdTranslation_State", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runVoltsSysid(voltage.in(Volts)),
@@ -188,6 +191,31 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
                     .voltage(Volts.of(motor.getMotorVoltage().getValueAsDouble()))
                     .angularPosition(Rotations.of(motor.getPosition().getValueAsDouble()))
                     .angularVelocity(RotationsPerSecond.of(motor.getVelocity().getValueAsDouble())),
+                subsystem));
+    }
+
+    /**
+     * Creates a SysIdRoutine for this motor configured for arm (gravity-varying) characterization.
+     * Logs position in radians from horizontal and velocity in radians/sec, accounting for
+     * the gear ratio and the arm's angle at motor position zero.
+     *
+     * @param subsystem        the subsystem that owns this motor
+     * @param horizontalOffsetRad the arm angle (radians from horizontal) when motor position is 0
+     */
+    public SysIdRoutine getSysIdRoutineArm(SubsystemBase subsystem, double horizontalOffsetRad) {
+        return new SysIdRoutine(
+            new SysIdRoutine.Config(
+                Volts.per(Seconds).of(0.5), Volts.of(4.0), null,
+                (state) -> SignalLogger.writeString("SysIdTranslation_State", state.toString())),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> runVoltsSysid(voltage.in(Volts)),
+                (log) -> log.motor(NTPath)
+                    .voltage(Volts.of(motor.getMotorVoltage().getValueAsDouble()))
+                    .angularPosition(Radians.of(
+                        motor.getPosition().getValueAsDouble() / gearRatio * 2 * Math.PI
+                        + horizontalOffsetRad))
+                    .angularVelocity(RadiansPerSecond.of(
+                        motor.getVelocity().getValueAsDouble() / gearRatio * 2 * Math.PI)),
                 subsystem));
     }
 

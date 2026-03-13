@@ -101,23 +101,21 @@ public class RobotContainer {
         }
     }
     private void configureSysIDBindings(){
-                // SysId characterization: hold button for duration of test. One mechanism at a time.
-        // Climber: leftStick / rightStick / povLeft / povRight
+        // SysId characterization: hold button for duration of test. One mechanism at a time.
+        // Intake deploy arm (TalonFX-30): POV up/down = quasistatic fwd/rev, left/right = dynamic fwd/rev
         driverController.povUp().whileTrue(
-            feedSubsystem.sysIdAgitatorCommand(SysIdCommand.Mode.QUASISTATIC, SysIdRoutine.Direction.kForward));
+            intakeSubsystem.sysIdDeployCommand(SysIdCommand.Mode.QUASISTATIC, SysIdRoutine.Direction.kForward));
         driverController.povDown().whileTrue(
-            feedSubsystem.sysIdAgitatorCommand(SysIdCommand.Mode.QUASISTATIC, SysIdRoutine.Direction.kReverse));
+            intakeSubsystem.sysIdDeployCommand(SysIdCommand.Mode.QUASISTATIC, SysIdRoutine.Direction.kReverse));
         driverController.povLeft().whileTrue(
-            feedSubsystem.sysIdAgitatorCommand(SysIdCommand.Mode.DYNAMIC, SysIdRoutine.Direction.kForward));
+            intakeSubsystem.sysIdDeployCommand(SysIdCommand.Mode.DYNAMIC, SysIdRoutine.Direction.kForward));
         driverController.povRight().whileTrue(
-            feedSubsystem.sysIdAgitatorCommand(SysIdCommand.Mode.DYNAMIC, SysIdRoutine.Direction.kReverse));
+            intakeSubsystem.sysIdDeployCommand(SysIdCommand.Mode.DYNAMIC, SysIdRoutine.Direction.kReverse));
         // To run SysId on other mechanisms, bind similarly using:
         // turretSubsystem.sysIdAimCommand(mode, direction) / sysIdHoodCommand(mode, direction)
-        // intakeSubsystem.sysIdDeployCommand(mode, direction)
         // flywheelSubsystem.sysIdCommand(mode, direction)
         // feedSubsystem.sysIdAgitatorCommand(mode, direction) / sysIdFeedCommand(mode, direction)
         // driveSubsystem.sysIdQuasistatic(direction) / sysIdDynamic(direction)
-
     }
 
     private void configureBindings() {

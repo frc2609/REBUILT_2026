@@ -60,7 +60,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     /** SysId for intake deploy motor. Hold the bound button for the duration of the test. */
     public Command sysIdDeployCommand(frc.robot.commands.SysIdCommand.Mode mode, SysIdRoutine.Direction direction) {
-        return deployMotor.createSysIdCommand(this, mode, direction);
+        return deployMotor.createSysIdArmCommand(
+            this, mode, direction, Constants.Intake.Deploy.HORIZONTAL_OFFSET_RAD);
     }
 
     /** SysId for intake roller (drive) motor. Hold the bound button for the duration of the test. */

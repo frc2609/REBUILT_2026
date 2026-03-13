@@ -290,6 +290,9 @@ public final class Constants {
             public static final double GEAR_RATIO = 27.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
+            // Arm angle (radians from horizontal) when motor position is 0 (deployed).
+            // Measure physically and update before running SysId arm characterization.
+            public static final double HORIZONTAL_OFFSET_RAD = 0.0;
 
             // NOTE: Cuts off at 10 key-value pairs
             public static final Map<String, Object> config = new HashMap<>(Map.of(

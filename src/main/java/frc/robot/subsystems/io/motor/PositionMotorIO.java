@@ -46,4 +46,26 @@ public interface PositionMotorIO {
         }
         return new SysIdCommand(routine, subsystem, mode, direction);
     }
+
+    /**
+     * Returns a SysIdRoutine logging position in radians from horizontal, for arm characterization.
+     * Override in implementations that support arm SysId.
+     */
+    default SysIdRoutine getSysIdRoutineArm(SubsystemBase subsystem, double horizontalOffsetRad) {
+        return null;
+    }
+
+    /**
+     * Returns a command that runs an arm SysId test logging position in radians from horizontal.
+     * Returns a no-op if the implementation does not support arm SysId.
+     */
+    default Command createSysIdArmCommand(
+            SubsystemBase subsystem, SysIdCommand.Mode mode, SysIdRoutine.Direction direction,
+            double horizontalOffsetRad) {
+        SysIdRoutine routine = getSysIdRoutineArm(subsystem, horizontalOffsetRad);
+        if (routine == null) {
+            return Commands.none();
+        }
+        return new SysIdCommand(routine, subsystem, mode, direction);
+    }
 }
