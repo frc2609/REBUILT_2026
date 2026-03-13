@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -76,5 +77,11 @@ public class IntakeSubsystem extends SubsystemBase {
         driveMotor.logMotorPID();
         deployMotor.updateFromTunables();
         driveMotor.updateFromTunables();
+
+        // Verify SysId arm angle offset: position the arm at horizontal and confirm this reads 0.
+        // Adjust Constants.Intake.Deploy.HORIZONTAL_OFFSET_RAD until it does.
+        Logger.recordOutput("Intake/Deploy/SysIdArmAngleRad",
+            deployMotor.getPositionDegrees() * Math.PI / 180.0
+            + Constants.Intake.Deploy.HORIZONTAL_OFFSET_RAD);
     }
 }
