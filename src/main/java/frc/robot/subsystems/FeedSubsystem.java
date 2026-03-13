@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
 
 /** Shooter Subsystem using velocity control (rotations per second). */
@@ -42,6 +45,16 @@ public class FeedSubsystem extends SubsystemBase {
     public void stop() {
         agitatorMotor.stop();
         feedMotor.stop();
+    }
+
+    /** SysId characterization for the agitator motor. Hold the button for the duration of the test. */
+    public Command sysIdAgitatorCommand(frc.robot.commands.SysIdCommand.Mode mode, SysIdRoutine.Direction direction) {
+        return agitatorMotor.createSysIdCommand(this, mode, direction);
+    }
+
+    /** SysId characterization for the feed motor. Hold the button for the duration of the test. */
+    public Command sysIdFeedCommand(frc.robot.commands.SysIdCommand.Mode mode, SysIdRoutine.Direction direction) {
+        return feedMotor.createSysIdCommand(this, mode, direction);
     }
 
     @Override

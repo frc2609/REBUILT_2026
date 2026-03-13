@@ -1,6 +1,12 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
@@ -50,6 +56,16 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void stop() {
         driveMotor.stop();
+    }
+
+    /** SysId for intake deploy motor. Hold the bound button for the duration of the test. */
+    public Command sysIdDeployCommand(frc.robot.commands.SysIdCommand.Mode mode, SysIdRoutine.Direction direction) {
+        return deployMotor.createSysIdCommand(this, mode, direction);
+    }
+
+    /** SysId for intake roller (drive) motor. Hold the bound button for the duration of the test. */
+    public Command sysIdRollerCommand(frc.robot.commands.SysIdCommand.Mode mode, SysIdRoutine.Direction direction) {
+        return driveMotor.createSysIdCommand(this, mode, direction);
     }
 
     @Override

@@ -13,7 +13,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.SysIdCommand;
 import frc.robot.commands.FullShoot;
 import frc.robot.commands.PushIntake;
 import frc.robot.commands.SetIntakeSpeedRPS;
@@ -31,7 +33,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
+    private final boolean runningSysID = true;
     private final CommandXboxController driverController =
         new CommandXboxController(Constants.Controls.DRIVER_CONTROLLER_PORT);
 
@@ -92,8 +94,30 @@ public class RobotContainer {
         climberSubsystem.resetPositionToAbsolute();
         intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
+        if (runningSysID){
+            configureSysIDBindings();
+        } else {
+            configureBindings();
+        }
+    }
+    private void configureSysIDBindings(){
+                // SysId characterization: hold button for duration of test. One mechanism at a time.
+        // Climber: leftStick / rightStick / povLeft / povRight
+        driverController.povUp().whileTrue(
+            feedSubsystem.sysIdAgitatorCommand(SysIdCommand.Mode.QUASISTATIC, SysIdRoutine.Direction.kForward));
+        driverController.povDown().whileTrue(
+            feedSubsystem.sysIdAgitatorCommand(SysIdCommand.Mode.QUASISTATIC, SysIdRoutine.Direction.kReverse));
+        driverController.povLeft().whileTrue(
+            feedSubsystem.sysIdAgitatorCommand(SysIdCommand.Mode.DYNAMIC, SysIdRoutine.Direction.kForward));
+        driverController.povRight().whileTrue(
+            feedSubsystem.sysIdAgitatorCommand(SysIdCommand.Mode.DYNAMIC, SysIdRoutine.Direction.kReverse));
+        // To run SysId on other mechanisms, bind similarly using:
+        // turretSubsystem.sysIdAimCommand(mode, direction) / sysIdHoodCommand(mode, direction)
+        // intakeSubsystem.sysIdDeployCommand(mode, direction)
+        // flywheelSubsystem.sysIdCommand(mode, direction)
+        // feedSubsystem.sysIdAgitatorCommand(mode, direction) / sysIdFeedCommand(mode, direction)
+        // driveSubsystem.sysIdQuasistatic(direction) / sysIdDynamic(direction)
 
-        configureBindings();
     }
 
     private void configureBindings() {
@@ -128,7 +152,7 @@ public class RobotContainer {
                 () -> -driverController.getRightX()));
 
         xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
-        resetGyroTrigger.onTrue( 
+        resetGyroTrigger.onTrue(
             Commands.runOnce(
                     () ->
                         driveSubsystem.setPose(

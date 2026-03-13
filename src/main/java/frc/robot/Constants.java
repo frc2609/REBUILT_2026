@@ -285,11 +285,12 @@ public final class Constants {
 
         public static final class Deploy {
             public static final double INERTIA = 0.001;
-            public static final double ZERO_OFFSET = 0.836;
+            /** Encoder rotations when intake is deployed; used so 0° = deployed. (Retracted ≈ -0.57.) */
+            public static final double ZERO_OFFSET = -0.16;
             public static final double GEAR_RATIO = 27.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
-            
+
             // NOTE: Cuts off at 10 key-value pairs
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId",30,

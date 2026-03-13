@@ -1,5 +1,6 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -180,7 +181,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         return new SysIdRoutine(
             new SysIdRoutine.Config(
                 null, null, null,
-                (state) -> Logger.recordOutput(NTPath + "/SysIdState", state.toString())),
+                (state) -> SignalLogger.writeString("SysIdTranslation_State", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runVoltsSysid(voltage.in(Volts)),
                 (log) -> log.motor(NTPath)
