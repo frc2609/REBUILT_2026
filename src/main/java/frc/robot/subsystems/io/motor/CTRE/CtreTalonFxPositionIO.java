@@ -133,6 +133,31 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
     }
 
     /**
+     * Drives the motor with raw voltage for SysID characterization with predictive limit stopping.
+     * In addition to the hard limit checks in {@link #runVolts}, this predicts the position
+     * 2 robot loops ahead (40 ms) using current velocity and zeroes the voltage if the
+     * mechanism would reach a soft-limit boundary, giving the loop time to react before
+     * the limit is actually breached.
+     */
+    public void runVoltsSysid(double volts) {
+        double currentRotations = motor.getPosition().getValueAsDouble();
+        double velocityRPS = motor.getVelocity().getValueAsDouble();
+        // Predict position 2 x 20 ms loops into the future
+        double predictedRotations = currentRotations + velocityRPS * 0.040;
+
+        if (forwardLimitEnabled && volts > 0
+                && (currentRotations >= forwardLimitRotations || predictedRotations >= forwardLimitRotations)) {
+            volts = 0;
+        }
+        if (reverseLimitEnabled && volts < 0
+                && (currentRotations <= reverseLimitRotations || predictedRotations <= reverseLimitRotations)) {
+            volts = 0;
+        }
+
+        motor.setControl(voltageOut.withOutput(volts));
+    }
+
+    /**
      * Creates a SysIdRoutine for this motor.
      *
      * <p>Bind the returned quasistatic/dynamic commands to buttons in RobotContainer.
@@ -154,7 +179,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
                 null, null, null,
                 (state) -> Logger.recordOutput(NTPath + "/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
-                (voltage) -> runVolts(voltage.in(Volts)),
+                (voltage) -> runVoltsSysid(voltage.in(Volts)),
                 (log) -> log.motor(NTPath)
                     .voltage(Volts.of(motor.getMotorVoltage().getValueAsDouble()))
                     .angularPosition(Rotations.of(motor.getPosition().getValueAsDouble()))
