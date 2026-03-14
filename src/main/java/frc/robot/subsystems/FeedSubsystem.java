@@ -13,16 +13,16 @@ public class FeedSubsystem extends SubsystemBase {
         this.feedMotor = feedMotor;
     }
 
-    public void setSetpoints(double agitatorRPS, double feedRPS) {
-        agitatorMotor.setSetpoint(agitatorRPS);
-        feedMotor.setSetpoint(feedRPS);
+    public void setSetpoints(double agitatorRPM, double feedRPM) {
+        agitatorMotor.setSetpoint(agitatorRPM);
+        feedMotor.setSetpoint(feedRPM);
     }
 
     public void setAgitatorSpeed() {
-        agitatorMotor.setVelocityRps(agitatorMotor.getSetpoint());
+        agitatorMotor.setVelocityRps(agitatorMotor.getSetpointRPM()/60.0);
     }
     public void setFeedSpeed() {
-        feedMotor.setVelocityRps(feedMotor.getSetpoint());
+        feedMotor.setVelocityRps(feedMotor.getSetpointRPM()/60.0);
     }
     public void setAgitatorSpeed(double rotationsPerSecond) {
         agitatorMotor.setVelocityRps(rotationsPerSecond);

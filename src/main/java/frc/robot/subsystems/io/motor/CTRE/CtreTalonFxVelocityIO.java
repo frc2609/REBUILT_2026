@@ -8,11 +8,13 @@ import java.util.Map;
 public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMotorIO {
 
     private VelocityDutyCycle control;
+    //private TorqueCurrentFOC torqueControl;
     public double setpointRps = 0.0;
 
     public CtreTalonFxVelocityIO(Map<String, Object> cfg) {
         super(cfg);
         control = new VelocityDutyCycle(0.0);
+        //torqueControl = new TorqueCurrentFOC(0.0);
     }
 
     @Override
@@ -21,16 +23,23 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
             setpointRps = velocity;
             control = control.withVelocity(setpointRps);
             motor.setControl(control);
-            // if (hasFollower)
-            // {
-            //     followerMotor.setControl(control);
-            // }
         }
+    }
+
+    @Override
+    public void set(double percent) {
+        motor.set(percent);
     }
 
     @Override
     public double getVelocityRps() {
         return motor.getVelocity().getValueAsDouble();
+    }
+
+    @Override
+    public double getSetpointRPM() {
+        double input = setpointLogged.get();
+        return input;
     }
 
     @Override
@@ -41,7 +50,6 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
     @Override
     public void logMotorPID() {
         measuredLogged.set(getVelocityRps()*60.0);
-        //setpointLogged.set(setpointRps*60.0);
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
     }
 
@@ -49,8 +57,5 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
     public void stop() {
         setpointRps = 0.0;
         motor.stopMotor();
-        // if (hasFollower) {
-        //     followerMotor.stopMotor();
-        // }
     }
 }

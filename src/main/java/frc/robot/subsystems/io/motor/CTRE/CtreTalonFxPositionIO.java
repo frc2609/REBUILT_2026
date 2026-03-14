@@ -1,6 +1,7 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import java.util.Map;
@@ -11,7 +12,8 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import frc.robot.util.Conversions;
 
 public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMotorIO {
-    private MotionMagicDutyCycle control = new MotionMagicDutyCycle(0).withSlot(0);
+    //private MotionMagicDutyCycle control = new MotionMagicDutyCycle(0).withSlot(0);
+    private PositionDutyCycle control = new PositionDutyCycle(0).withSlot(0);
     private final double gearRatio;
     private final double encoderRatio;
 
@@ -58,7 +60,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         // Keep a vendor-agnostic setpoint for consistent "at position" semantics across
         // implementations.
         targetDegrees = Conversions.rotationsToDegrees(targetRotations, gearRatio);
-        System.out.println("POSITION COMMAND: "+degrees+" -> "+targetRotations);
+        //System.out.println("POSITION COMMAND: "+degrees+" -> "+targetRotations);
 
         control = control.withPosition(targetRotations);
         motor.setControl(control);
@@ -77,19 +79,25 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
     }
 
     @Override
-    public void resetToAbsolute(double absolutePositionRotations) {
-        System.out.println("ENCODER RESET: "+absolutePositionRotations);
-        motor.setPosition(absolutePositionRotations);
+    public void resetToAbsolute(double absRotations) {
+        double motorRotations = absRotations * gearRatio;
+        System.out.println(NTPath+": ENCODER RESET, rotations="+motorRotations);
+        motor.setPosition(motorRotations);
         targetDegrees = getPositionDegrees(); // 0?
         if (hasFollower) {
-            followerMotor.setPosition(absolutePositionRotations);
+            followerMotor.setPosition(motorRotations);
         }
+    }
+
+    @Override
+    public void resetToZero() {
+        motor.setPosition(0.0);
     }
 
     @Override
     public void logMotorPID() {
         measuredLogged.set(getPositionDegrees());
-        Logger.recordOutput(NTPath+"/Rotations", motor.getPosition().getValueAsDouble());
+        rotationsLogged.set(motor.getPosition().getValueAsDouble());
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
     }
 
@@ -100,6 +108,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         rotationsLogged.set(motor.getPosition().getValueAsDouble());
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
     }
+
 
     @Override
     public void stop() {

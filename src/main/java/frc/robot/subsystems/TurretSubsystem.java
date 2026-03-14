@@ -17,6 +17,9 @@ public class TurretSubsystem extends SubsystemBase {
         this.aimMotor = aimMotor;
         this.hoodMotor = hoodMotor;
         this.aimEncoder = aimEncoder;
+
+        System.out.println("RESET HOOD TO ZERO");
+        hoodMotor.resetToZero();
     }
 
     public void setSetpoints(double aimDeg, double hoodDeg) {
@@ -25,7 +28,6 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void setAimPosition() {
-        System.out.println("SET AIM POSITION: "+aimMotor.getSetpoint());
         aimMotor.setTargetPositionDegrees(aimMotor.getSetpoint());
     }
     public void setAimPosition(double degrees) {
@@ -35,7 +37,6 @@ public class TurretSubsystem extends SubsystemBase {
     public void resetAimPositionToAbsolute(double offsetRotations) {
         aimMotor.resetToAbsolute(aimEncoder.getRotations()-offsetRotations);
     }
-
     public boolean aimIsAtPosition(double toleranceDegrees) {
         return aimMotor.isAtPosition(toleranceDegrees);
     }

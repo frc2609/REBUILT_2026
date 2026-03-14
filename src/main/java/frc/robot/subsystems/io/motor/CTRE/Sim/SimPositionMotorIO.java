@@ -88,19 +88,10 @@ public class SimPositionMotorIO extends CtreTalonFxPositionIO {
         talonFXSim.setRotorVelocity(motorSim.getAngularVelocity().times(kGearRatio));
     }
 
-    // @Override
-    // public double getPositionDegrees() {
-    //     // Use the TalonFX simulated rotor position (set in updateSim) and
-    //     // convert from rotor rotations to mechanism degrees. Reading the
-    //     // TalonFX state ensures we match the same units/representation the
-    //     // CTRE implementation exposes (and matches the velocity sim path).
-    //     return Conversions.rotationsToDegrees(motor.getPosition().getValueAsDouble(), kGearRatio);
-    // }
-
     @Override
     public void logMotorPID() {
         measuredLogged.set(getPositionDegrees());
-        rotationsLogged.set(motor.getPosition().getValueAsDouble());
+        rotationsLogged.set(motorSim.getAngularPositionRotations());
         voltageLogged.set(talonFXSim.getMotorVoltage());
     }
 

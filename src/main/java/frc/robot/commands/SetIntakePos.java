@@ -16,6 +16,7 @@ public class SetIntakePos extends Command {
     public void execute() {
         intake.setDeployPosition(degrees);
     }
+
     @Override 
     public boolean isFinished(){
         return true;

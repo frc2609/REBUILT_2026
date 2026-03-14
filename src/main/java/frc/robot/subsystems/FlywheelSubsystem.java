@@ -16,12 +16,23 @@ public class FlywheelSubsystem extends SubsystemBase {
     public void setSetpoint(double rps) {
         flywheelMotor.setSetpoint(rps);
     }
+    public double getSetpointRPS() {
+        return flywheelMotor.getSetpointRPM()/60.0;
+    }
 
     public void setSpeed() {
-        flywheelMotor.setVelocityRps(flywheelMotor.getSetpoint());
+        flywheelMotor.setVelocityRps(getSetpointRPS());
     }
     public void setSpeed(double rotationsPerSecond) {
         flywheelMotor.setVelocityRps(rotationsPerSecond);
+    }
+
+    public void bangBang(double speedRPS, double kF){
+        if (flywheelMotor.getVelocityRps() < speedRPS) {
+            flywheelMotor.set(1.0);
+        } else {
+            flywheelMotor.set(kF);
+        }
     }
 
     public boolean isAtSpeed(double tolerance) {

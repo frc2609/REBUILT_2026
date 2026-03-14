@@ -10,8 +10,10 @@ public interface VelocityMotorIO {
 
     void updateFromTunables();
 
-    double getSetpoint();
+    double getSetpointRPM();
     void setSetpoint(double value);
+
+    void set(double percent);
 
     boolean isAtSpeed(double toleranceRps);
 

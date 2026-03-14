@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.ctre.phoenix6.CANBus;
@@ -12,6 +13,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import frc.robot.Constants;
 
@@ -32,6 +34,7 @@ public class CtreTalonFxIO {
 
     public String NTPath;
     private ArrayList<LoggedNetworkNumber> tunables;
+    private ArrayList<String> usedTunableIDs;
     private double[] tunables_old;
 
     public CtreTalonFxIO(Map<String, Object> cfg) {
@@ -95,10 +98,14 @@ public class CtreTalonFxIO {
         setters.put(
             "statorCurrentLimitEnabled", 
             value -> config.CurrentLimits.StatorCurrentLimitEnable = (boolean) value);
-
+        
         setters.put(
             "isRioCANBUS", 
             value -> this.isRioCANBUS = (boolean) value);
+        setters.put(
+            "useClosedLoopFFSign", 
+            value -> this.config.Slot0.StaticFeedforwardSign = (((boolean) value) ? 
+            StaticFeedforwardSignValue.UseClosedLoopSign : StaticFeedforwardSignValue.UseVelocitySign));
 
         setConfiguration(cfg);
 
@@ -121,6 +128,7 @@ public class CtreTalonFxIO {
 
         NTPath = "/Tuning/"+Constants.motorNames.get(motorId);
         tunables = new ArrayList<LoggedNetworkNumber>();
+        usedTunableIDs = new ArrayList<String>();
         
         for (String key : Constants.tunableKeys) {
             if (cfg.get(key) != null)
@@ -129,6 +137,7 @@ public class CtreTalonFxIO {
                     NTPath + "/Tunables/" + key, 
                     (double) cfg.get(key)
                 ));
+                usedTunableIDs.add(key);
             }
         }
 
@@ -174,8 +183,10 @@ public class CtreTalonFxIO {
 
     public void applyConfiguration() {
         motor.getConfigurator().apply(config);
+        Logger.recordOutput(NTPath+"/Config", config.Slot0.toString());
         if (hasFollower) {
             followerMotor.getConfigurator().apply(config);
+            //followerMotor.setControl(new Follower(this.motorId, followerAligned));
         }
     }
 
@@ -191,15 +202,16 @@ public class CtreTalonFxIO {
 
         for (int i = 0; i < tunables.size(); i++) {
             double value = tunables.get(i).getAsDouble();
+            
             if (value != tunables_old[i])
             {   
-                setters.get(Constants.tunableKeys[i]).accept(value);
+                setters.get(usedTunableIDs.get(i)).accept(value);
                 changed = true;
             }
         }
 
         if (changed)
-        {
+        {   
             applyConfiguration();
             copyToOldTunables();
         }
@@ -207,12 +219,10 @@ public class CtreTalonFxIO {
 
     public double getSetpoint() {
         double input = setpointLogged.get();
-        // setpointLogged.set(input);
         return input;
     }
 
     public void setSetpoint(double value) {
         setpointLogged.set(value);
-        System.out.println(NTPath+": Set setpoint value to "+value);
     }
 }
