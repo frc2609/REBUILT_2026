@@ -11,7 +11,6 @@ public class TurretSubsystem extends SubsystemBase {
     private final PositionMotorIO aimMotor;
     private final PositionMotorIO hoodMotor;
     private final AbsEncoderIO aimEncoder;
-    public final FuelPhysicsSim ballSim;
 
     public TurretSubsystem(
         PositionMotorIO aimMotor, PositionMotorIO hoodMotor, 
@@ -20,13 +19,6 @@ public class TurretSubsystem extends SubsystemBase {
         this.aimMotor = aimMotor;
         this.hoodMotor = hoodMotor;
         this.aimEncoder = aimEncoder;
-
-        this.ballSim = new FuelPhysicsSim("Sim/Fuel");
-        ballSim.enable();
-        ballSim.placeFieldBalls(); 
-
-        ballSim.configureRobot(0.5, 0.5, 0.01,
-            () -> swerve.getPose(), () -> swerve.getChassisSpeeds());
     }
 
     public void setAimPosition(double degrees) {
@@ -66,7 +58,5 @@ public class TurretSubsystem extends SubsystemBase {
 
         aimMotor.updateFromTunables();
         hoodMotor.updateFromTunables();
-
-        ballSim.tick();
     }
 }

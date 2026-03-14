@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.util.ProjectileSimulator;
+import frc.robot.util.ShotCalculator;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -128,8 +130,6 @@ public final class Constants {
         private Controls() {}
     }
 
-    // NOTE: the pid values are not correct, nor are the limits
-
     public static final class Climber {
         public static final int EncoderChannel = 0;
         public static final double INERTIA = 0.01;
@@ -159,6 +159,37 @@ public final class Constants {
             config.put("statorCurrentLimitEnabled", true);
         }
     }
+
+    // On the fly settings 
+
+    public static ProjectileSimulator.SimParameters simParameters = 
+        new ProjectileSimulator.SimParameters(
+            0.215,   // ball mass kg
+            0.1501,  // ball diameter m
+            0.47,    // drag coeff (smooth sphere)
+            0.2,     // Magnus coeff
+            1.225,   // air density
+            0.482,    // exit height (m), floor to where the ball leaves the shooter
+            0.1016,  // flywheel diameter (m), measure with calipers
+            1.83,    // target height (m), from game manual
+            0.6,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
+            75.0,    // launch angle from horizontal, measure from CAD
+            0.001,   // sim timestep
+            1500, 6000, 25, 5.0  // RPM search range, iterations, max sim time
+        );
+
+    public static ShotCalculator.Config shotConfig = new ShotCalculator.Config();
+    static {
+        shotConfig.launcherOffsetX = 0.0;  // how far forward the launcher is from robot center (m)
+        shotConfig.launcherOffsetY = 0.0;   // how far left, 0 if centered
+        shotConfig.phaseDelayMs = 30.0;     // your vision pipeline latency
+        shotConfig.mechLatencyMs = 20.0;    // how long the mechanism takes to respond
+        shotConfig.maxTiltDeg = 5.0;        // suppress firing when chassis tilts past this (bumps/ramps)
+        shotConfig.headingSpeedScalar = 1.0; // heading tolerance tightens with robot speed (0 to disable)
+        shotConfig.headingReferenceDistance = 2.5; // heading tolerance scales with distance from hub
+    }
+    
+    // Subsystems
 
     public static final class Feed {
         public static final double INERTIA = 0.01;
