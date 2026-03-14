@@ -48,7 +48,8 @@ public class RobotFactory {
             driveSubsystem::addVisionMeasurement, buildVisionIO()
         );
         turretSubsystem = new TurretSubsystem(
-            buildTurretAimIO(), buildTurretHoodIO(), buildTurretEncoderIO()
+            buildTurretAimIO(), buildTurretHoodIO(), buildTurretEncoderIO(),
+            driveSubsystem
         );
         flywheelSubsystem = new FlywheelSubsystem(
             buildFlywheelIO()

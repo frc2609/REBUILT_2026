@@ -25,6 +25,9 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.util.FuelPhysicsSim;
+import frc.robot.util.ProjectileSimulator;
+import frc.robot.util.ShotCalculator;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -53,6 +56,8 @@ public class RobotContainer {
     private final ClimberSubsystem climberSubsystem = robotFactory.getClimberSubsystem();
     // private final VisionSubsystem visionSubsystem = robotFactory.getVisionSubsystem();
 
+    private final ShotCalculator shotCalc;
+
     private final Command holdShooterCommand =
         new HoldFlywheelSpeed(flywheelSubsystem, Constants.Controls.SHOOTER_HOLD_RPS);
 
@@ -61,8 +66,55 @@ public class RobotContainer {
 
     private final Command holdAgitatorCommand = 
         new HoldAgitatorSpeed(agitatorSubsystem, Constants.Controls.AGITATOR_HOLD_RPS);
-    
+
+    private final Command autoAimHubCommand;
+
     public RobotContainer() {
+        
+        ProjectileSimulator.SimParameters params = new ProjectileSimulator.SimParameters(
+            0.215,   // ball mass kg
+            0.1501,  // ball diameter m
+            0.47,    // drag coeff (smooth sphere)
+            0.2,     // Magnus coeff
+            1.225,   // air density
+            0.1,    // exit height (m), floor to where the ball leaves the shooter
+            0.1016,  // flywheel diameter (m), measure with calipers
+            1.83,    // target height (m), from game manual
+            0.6,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
+            75.0,    // launch angle from horizontal, measure from CAD
+            0.001,   // sim timestep
+            1500, 6000, 25, 5.0  // RPM search range, iterations, max sim time
+        );
+
+        ProjectileSimulator sim = new ProjectileSimulator(params);
+        ProjectileSimulator.GeneratedLUT lut = sim.generateLUT();
+
+        // in RobotContainer or wherever you set stuff up
+        ShotCalculator.Config config = new ShotCalculator.Config();
+        config.launcherOffsetX = -0.2;  // how far forward the launcher is from robot center (m)
+        config.launcherOffsetY = -0.2;   // how far left, 0 if centered
+        config.phaseDelayMs = 30.0;     // your vision pipeline latency
+        config.mechLatencyMs = 20.0;    // how long the mechanism takes to respond
+        config.maxTiltDeg = 5.0;        // suppress firing when chassis tilts past this (bumps/ramps)
+        config.headingSpeedScalar = 1.0; // heading tolerance tightens with robot speed (0 to disable)
+        config.headingReferenceDistance = 2.5; // heading tolerance scales with distance from hub
+
+        this.shotCalc = new ShotCalculator(config);
+
+        // load the LUT you generated
+        for (var entry : lut.entries()) {
+            if (entry.reachable()) {
+                System.out.printf("%.2fm -> %.0f RPM, %.3fs TOF%n",
+                    entry.distanceM(), entry.rpm(), entry.tof());
+                shotCalc.loadLUTEntry(entry.distanceM(), entry.rpm(), entry.tof());
+            }
+        }
+
+        autoAimHubCommand = new AimTurretField(
+            driveSubsystem, turretSubsystem, Constants.Field.BLUE_HUB, shotCalc,
+            driverController.rightTrigger()
+        );
+
         configureBindings();
     }
     
@@ -80,11 +132,7 @@ public class RobotContainer {
         holdShooterTrigger.whileTrue(holdShooterCommand);
         holdIntakeTrigger.whileTrue(holdIntakeCommand);
         holdAgitatorTrigger.whileTrue(holdAgitatorCommand);
-
-        Translation2d HUB_POSITION = Constants.Field.BLUE_HUB;
-        aimTurretTrigger.whileTrue(new AimTurretField(
-            driveSubsystem::getPose, turretSubsystem, HUB_POSITION
-        ));
+        turretSubsystem.setDefaultCommand(autoAimHubCommand);
 
         // Default command, normal field-relative drive
         driveSubsystem.setDefaultCommand(
