@@ -121,8 +121,8 @@ public final class Constants {
         public static final double TURRET_HOOD_DEG = 10;
 
         public static final double AGITATOR_HOLD_RPM = 500.0;
-        public static final double FEED_HOLD_RPM = 1000.0; // max speed
-        public static final double FLYWHEEL_HOLD_RPM = 500.0;
+        public static final double FEED_HOLD_RPM = 2500.0; // max speed
+        public static final double FLYWHEEL_HOLD_RPM = 1500.0;
 
     }
 
@@ -263,7 +263,7 @@ public final class Constants {
 
         public static final Map<String, Object> config = new HashMap<>(Map.of(
             "motorId", 20,
-            "kP", 0.04,
+            "kP", 0.05,
             "kV", 0.0097,
             "inverted", false
         ));
@@ -280,7 +280,7 @@ public final class Constants {
                 "motorId", 31,
                 "isRioCANBUS",true,
                 "inverted", true,
-                "kP", 0.04,
+                "kP", 0.032,
                 "kV", 0.0097
             ));
         }
