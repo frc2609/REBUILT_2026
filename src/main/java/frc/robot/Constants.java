@@ -11,10 +11,14 @@ import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.util.Conversions;
+import frc.robot.util.ProjectileSimulator;
+import frc.robot.util.ShotCalculator;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -106,6 +110,12 @@ public final class Constants {
     public static final PositionMotorType TURRET_HOOD_POSITION_MOTOR_TYPE =
         PositionMotorType.CTRE_TALON_FX;
 
+    public static final class Field
+    {
+        public static final Translation2d RED_HUB = new Translation2d(11.92, 4.033);
+        public static final Translation2d BLUE_HUB = new Translation2d(4.625, 4.033);
+    }
+
     public static final class Controls {
         public static final int DRIVER_CONTROLLER_PORT = 0;
 
@@ -121,14 +131,12 @@ public final class Constants {
         public static final double CLIMBER_DEPLOYED_DEG = 360.0;
 
         public static final double TURRET_AIM_DEG = 45.0;
-        public static final double TURRET_HOOD_DEG = 10.0;
+        public static final double TURRET_HOOD_DEG = 16.0;
 
         public static final double AGITATOR_HOLD_RPM = 2000.0;
         public static final double FEED_HOLD_RPM = 3000.0; // max speed
         public static final double FLYWHEEL_HOLD_RPM = 2200.0;
     }
-
-    // NOTE: the pid values are not correct, nor are the limits
 
     public static final class Climber {
         public static final int EncoderChannel = 1;
@@ -162,6 +170,37 @@ public final class Constants {
         }
     }
 
+    // On the fly settings 
+
+    public static ProjectileSimulator.SimParameters simParameters = 
+        new ProjectileSimulator.SimParameters(
+            0.215,   // ball mass kg
+            0.1501,  // ball diameter m
+            0.47,    // drag coeff (smooth sphere)
+            0.2,     // Magnus coeff
+            1.225,   // air density
+            0.482,    // exit height (m), floor to where the ball leaves the shooter
+            0.1016,  // flywheel diameter (m), measure with calipers
+            1.83,    // target height (m), from game manual
+            0.6,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
+            75.0,    // launch angle from horizontal, measure from CAD
+            0.001,   // sim timestep
+            1500, 6000, 25, 5.0  // RPM search range, iterations, max sim time
+        );
+
+    public static ShotCalculator.Config shotConfig = new ShotCalculator.Config();
+    static {
+        shotConfig.launcherOffsetX = 0.0;  // how far forward the launcher is from robot center (m)
+        shotConfig.launcherOffsetY = 0.0;   // how far left, 0 if centered
+        shotConfig.phaseDelayMs = 30.0;     // your vision pipeline latency
+        shotConfig.mechLatencyMs = 20.0;    // how long the mechanism takes to respond
+        shotConfig.maxTiltDeg = 5.0;        // suppress firing when chassis tilts past this (bumps/ramps)
+        shotConfig.headingSpeedScalar = 1.0; // heading tolerance tightens with robot speed (0 to disable)
+        shotConfig.headingReferenceDistance = 2.5; // heading tolerance scales with distance from hub
+    }
+    
+    // Subsystems
+
     public static final class Feed {
         public static final double INERTIA = 0.01;
         public static final double GEAR_RATIO = 25.0/12.0;
@@ -193,15 +232,15 @@ public final class Constants {
 
         public static final class Aim {
             public static final double INERTIA = 0.01;
-            public static final double GEAR_RATIO = 5.0;
+            public static final double GEAR_RATIO = 60.0;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.22;
+            public static final double ZERO_OFFSET = 0.386;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
-                "kP", 0.1,
-                "kD", 0.004,
-                "kS", 0.0
+                "kP", 0.2,
+                "kD", 0.0,
+                "kS", 0.018
             ));
             static {
                 // config.put("MotionMagicCruiseVelocity", 100.0);
@@ -231,9 +270,9 @@ public final class Constants {
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 52,
-                "kP", 0.06,
+                "kP", 0.4,
                 "kD", 0.0,
-                "kS", 0.035
+                "kS", 0.037
             ));
             static {
                 // config.put("MotionMagicCruiseVelocity", 2.0);

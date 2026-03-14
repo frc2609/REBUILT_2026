@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
+import frc.robot.util.FuelPhysicsSim;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 
 /** Shooter Subsystem using velocity control (rotations per second). */
@@ -12,7 +14,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public TurretSubsystem(
         PositionMotorIO aimMotor, PositionMotorIO hoodMotor, 
-        AbsEncoderIO aimEncoder
+        AbsEncoderIO aimEncoder, DriveSubsystem swerve
     ) {
         this.aimMotor = aimMotor;
         this.hoodMotor = hoodMotor;
