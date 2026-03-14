@@ -31,6 +31,8 @@ public class VisionSubsystem extends SubsystemBase {
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
+  // When false, pose observations are not fed into the drive pose estimator.
+  private boolean useVisionMeasurements = false;
 
   public VisionSubsystem(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -135,11 +137,13 @@ public class VisionSubsystem extends SubsystemBase {
           angularStdDev *= cameraStdDevFactors[cameraIndex];
         }
 
-        // Send vision observation
-        consumer.accept(
-            observation.pose().toPose2d(),
-            observation.timestamp(),
-            VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+        // Send vision observation only if enabled
+        if (useVisionMeasurements) {
+          consumer.accept(
+              observation.pose().toPose2d(),
+              observation.timestamp(),
+              VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
+        }
       }
 
       // Log camera metadata
@@ -168,6 +172,16 @@ public class VisionSubsystem extends SubsystemBase {
         "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
     Logger.recordOutput(
         "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
+  }
+
+  /** Enables or disables feeding vision measurements into the pose estimator. */
+  public void setUseVisionMeasurements(boolean enabled) {
+    useVisionMeasurements = enabled;
+  }
+
+  /** Returns whether vision measurements are currently used for localization. */
+  public boolean getUseVisionMeasurements() {
+    return useVisionMeasurements;
   }
 
   @FunctionalInterface

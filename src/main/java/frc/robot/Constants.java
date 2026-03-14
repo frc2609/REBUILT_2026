@@ -286,7 +286,7 @@ public final class Constants {
         public static final class Deploy {
             public static final double INERTIA = 0.001;
             /** Encoder rotations when intake is deployed; used so 0° = deployed. (Retracted ≈ -0.57.) */
-            public static final double ZERO_OFFSET = -0.16;
+            public static final double ZERO_OFFSET = 0.16;
             public static final double GEAR_RATIO = 27.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
@@ -310,7 +310,7 @@ public final class Constants {
 
                 // TalonFX outputted rotations
                 config.put("forwardLimitRotations", 0.0);
-                config.put("reverseLimitRotations", -0.38*GEAR_RATIO);
+                config.put("reverseLimitRotations", 0.38*GEAR_RATIO);
 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 

@@ -9,6 +9,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -25,6 +26,7 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -33,12 +35,13 @@ import frc.robot.subsystems.drive.DriveSubsystem;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    private final boolean runningSysID = true;
+    private final boolean runningSysID = false;
     private final CommandXboxController driverController =
         new CommandXboxController(Constants.Controls.DRIVER_CONTROLLER_PORT);
 
     private final Trigger xTrigger = driverController.x();
     private final Trigger resetGyroTrigger = driverController.back();
+    private final Trigger toggle3DLocalizeTrigger = driverController.rightStick();
 
     private final Trigger shootTrigger = driverController.rightTrigger();
     private final Trigger pushIntakeTrigger = driverController.leftBumper();
@@ -63,7 +66,7 @@ public class RobotContainer {
     private final DriveSubsystem driveSubsystem = robotFactory.getDriveSubsystem();
     private final FeedSubsystem feedSubsystem = robotFactory.getFeedSubsystem();
     private final ClimberSubsystem climberSubsystem = robotFactory.getClimberSubsystem();
-    // private final VisionSubsystem visionSubsystem = robotFactory.getVisionSubsystem();
+    private final VisionSubsystem visionSubsystem = robotFactory.getVisionSubsystem();
 
     private final Command fullShooterCommand = new FullShoot(
         flywheelSubsystem, 
@@ -94,6 +97,10 @@ public class RobotContainer {
         climberSubsystem.resetPositionToAbsolute();
         intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
+
+        // For localization testing, start with vision measurements disabled.
+        visionSubsystem.setUseVisionMeasurements(false);
+
         if (runningSysID){
             configureSysIDBindings();
         } else {
@@ -157,6 +164,29 @@ public class RobotContainer {
                             new Pose2d(driveSubsystem.getPose().getTranslation(), Rotation2d.kZero)),
                     driveSubsystem)
                 .ignoringDisable(true));
+
+        // Toggle 3D localization (Limelight pipeline + vision fusion) on right stick click
+        toggle3DLocalizeTrigger.onTrue(
+            Commands.runOnce(
+                () -> {
+                    boolean enable = !visionSubsystem.getUseVisionMeasurements();
+                    visionSubsystem.setUseVisionMeasurements(enable);
+
+                    // Swap Limelight pipelines: 0 = 2D / default, 1 = 3D localize
+                    var ntInst = NetworkTableInstance.getDefault();
+                    int pipelineIndex = enable ? 1 : 0;
+                    ntInst
+                        .getTable(Constants.Vision.Left.name)
+                        .getEntry("pipeline")
+                        .setNumber(pipelineIndex);
+                    ntInst
+                        .getTable(Constants.Vision.Right.name)
+                        .getEntry("pipeline")
+                        .setNumber(pipelineIndex);
+                    ntInst.flush();
+                }
+            )
+        );
     }
 
     public Command getAutonomousCommand() {
