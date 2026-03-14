@@ -27,9 +27,9 @@ public class FullShoot extends Command {
 
     @Override
     public void execute() {
-        flywheel.setSpeed(500.0/60.0); // Variable
-        //agitator.setAgitatorSpeed(agitatorRPS);
-        // agitator.setFeedSpeed(agitatorRPS);
+        flywheel.setSpeed(2200.0/60.0); // Variable
+        agitator.setAgitatorSpeed(2000/60);
+        agitator.setFeedSpeed(2500/60);
     }
 
     @Override
