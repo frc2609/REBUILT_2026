@@ -21,6 +21,11 @@ import java.util.Queue;
 
 /** IO implementation for Pigeon 2. */
 public class GyroIOPigeon2 implements GyroIO {
+  /** Set true to negate yaw (reverses rotation direction). */
+  private static final boolean INVERT_YAW = false;
+  /** Add this to raw yaw in degrees (e.g. 180 if Pigeon is mounted 180° rotated). */
+  private static final double YAW_OFFSET_DEGREES = 180.0;
+
   private final Pigeon2 pigeon =
       new Pigeon2(TunerConstants.DrivetrainConstants.Pigeon2Id, TunerConstants.kCANBus);
   private final StatusSignal<Angle> yaw = pigeon.getYaw();
@@ -43,17 +48,32 @@ public class GyroIOPigeon2 implements GyroIO {
     yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(yaw.clone());
   }
 
+  private static double correctYaw(double degrees) {
+    double d = INVERT_YAW ? -degrees : degrees;
+    d += YAW_OFFSET_DEGREES;
+    return d;
+  }
+
+  /** Zeros the Pigeon so that current heading becomes 0 after correction. */
+  @Override
+  public void zeroYaw() {
+    double pigeonZero =
+        INVERT_YAW ? YAW_OFFSET_DEGREES : -YAW_OFFSET_DEGREES;
+    pigeon.getConfigurator().setYaw(pigeonZero);
+  }
+
   @Override
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected = BaseStatusSignal.refreshAll(yaw, yawVelocity).equals(StatusCode.OK);
-    inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
-    inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
+    inputs.yawPosition = Rotation2d.fromDegrees(correctYaw(yaw.getValueAsDouble()));
+    inputs.yawVelocityRadPerSec =
+        INVERT_YAW ? -Units.degreesToRadians(yawVelocity.getValueAsDouble()) : Units.degreesToRadians(yawVelocity.getValueAsDouble());
 
     inputs.odometryYawTimestamps =
         yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
     inputs.odometryYawPositions =
         yawPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromDegrees(value))
+            .map((Double value) -> Rotation2d.fromDegrees(correctYaw(value)))
             .toArray(Rotation2d[]::new);
     yawTimestampQueue.clear();
     yawPositionQueue.clear();

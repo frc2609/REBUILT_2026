@@ -21,4 +21,7 @@ public interface GyroIO {
   }
 
   public default void updateInputs(GyroIOInputs inputs) {}
+
+  /** Zeros the gyro so current heading is treated as 0. No-op if not supported. */
+  public default void zeroYaw() {}
 }

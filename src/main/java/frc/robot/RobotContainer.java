@@ -170,13 +170,8 @@ public class RobotContainer {
                 () -> -driverController.getRightX()));
 
         xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
-        resetGyroTrigger.onTrue( 
-            Commands.runOnce(
-                    () ->
-                        driveSubsystem.setPose(
-                            new Pose2d(driveSubsystem.getPose().getTranslation(), Rotation2d.kZero)),
-                    driveSubsystem)
-                .ignoringDisable(true));
+        resetGyroTrigger.onTrue(
+            Commands.runOnce(driveSubsystem::zeroHeading, driveSubsystem).ignoringDisable(true));
     }
 
     public Command getAutonomousCommand() {

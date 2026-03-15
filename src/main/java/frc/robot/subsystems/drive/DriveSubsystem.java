@@ -320,6 +320,15 @@ public class DriveSubsystem extends SubsystemBase {
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+    Rotation2d gyroForReset =
+        gyroInputs.connected ? gyroInputs.yawPosition : rawGyroRotation;
+    poseEstimator.resetPosition(gyroForReset, getModulePositions(), pose);
+  }
+
+  /** Zeros the gyro and sets current heading to 0 (keeps translation). Use for driver reset. */
+  public void zeroHeading() {
+    gyroIO.zeroYaw();
+    setPose(new Pose2d(getPose().getTranslation(), Rotation2d.kZero));
   }
 
   /** Adds a new timestamped vision measurement. */
