@@ -44,7 +44,8 @@ public class AimTurretField extends Command {
         this.shootTrigger = shootTrigger;
         this.ballSim = ballSim;
 
-        power = new LoggedNetworkNumber("shotPower", 0.0135);
+        // magic number
+        power = new LoggedNetworkNumber("shotPower", 0.67);
 
         addRequirements(turret);
     }
@@ -84,13 +85,14 @@ public class AimTurretField extends Command {
             0
         ).plus(launchVector);
 
-        flywheel.setAutoSpeed(shot.rpm()/60.0);
+        turret.setHoodPosition();
+        flywheel.setAutoSpeed(power.get()*shot.rpm()/60.0);
         double turretAngleDeg = shot.launcherAngle()
-            .minus(new Rotation2d(Math.PI))
+            .minus(new Rotation2d().fromDegrees(-145.0))
             .minus(swerve.getRotation())
             .getDegrees();
 
-        if (Math.abs(turretAngleDeg) <= 90.0) {
+        if (Math.abs(turretAngleDeg) <= Constants.Turret.Aim.RANGE_DEG) {
             turret.setAimPosition(turretAngleDeg);
         }
 

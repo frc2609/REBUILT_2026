@@ -1,12 +1,11 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import java.util.Map;
 
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import frc.robot.util.Conversions;
@@ -47,7 +46,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
     } 
 
     @Override
-    public void setTargetPositionDegrees(double degrees) {
+    public void setTargetPositionDegrees(double degrees, double ff) {
         double targetRotations = Conversions.degreesToRotations(degrees, gearRatio);
 
         if (forwardLimitEnabled) {
@@ -62,8 +61,13 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         targetDegrees = Conversions.rotationsToDegrees(targetRotations, gearRatio);
         //System.out.println("POSITION COMMAND: "+degrees+" -> "+targetRotations);
 
-        control = control.withPosition(targetRotations);
+        control = control.withPosition(targetRotations).withFeedForward(ff);
         motor.setControl(control);
+    }
+
+    @Override
+    public void setTargetPositionDegrees(double degrees) {
+        setTargetPositionDegrees(degrees, 0.0);
     }
 
     @Override
@@ -81,7 +85,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
     @Override
     public void resetToAbsolute(double absRotations) {
         double motorRotations = absRotations * gearRatio;
-        System.out.println(NTPath+": ENCODER RESET, rotations="+motorRotations);
+        System.out.println(NTPath+": ENCODER RESET, absReading="+absRotations+", gear:"+gearRatio+" rotations:"+motorRotations);
         motor.setPosition(motorRotations);
         targetDegrees = getPositionDegrees(); // 0?
         if (hasFollower) {

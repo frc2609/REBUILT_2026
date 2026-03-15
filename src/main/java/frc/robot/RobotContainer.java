@@ -7,8 +7,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -52,49 +50,31 @@ public class RobotContainer {
     private final Trigger holdAgitatorTrigger = driverController.b();
     private final Trigger holdFeedTrigger = driverController.y();
     private final Trigger holdFlywheelTrigger = driverController.rightBumper();
-    private final Trigger setHoodTrigger = driverController.povUp();
     private final Trigger setIntakeTrigger = driverController.povDown();
 
     // Dashboard inputs (later)
     // private final LoggedDashboardChooser<Command> autoChooser;
 
     private final RobotFactory robotFactory = new RobotFactory();
-    private final TurretSubsystem turretSubsystem = robotFactory.getTurretSubsystem();
-    private final FlywheelSubsystem flywheelSubsystem = robotFactory.getFlywheelSubsystem();
-    private final IntakeSubsystem intakeSubsystem = robotFactory.getIntakeSubsystem();
-    private final DriveSubsystem driveSubsystem = robotFactory.getDriveSubsystem();
-    private final FeedSubsystem feedSubsystem = robotFactory.getFeedSubsystem();
-    private final ClimberSubsystem climberSubsystem = robotFactory.getClimberSubsystem();
-
-    private final Command fullShooterCommand = new FullShoot(
-        flywheelSubsystem, 
-        feedSubsystem, 
-        Constants.Controls.FEED_HOLD_RPM / 60.0, 
-        Constants.Controls.AGITATOR_HOLD_RPM / 60.0
-    );
-
-    private final Command startIntakeCommand = new SetIntakeSpeedRPS(
-        intakeSubsystem, 
-        Constants.Controls.INTAKE_RUN_RPM / 60.0
-    );
-    
-    private final Command intakeDefaultSpeed = new SetIntakeSpeedRPS(
-        intakeSubsystem, 
-        Constants.Controls.INTAKE_IDLE_RPM / 60.0
-    );
-
-    private final Command pushIntakeCommand = new PushIntake(
-        intakeSubsystem, 
-        driverController::getLeftTriggerAxis, 
-        Constants.Controls.INTAKE_DEPLOYED_DEG, 
-        Constants.Controls.INTAKE_RETRACT_DEG
-    );
+    public final TurretSubsystem turretSubsystem;
+    public final FlywheelSubsystem flywheelSubsystem;
+    public final IntakeSubsystem intakeSubsystem;
+    public final DriveSubsystem driveSubsystem;
+    public final FeedSubsystem feedSubsystem;
+    public final ClimberSubsystem climberSubsystem;
 
     private final Command autoAimHubCommand;
     private final ShotCalculator shotCalculator;
     private final FuelPhysicsSim ballSim = new FuelPhysicsSim("Sim/Fuel");
 
     public RobotContainer() {
+        turretSubsystem = robotFactory.getTurretSubsystem();
+        flywheelSubsystem = robotFactory.getFlywheelSubsystem();
+        intakeSubsystem = robotFactory.getIntakeSubsystem();
+        driveSubsystem = robotFactory.getDriveSubsystem();
+        feedSubsystem = robotFactory.getFeedSubsystem();
+        climberSubsystem = robotFactory.getClimberSubsystem();
+        
         ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
         ProjectileSimulator.GeneratedLUT lut = sim.generateLUT();
         this.shotCalculator = new ShotCalculator(Constants.shotConfig);
@@ -120,16 +100,8 @@ public class RobotContainer {
                 () -> driveSubsystem.getPose(), () -> driveSubsystem.getChassisSpeeds());
         }
 
-        configureBindings();
-    }
-
-    public void updateSim() {
-        ballSim.tick();
-    }
-    
-    /** Robot-wide init hook (called from {@link Robot#robotInit()}). */
-    public void robotInit() {
-        // Avoid syncing absolute encoders during construction; do it at a predictable time during boot.
+        turretSubsystem.setEncoderInvert(true);
+            
         climberSubsystem.resetPositionToAbsolute();
         intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
@@ -137,15 +109,35 @@ public class RobotContainer {
         configureBindings();
     }
 
-    private void configureBindings() {
-        // Main Control System
+    public void updateSim() {
+        ballSim.tick();
+    }
+    
+
+    private void configureBindings() {        
+        // Main controls
 
         turretSubsystem.setDefaultCommand(autoAimHubCommand);
-        shootTrigger.whileTrue(fullShooterCommand);
-
-        startIntakeTrigger.onTrue(startIntakeCommand);
-        stopIntakeTrigger.onTrue(intakeDefaultSpeed);
-        pushIntakeTrigger.whileTrue(pushIntakeCommand);
+        shootTrigger.whileTrue(new FullShoot(
+            flywheelSubsystem, 
+            feedSubsystem, 
+            Constants.Controls.FEED_HOLD_RPM / 60.0, 
+            Constants.Controls.AGITATOR_HOLD_RPM / 60.0
+        ));
+        startIntakeTrigger.onTrue(new SetIntakeSpeedRPS(
+            intakeSubsystem, 
+            Constants.Controls.INTAKE_RUN_RPM / 60.0
+        ));
+        stopIntakeTrigger.onTrue(new SetIntakeSpeedRPS(
+            intakeSubsystem, 
+            Constants.Controls.INTAKE_IDLE_RPM / 60.0
+        ));
+        pushIntakeTrigger.whileTrue(new PushIntake(
+            intakeSubsystem, 
+            driverController::getLeftTriggerAxis, 
+            Constants.Controls.INTAKE_DEPLOYED_DEG, 
+            Constants.Controls.INTAKE_RETRACT_DEG
+        ));
 
         // Tuning commands
 

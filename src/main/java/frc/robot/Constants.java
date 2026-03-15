@@ -11,7 +11,6 @@ import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -125,15 +124,15 @@ public final class Constants {
         // RPM values are INPUT RPM, will be geared down
 
         public static final double INTAKE_DEPLOYED_DEG = 0.0;
-        public static final double INTAKE_RETRACT_DEG  = -0.3*360.0;
+        public static final double INTAKE_RETRACT_DEG  = 135;
         
-        public static final double INTAKE_RUN_RPM = 5000.0;
+        public static final double INTAKE_RUN_RPM = 4000.0;
         public static final double INTAKE_IDLE_RPM = 0.0;
 
         public static final double CLIMBER_DEPLOYED_DEG = 360.0;
 
         public static final double TURRET_AIM_DEG = 45.0;
-        public static final double TURRET_HOOD_DEG = 16.0;
+        public static final double TURRET_HOOD_DEG = 15.0;
 
         public static final double AGITATOR_HOLD_RPM = 2000.0;
         public static final double FEED_HOLD_RPM = 3000.0; // max speed
@@ -182,10 +181,10 @@ public final class Constants {
             0.2,     // Magnus coeff
             1.225,   // air density
             0.482,    // exit height (m), floor to where the ball leaves the shooter
-            0.1016,  // flywheel diameter (m), measure with calipers
+            0.0762,  // flywheel diameter (m), measure with calipers
             1.83,    // target height (m), from game manual
             0.6,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
-            75.0,    // launch angle from horizontal, measure from CAD
+            65.0,    // launch angle from horizontal, measure from CAD
             0.001,   // sim timestep
             1500, 6000, 25, 5.0  // RPM search range, iterations, max sim time
         );
@@ -236,13 +235,14 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 60.0;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.386;
+            public static final double ZERO_OFFSET = 0.53; // 0.242 unrestricted
+            public static final double RANGE_DEG = 90.0; // 160
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
                 "kP", 0.2,
                 "kD", 0.0,
-                "kS", 0.018
+                "kS", 0.005
             ));
             static {
                 // config.put("MotionMagicCruiseVelocity", 100.0);
@@ -251,10 +251,10 @@ public final class Constants {
 
                 config.put("forwardLimitEnabled", true);
                 config.put("forwardLimitRotations",
-                    Conversions.degreesToRotations(90.0, GEAR_RATIO));
+                    Conversions.degreesToRotations(RANGE_DEG, GEAR_RATIO));
                 config.put("reverseLimitEnabled", true);
                 config.put("reverseLimitRotations",
-                    Conversions.degreesToRotations(-90.0, GEAR_RATIO));
+                    Conversions.degreesToRotations(-RANGE_DEG, GEAR_RATIO));
                 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 config.put("inverted", false);
@@ -274,7 +274,7 @@ public final class Constants {
                 "motorId", 52,
                 "kP", 0.4,
                 "kD", 0.0,
-                "kS", 0.037
+                "kS", 0.03
             ));
             static {
                 // config.put("MotionMagicCruiseVelocity", 2.0);
@@ -326,7 +326,7 @@ public final class Constants {
 
         public static final class Deploy {
             public static final double INERTIA = 0.001;
-            public static final double ZERO_OFFSET = -0.165;
+            public static final double ZERO_OFFSET = 0.0;
             public static final double GEAR_RATIO = 27.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
@@ -334,9 +334,9 @@ public final class Constants {
             // NOTE: Cuts off at 10 key-value pairs
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId",30,
-                "kP", 0.15,
+                "kP", 0.04,
                 "kD", 0.0,
-                "kG", 0.0,
+                "kG", 0.03,
                 "kS", 0.06
             ));
             static {
@@ -346,8 +346,10 @@ public final class Constants {
                 config.put("reverseLimitEnabled", true);
 
                 // TalonFX outputted rotations
-                config.put("forwardLimitRotations", 0.0);
-                config.put("reverseLimitRotations", 8.8);
+                config.put("forwardLimitRotations", 
+                    Conversions.degreesToRotations(140.0, GEAR_RATIO)
+                );
+                config.put("reverseLimitRotations", -0.05);
 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 
