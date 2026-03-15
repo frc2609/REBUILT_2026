@@ -9,10 +9,12 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.lib.BLine.Path;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FullShoot;
 import frc.robot.commands.PushIntake;
@@ -23,6 +25,8 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -51,8 +55,8 @@ public class RobotContainer {
     private final Trigger setHoodTrigger = driverController.povUp();
     private final Trigger setIntakeTrigger = driverController.povDown();
 
-    // Dashboard inputs (later)
-    // private final LoggedDashboardChooser<Command> autoChooser;
+    private final LoggedDashboardChooser<Command> autoChooser =
+        new LoggedDashboardChooser<>("Auto Routine");
 
     private final RobotFactory robotFactory = new RobotFactory();
     private final TurretSubsystem turretSubsystem = robotFactory.getTurretSubsystem();
@@ -93,7 +97,15 @@ public class RobotContainer {
         intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
 
+        configureAutoChooser();
         configureBindings();
+    }
+
+    private void configureAutoChooser() {
+        autoChooser.addDefaultOption("None", Commands.none());
+        autoChooser.addOption("BLine: test", driveSubsystem.followPath(new Path("firstAuto")));
+        Logger.registerDashboardInput(autoChooser);
+        SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
     }
 
     private void configureBindings() {
@@ -129,16 +141,11 @@ public class RobotContainer {
                 () -> -driverController.getRightX()));
 
         xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
-        resetGyroTrigger.onTrue( 
-            Commands.runOnce(
-                    () ->
-                        driveSubsystem.setPose(
-                            new Pose2d(driveSubsystem.getPose().getTranslation(), Rotation2d.kZero)),
-                    driveSubsystem)
-                .ignoringDisable(true));
+        resetGyroTrigger.onTrue(
+            Commands.runOnce(driveSubsystem::zeroHeading, driveSubsystem).ignoringDisable(true));
     }
 
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return autoChooser.get();
     }
 }
