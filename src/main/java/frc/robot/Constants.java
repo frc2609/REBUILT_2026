@@ -383,7 +383,7 @@ public final class Constants {
         public static final class Left {
             public static final String name = "limelight-left";
             // User: x=13in(left), y=-10.5in(back), z=8in(up), pitch=10deg up, yaw=left(90deg)
-            public static final Transform3d robotToCamera = new Transform3d(
+            public static final Transform3d fromRobot = new Transform3d(
                 new Translation3d(
                     Units.inchesToMeters(-10.5),  // WPILib X = user Y (forward)
                     Units.inchesToMeters(13.0),   // WPILib Y = user X (left)
@@ -394,7 +394,7 @@ public final class Constants {
         public static final class Right {
             public static final String name = "limelight-right";
             // User: x=-13in(right), y=-10.375in(back), z=6in(up), pitch=10deg up, yaw=right(-90deg)
-            public static final Transform3d robotToCamera = new Transform3d(
+            public static final Transform3d fromRobot = new Transform3d(
                 new Translation3d(
                     Units.inchesToMeters(-10.375), // WPILib X = user Y (forward)
                     Units.inchesToMeters(-13.0),   // WPILib Y = user X (left, negative=right)
@@ -405,7 +405,7 @@ public final class Constants {
         public static final class Front {
             public static final String name = "limelight-front";
             // User: x=0(center), y=2.75in(forward), z=16.25in(up), pitch=0deg, yaw=forward(0deg)
-            public static final Transform3d robotToCamera = new Transform3d(
+            public static final Transform3d fromRobot = new Transform3d(
                 new Translation3d(
                     Units.inchesToMeters(2.75),    // WPILib X = user Y (forward)
                     0.0,                           // WPILib Y = user X (center)
