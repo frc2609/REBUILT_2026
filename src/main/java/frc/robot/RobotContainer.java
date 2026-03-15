@@ -35,7 +35,7 @@ import frc.robot.subsystems.vision.VisionSubsystem;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    private final boolean runningSysID = false;
+    private final boolean runningSysID = true;
     private final CommandXboxController driverController =
         new CommandXboxController(Constants.Controls.DRIVER_CONTROLLER_PORT);
 
@@ -118,6 +118,46 @@ public class RobotContainer {
             intakeSubsystem.sysIdDeployCommand(SysIdCommand.Mode.DYNAMIC, SysIdRoutine.Direction.kForward));
         driverController.povRight().whileTrue(
             intakeSubsystem.sysIdDeployCommand(SysIdCommand.Mode.DYNAMIC, SysIdRoutine.Direction.kReverse));
+
+        driveSubsystem.setDefaultCommand(
+            DriveCommands.joystickDrive(
+                driveSubsystem,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX()));
+
+        xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
+        resetGyroTrigger.onTrue(
+            Commands.runOnce(
+                    () ->
+                        driveSubsystem.setPose(
+                            new Pose2d(driveSubsystem.getPose().getTranslation(), Rotation2d.kZero)),
+                    driveSubsystem)
+                .ignoringDisable(true));
+
+        // Toggle 3D localization (Limelight pipeline + vision fusion) on right stick click
+        toggle3DLocalizeTrigger.onTrue(
+            Commands.runOnce(
+                () -> {
+                    boolean enable = !visionSubsystem.getUseVisionMeasurements();
+                    visionSubsystem.setUseVisionMeasurements(enable);
+
+                    // Swap Limelight pipelines: 0 = 2D / default, 1 = 3D localize
+                    var ntInst = NetworkTableInstance.getDefault();
+                    int pipelineIndex = enable ? 1 : 0;
+                    ntInst
+                        .getTable(Constants.Vision.Left.name)
+                        .getEntry("pipeline")
+                        .setNumber(pipelineIndex);
+                    ntInst
+                        .getTable(Constants.Vision.Right.name)
+                        .getEntry("pipeline")
+                        .setNumber(pipelineIndex);
+                    ntInst.flush();
+                }
+            )
+        );
+            
         // To run SysId on other mechanisms, bind similarly using:
         // turretSubsystem.sysIdAimCommand(mode, direction) / sysIdHoodCommand(mode, direction)
         // flywheelSubsystem.sysIdCommand(mode, direction)
