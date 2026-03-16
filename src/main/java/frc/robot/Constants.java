@@ -135,7 +135,7 @@ public final class Constants {
         // RPM values are INPUT RPM, will be geared down
 
         public static final double INTAKE_DEPLOYED_DEG = 0.0;
-        public static final double INTAKE_RETRACT_DEG  = 135;
+        public static final double INTAKE_RETRACT_DEG  = 90.0; // for push
         
         public static final double INTAKE_RUN_RPM = 4000.0;
         public static final double INTAKE_IDLE_RPM = 0.0;

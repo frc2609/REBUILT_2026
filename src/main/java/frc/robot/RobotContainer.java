@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AimTurretField;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FullShoot;
+import frc.robot.commands.HoldIntakeDeployed;
 import frc.robot.commands.PushIntake;
 import frc.robot.commands.SetIntakeSpeedRPS;
 import frc.robot.subsystems.FeedSubsystem;
@@ -130,6 +131,10 @@ public class RobotContainer {
             pushIntakeAxis, 
             Constants.Controls.INTAKE_DEPLOYED_DEG, 
             Constants.Controls.INTAKE_RETRACT_DEG
+        ));
+        intakeSubsystem.setDefaultCommand(new HoldIntakeDeployed(
+            intakeSubsystem, 
+            Constants.Controls.INTAKE_DEPLOYED_DEG
         ));
 
         // Tuning commands
