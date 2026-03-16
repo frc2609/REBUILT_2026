@@ -14,7 +14,6 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
     //private MotionMagicDutyCycle control = new MotionMagicDutyCycle(0).withSlot(0);
     private PositionDutyCycle control = new PositionDutyCycle(0).withSlot(0);
     private final double gearRatio;
-    private final double encoderRatio;
 
     public double targetDegrees = 0.0;
 
@@ -38,7 +37,6 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         rotationsLogged = new LoggedNetworkNumber(NTPath+"/Rotations");
 
         this.gearRatio = gearRatio;
-        this.encoderRatio = encoderRatio;
     }
 
     public CtreTalonFxPositionIO(Map<String, Object> cfg, double gearRatio) {

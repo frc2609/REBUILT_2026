@@ -6,7 +6,6 @@ package frc.robot;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -114,7 +113,19 @@ public final class Constants {
     public static final class Field
     {
         public static final Translation2d RED_HUB = new Translation2d(11.92, 4.033);
+        public static final Translation2d RED_HUB_FORWARD = new Translation2d(-1.0, 0.0);
+
         public static final Translation2d BLUE_HUB = new Translation2d(4.625, 4.033);
+        public static final Translation2d BLUE_HUB_FORWARD = new Translation2d(1.0, 0.0);
+
+        public static final double BLUE_ZONE_X = 4.47;
+        public static final double RED_ZONE_X = 0.0;
+
+        public static final double CENTER_Y = 4.1;
+        public static final double PASS_LEFT_Y = 6.3;
+        public static final double PASS_RIGHT_Y = 2.0;
+        public static final double BLUE_PASS_X = 2.0;
+        public static final double RED_PASS_X = 13.8;
     }
 
     public static final class Controls {
@@ -131,12 +142,13 @@ public final class Constants {
 
         public static final double CLIMBER_DEPLOYED_DEG = 360.0;
 
-        public static final double TURRET_AIM_DEG = 45.0;
         public static final double TURRET_HOOD_DEG = 15.0;
 
         public static final double AGITATOR_HOLD_RPM = 2000.0;
         public static final double FEED_HOLD_RPM = 3000.0; // max speed
-        public static final double FLYWHEEL_HOLD_RPM = 2200.0;
+
+        public static final double FLYWHEEL_LOB_RPM = 2200.0;
+        public static final double LOB_DISTANCE = 2.0;
     }
 
     public static final class Climber {
@@ -210,7 +222,8 @@ public final class Constants {
             "motorId", 21,
             "kP", 0.04,
             "kV", 0.0113,
-            "inverted", true
+            "inverted", true,
+            "neutralMode", NeutralMode.COAST
         ));
     }
 
@@ -237,6 +250,7 @@ public final class Constants {
             public static final double ENCODER_RATIO = 1.0;
             public static final double ZERO_OFFSET = 0.53; // 0.242 unrestricted
             public static final double RANGE_DEG = 90.0; // 160
+            public static final double HEADING_OFFSET_DEG = -145.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
@@ -304,7 +318,8 @@ public final class Constants {
             "motorId", 20,
             "kP", 0.05,
             "kV", 0.012,
-            "inverted", false
+            "inverted", false,
+            "neutralMode", NeutralMode.COAST
         ));
     }
 
