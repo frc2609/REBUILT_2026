@@ -221,7 +221,7 @@ public class RobotFactory {
             return new SimAbsEncoderIO(0);
         }
 
-        return new WpiDutyCycleEncoderIO(Constants.Turret.EncoderChannel);
+        return new CANCoderIO(Constants.Turret.EncoderChannel);
     }
 
     // INTAKE
@@ -235,7 +235,7 @@ public class RobotFactory {
         return new SimAbsEncoderIO(0);
         }
 
-        return new CANCoderIO(Constants.Intake.EncoderChannel);
+        return new WpiDutyCycleEncoderIO(Constants.Intake.EncoderChannel);
     }
 
     private PositionMotorIO buildIntakeDeployIO() {
