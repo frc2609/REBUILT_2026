@@ -5,10 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import javax.xml.stream.events.StartDocument;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.configs.Slot1Configs;
+import com.ctre.phoenix6.configs.SlotConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -31,7 +35,7 @@ public class CtreTalonFxIO {
     public int followerId = -1;
     public boolean hasFollower = false;
 
-    public LoggedNetworkNumber measuredLogged, setpointLogged, voltageLogged;
+    public LoggedNetworkNumber measuredLogged, setpointLogged, voltageLogged, statorLogged;
 
     public String NTPath;
     private ArrayList<LoggedNetworkNumber> tunables;
@@ -153,6 +157,7 @@ public class CtreTalonFxIO {
         measuredLogged = new LoggedNetworkNumber(NTPath+"/Measured");
         setpointLogged = new LoggedNetworkNumber(NTPath+"/Setpoint");
         voltageLogged = new LoggedNetworkNumber(NTPath+"/PID Output (V)");
+        statorLogged = new LoggedNetworkNumber(NTPath+"/Stator Current (A)");
     }
 
     private static com.ctre.phoenix6.signals.NeutralModeValue toPhoenixNeutralMode(
@@ -188,6 +193,11 @@ public class CtreTalonFxIO {
     }
 
     public void applyConfiguration() {
+        // Slot 1 higher kP to oscillate and unjam
+        SlotConfigs unjamSlot = SlotConfigs.from(this.config.Slot0);
+        unjamSlot.kP *= Constants.Controls.UNJAM_FACTOR;
+        this.config.Slot1 = Slot1Configs.from(unjamSlot);
+
         motor.getConfigurator().apply(config);
         Logger.recordOutput(NTPath+"/ConfigSlot0", config.Slot0.toString());
         Logger.recordOutput(NTPath+"/ConfigSlot1", config.Slot1.toString());

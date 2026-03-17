@@ -130,12 +130,14 @@ public final class Constants {
 
     public static final class Controls {
         public static final int DRIVER_CONTROLLER_PORT = 0;
+        public static final double UNJAM_FACTOR = 10.0; // kP multiplier when unjamming
 
         // Rotation values are OUTPUT degrees
         // RPM values are INPUT RPM, will be geared down
 
         public static final double INTAKE_DEPLOYED_DEG = 0.0;
         public static final double INTAKE_RETRACT_DEG  = 90.0; // for push
+        public static final double INTAKE_AUTO_PUSH_TIME = 2.5; // seconds to retract
         
         public static final double INTAKE_RUN_RPM = 4000.0;
         public static final double INTAKE_IDLE_RPM = 0.0;
@@ -218,6 +220,8 @@ public final class Constants {
         public static final double INERTIA = 0.01;
         public static final double GEAR_RATIO = 25.0/12.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
+        public static final double JAM_CURRENT = 150.0; // stator limit before unjam
+        public static final double UNJAM_TIME  = 3.0; // seconds
         public static final Map<String, Object> config = new HashMap<>(Map.of(
             "motorId", 21,
             "kP", 0.04,

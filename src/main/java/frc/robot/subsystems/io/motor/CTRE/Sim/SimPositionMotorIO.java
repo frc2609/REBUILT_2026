@@ -90,6 +90,7 @@ public class SimPositionMotorIO extends CtreTalonFxPositionIO {
         measuredLogged.set(getPositionDegrees());
         rotationsLogged.set(motorSim.getAngularPositionRotations());
         voltageLogged.set(talonFXSim.getMotorVoltage());
+        statorLogged.set(talonFXSim.getTorqueCurrent());
     }
 
     @Override

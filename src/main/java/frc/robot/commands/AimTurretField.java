@@ -1,8 +1,5 @@
 package frc.robot.commands;
 
-import java.util.Optional;
-import java.util.function.Consumer;
-
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -16,13 +13,11 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.util.FuelPhysicsSim;
 import frc.robot.util.ShotCalculator;
 
 public class AimTurretField extends Command {
@@ -32,12 +27,10 @@ public class AimTurretField extends Command {
     private final ShotCalculator shotCalc;
     private final LoggedNetworkNumber power; 
     private final LoggedNetworkNumber kVTarget; 
-    private double i = 0;
 
     public AimTurretField(
         DriveSubsystem swerve, TurretSubsystem turret,
-        FlywheelSubsystem flywheel,
-        ShotCalculator shotCalc
+        FlywheelSubsystem flywheel, ShotCalculator shotCalc
     ) {
         this.turret = turret;
         this.swerve = swerve;

@@ -1,16 +1,24 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
 
 /** Shooter Subsystem using velocity control (rotations per second). */
 public class FeedSubsystem extends SubsystemBase {
     private final VelocityMotorIO agitatorMotor;
     private final VelocityMotorIO feedMotor;
+    private final Timer unjamTimer;
+    private boolean unjamming = false;
 
     public FeedSubsystem(VelocityMotorIO agitatorMotor, VelocityMotorIO feedMotor) {
         this.agitatorMotor = agitatorMotor;
         this.feedMotor = feedMotor;
+        unjamTimer = new Timer();
+        unjamTimer.start();
     }
 
     public void setSetpoints(double agitatorRPM, double feedRPM) {
@@ -51,5 +59,22 @@ public class FeedSubsystem extends SubsystemBase {
         feedMotor.logMotorPID();
         agitatorMotor.updateFromTunables();
         feedMotor.updateFromTunables();
+
+        if (unjamming) {
+            if (unjamTimer.get() > Constants.Feed.UNJAM_TIME) {
+                unjamTimer.reset();
+                unjamming = false;
+                agitatorMotor.setIsUnjamSlot(false);
+                Logger.recordOutput("Feed Unjamming", false);
+            }
+        } else if (
+            agitatorMotor.getStatorCurrent() > Constants.Feed.JAM_CURRENT &&
+            unjamTimer.get() > Constants.Feed.UNJAM_TIME // debounce
+        ){
+            unjamTimer.reset();
+            unjamming = true;
+            agitatorMotor.setIsUnjamSlot(true);
+            Logger.recordOutput("Feed Unjamming", true);
+        }
     }
 }

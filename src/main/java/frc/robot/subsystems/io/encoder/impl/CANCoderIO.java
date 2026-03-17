@@ -2,7 +2,6 @@ package frc.robot.subsystems.io.encoder.impl;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 import frc.robot.Constants;
 

@@ -87,6 +87,7 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
     public void logMotorPID() {
         measuredLogged.set(motorSim.getAngularVelocityRPM());
         voltageLogged.set(talonFXSim.getMotorVoltage());
+        statorLogged.set(talonFXSim.getTorqueCurrent());
     }
 
     @Override

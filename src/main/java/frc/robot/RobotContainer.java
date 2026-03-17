@@ -11,9 +11,11 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AimTurretField;
+import frc.robot.commands.AutoPushIntake;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FullShoot;
 import frc.robot.commands.HoldIntakeDeployed;
@@ -43,7 +45,8 @@ public class RobotContainer {
     private final Trigger xTrigger = driverController.x();
     private final Trigger resetGyroTrigger = driverController.back();
 
-    private final Trigger shootTrigger = driverController.rightTrigger();
+    private final Trigger shootTrigger = driverController.rightTrigger(0.15);
+    private final Trigger autoIntakeTrigger = driverController.rightTrigger(0.9);
     private final Trigger pushIntakeTrigger = driverController.leftBumper();
     private final Supplier<Double> pushIntakeAxis = driverController::getLeftTriggerAxis;
     private final Trigger startIntakeTrigger = driverController.a();
@@ -126,17 +129,24 @@ public class RobotContainer {
             Constants.Controls.INTAKE_IDLE_RPM / 60.0
         ));
 
+        intakeSubsystem.setDefaultCommand(new HoldIntakeDeployed(
+            intakeSubsystem, 
+            Constants.Controls.INTAKE_DEPLOYED_DEG
+        ));
+        autoIntakeTrigger.whileTrue(new AutoPushIntake(
+            intakeSubsystem,
+            Constants.Controls.INTAKE_DEPLOYED_DEG, 
+            Constants.Controls.INTAKE_RETRACT_DEG,
+            Constants.Controls.INTAKE_AUTO_PUSH_TIME
+        ));
         pushIntakeTrigger.whileTrue(new PushIntake(
             intakeSubsystem, 
             pushIntakeAxis, 
             Constants.Controls.INTAKE_DEPLOYED_DEG, 
             Constants.Controls.INTAKE_RETRACT_DEG
-        ));
-        intakeSubsystem.setDefaultCommand(new HoldIntakeDeployed(
-            intakeSubsystem, 
-            Constants.Controls.INTAKE_DEPLOYED_DEG
-        ));
-
+        )
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+    
         // Tuning commands
 
         // feedSubsystem.setSetpoints(Constants.Controls.FEED_HOLD_RPM,Constants.Controls.AGITATOR_HOLD_RPM);
