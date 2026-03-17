@@ -101,6 +101,7 @@ public class RobotContainer {
         }
 
         turretSubsystem.setEncoderInvert(true);
+        intakeSubsystem.setEncoderInvert(true);
             
         climberSubsystem.resetPositionToAbsolute();
         intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
