@@ -229,14 +229,14 @@ public final class Constants {
     }
 
     public static final class Turret {
-        public static final int EncoderChannel = 0;
+        public static final int EncoderChannel = 32;
 
         public static final class Aim {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 60.0;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.53; // 0.242 unrestricted
-            public static final double RANGE_DEG = 90.0; // 160
+            public static final double ZERO_OFFSET = 0.788; // 0.242 unrestricted
+            public static final double RANGE_DEG = 110.0; // 160
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
@@ -309,7 +309,7 @@ public final class Constants {
     }
 
     public static final class Intake {
-        public static final int EncoderChannel = 32;
+        public static final int EncoderChannel = 0;
 
         public static final class Roller {
             public static final double INERTIA = 0.001;
@@ -326,7 +326,7 @@ public final class Constants {
 
         public static final class Deploy {
             public static final double INERTIA = 0.001;
-            public static final double ZERO_OFFSET = 0.0;
+            public static final double ZERO_OFFSET = 0.8;
             public static final double GEAR_RATIO = 27.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
