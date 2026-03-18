@@ -6,15 +6,19 @@ package frc.robot;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.util.Conversions;
+import frc.robot.util.ProjectileSimulator;
+import frc.robot.util.ShotCalculator;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -106,6 +110,24 @@ public final class Constants {
     public static final PositionMotorType TURRET_HOOD_POSITION_MOTOR_TYPE =
         PositionMotorType.CTRE_TALON_FX;
 
+    public static final class Field
+    {
+        public static final Translation2d RED_HUB = new Translation2d(11.92, 4.033);
+        public static final Translation2d RED_HUB_FORWARD = new Translation2d(-1.0, 0.0);
+
+        public static final Translation2d BLUE_HUB = new Translation2d(4.625, 4.033);
+        public static final Translation2d BLUE_HUB_FORWARD = new Translation2d(1.0, 0.0);
+
+        public static final double BLUE_ZONE_X = 4.47;
+        public static final double RED_ZONE_X = 0.0;
+
+        public static final double CENTER_Y = 4.1;
+        public static final double PASS_LEFT_Y = 6.3;
+        public static final double PASS_RIGHT_Y = 2.0;
+        public static final double BLUE_PASS_X = 2.0;
+        public static final double RED_PASS_X = 13.8;
+    }
+
     public static final class Controls {
         public static final int DRIVER_CONTROLLER_PORT = 0;
 
@@ -113,19 +135,20 @@ public final class Constants {
         // RPM values are INPUT RPM, will be geared down
 
         public static final double INTAKE_DEPLOYED_DEG = 0.0;
-        public static final double INTAKE_RETRACT_DEG  = -0.3*360.0;
+        public static final double INTAKE_RETRACT_DEG  = 90.0; // for push
         
-        public static final double INTAKE_RUN_RPM = 5000.0;
+        public static final double INTAKE_RUN_RPM = 4000.0;
         public static final double INTAKE_IDLE_RPM = 0.0;
 
         public static final double CLIMBER_DEPLOYED_DEG = 360.0;
 
-        public static final double TURRET_AIM_DEG = 45.0;
-        public static final double TURRET_HOOD_DEG = 10.0;
+        public static final double TURRET_HOOD_DEG = 15.0;
 
-        public static final double AGITATOR_HOLD_RPM = 2000.0;
+        public static final double AGITATOR_HOLD_RPM = 4000.0;
         public static final double FEED_HOLD_RPM = 3000.0; // max speed
-        public static final double FLYWHEEL_HOLD_RPM = 2200.0;
+
+        public static final double FLYWHEEL_LOB_RPM = 2200.0;
+        public static final double LOB_DISTANCE = 2.0;
     }
 
     /** BLine FollowPath PID gains. Path constraints are in deploy/autos/config.json. */
@@ -175,6 +198,37 @@ public final class Constants {
         }
     }
 
+    // On the fly settings 
+
+    public static ProjectileSimulator.SimParameters simParameters = 
+        new ProjectileSimulator.SimParameters(
+            0.215,   // ball mass kg
+            0.1501,  // ball diameter m
+            0.47,    // drag coeff (smooth sphere)
+            0.2,     // Magnus coeff
+            1.225,   // air density
+            0.482,    // exit height (m), floor to where the ball leaves the shooter
+            0.0762,  // flywheel diameter (m), measure with calipers
+            1.83,    // target height (m), from game manual
+            0.6,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
+            65.0,    // launch angle from horizontal, measure from CAD
+            0.001,   // sim timestep
+            1500, 6000, 25, 5.0  // RPM search range, iterations, max sim time
+        );
+
+    public static ShotCalculator.Config shotConfig = new ShotCalculator.Config();
+    static {
+        shotConfig.launcherOffsetX = 0.0;  // how far forward the launcher is from robot center (m)
+        shotConfig.launcherOffsetY = 0.0;   // how far left, 0 if centered
+        shotConfig.phaseDelayMs = 30.0;     // your vision pipeline latency
+        shotConfig.mechLatencyMs = 20.0;    // how long the mechanism takes to respond
+        shotConfig.maxTiltDeg = 5.0;        // suppress firing when chassis tilts past this (bumps/ramps)
+        shotConfig.headingSpeedScalar = 1.0; // heading tolerance tightens with robot speed (0 to disable)
+        shotConfig.headingReferenceDistance = 2.5; // heading tolerance scales with distance from hub
+    }
+    
+    // Subsystems
+
     public static final class Feed {
         public static final double INERTIA = 0.01;
         public static final double GEAR_RATIO = 25.0/12.0;
@@ -183,7 +237,8 @@ public final class Constants {
             "motorId", 21,
             "kP", 0.04,
             "kV", 0.0113,
-            "inverted", true
+            "inverted", true,
+            "neutralMode", NeutralMode.COAST
         ));
     }
 
@@ -202,19 +257,21 @@ public final class Constants {
     }
 
     public static final class Turret {
-        public static final int EncoderChannel = 0;
+        public static final int EncoderChannel = 32;
 
         public static final class Aim {
             public static final double INERTIA = 0.01;
-            public static final double GEAR_RATIO = 5.0;
+            public static final double GEAR_RATIO = 60.0;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.22;
+            public static final double ZERO_OFFSET = 0.03; // 0.242 unrestricted
+            public static final double RANGE_DEG = 110.0; // 160
+            public static final double HEADING_OFFSET_DEG = -170.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
-                "kP", 0.1,
-                "kD", 0.004,
-                "kS", 0.0
+                "kP", 0.2,
+                "kD", 0.0,
+                "kS", 0.005
             ));
             static {
                 // config.put("MotionMagicCruiseVelocity", 100.0);
@@ -223,10 +280,10 @@ public final class Constants {
 
                 config.put("forwardLimitEnabled", true);
                 config.put("forwardLimitRotations",
-                    Conversions.degreesToRotations(90.0, GEAR_RATIO));
+                    Conversions.degreesToRotations(RANGE_DEG, GEAR_RATIO));
                 config.put("reverseLimitEnabled", true);
                 config.put("reverseLimitRotations",
-                    Conversions.degreesToRotations(-90.0, GEAR_RATIO));
+                    Conversions.degreesToRotations(-RANGE_DEG, GEAR_RATIO));
                 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 config.put("inverted", false);
@@ -244,9 +301,9 @@ public final class Constants {
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 52,
-                "kP", 0.06,
+                "kP", 0.4,
                 "kD", 0.0,
-                "kS", 0.035
+                "kS", 0.03
             ));
             static {
                 // config.put("MotionMagicCruiseVelocity", 2.0);
@@ -276,12 +333,13 @@ public final class Constants {
             "motorId", 20,
             "kP", 0.05,
             "kV", 0.012,
-            "inverted", false
+            "inverted", false,
+            "neutralMode", NeutralMode.COAST
         ));
     }
 
     public static final class Intake {
-        public static final int EncoderChannel = 32;
+        public static final int EncoderChannel = 0;
 
         public static final class Roller {
             public static final double INERTIA = 0.001;
@@ -298,7 +356,7 @@ public final class Constants {
 
         public static final class Deploy {
             public static final double INERTIA = 0.001;
-            public static final double ZERO_OFFSET = -0.165;
+            public static final double ZERO_OFFSET = 0.78;
             public static final double GEAR_RATIO = 27.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
@@ -306,9 +364,9 @@ public final class Constants {
             // NOTE: Cuts off at 10 key-value pairs
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId",30,
-                "kP", 0.15,
+                "kP", 0.04,
                 "kD", 0.0,
-                "kG", 0.0,
+                "kG", 0.03,
                 "kS", 0.06
             ));
             static {
@@ -318,8 +376,10 @@ public final class Constants {
                 config.put("reverseLimitEnabled", true);
 
                 // TalonFX outputted rotations
-                config.put("forwardLimitRotations", 0.0);
-                config.put("reverseLimitRotations", 8.8);
+                config.put("forwardLimitRotations", 
+                    Conversions.degreesToRotations(140.0, GEAR_RATIO)
+                );
+                config.put("reverseLimitRotations", -0.05);
 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 
@@ -354,15 +414,35 @@ public final class Constants {
 
         public static final class Left {
             public static final String name = "limelight-left";
-            public static Transform3d fromRobot =
-                new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI/2));
+            // User: x=13in(left), y=-10.5in(back), z=8in(up), pitch=10deg(up), yaw=left(90deg)
+            public static final Transform3d fromRobot = new Transform3d(
+                new Translation3d(
+                    Units.inchesToMeters(-10.5),  // WPILib X = user Y (forward)
+                    Units.inchesToMeters(13.0),   // WPILib Y = user X (left)
+                    Units.inchesToMeters(8.0)),   // WPILib Z = user Z (up)
+                new Rotation3d(0.0, Units.degreesToRadians(-10.0), Math.PI / 2.0));
         }
 
         public static final class Right {
             public static final String name = "limelight-right";
-            public static Transform3d fromRobot =
-            
-                new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, -Math.PI/2));
+            // User: x=-13in(right), y=-10.375in(back), z=6in(up), pitch=10deg(up), yaw=right(-90deg)
+            public static final Transform3d fromRobot = new Transform3d(
+                new Translation3d(
+                    Units.inchesToMeters(-10.375), // WPILib X = user Y (forward)
+                    Units.inchesToMeters(-13.0),   // WPILib Y = user X (left, negative=right)
+                    Units.inchesToMeters(6.0)),    // WPILib Z = user Z (up)
+                new Rotation3d(0.0, Units.degreesToRadians(-10.0), -Math.PI / 2.0));
+        }
+
+        public static final class Front {
+            public static final String name = "limelight-front";
+            // User: x=0(center), y=2.75in(forward), z=16.25in(up), pitch=0(deg), yaw=forward(0deg)
+            public static final Transform3d fromRobot = new Transform3d(
+                new Translation3d(
+                    Units.inchesToMeters(2.75),    // WPILib X = user Y (forward)
+                    0.0,                           // WPILib Y = user X (center)
+                    Units.inchesToMeters(16.25)),  // WPILib Z = user Z (up)
+                new Rotation3d(0.0, 0.0, 0.0));
         }
     }
 }

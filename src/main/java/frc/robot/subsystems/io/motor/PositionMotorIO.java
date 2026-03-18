@@ -3,6 +3,7 @@ package frc.robot.subsystems.io.motor;
 /** Hardware-agnostic position control (degrees). */
 public interface PositionMotorIO {
     void setTargetPositionDegrees(double degrees);
+    void setTargetPositionDegrees(double degrees, double FF);
 
     double getPositionDegrees();
 

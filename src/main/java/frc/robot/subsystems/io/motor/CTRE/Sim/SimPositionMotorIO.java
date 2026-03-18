@@ -2,8 +2,6 @@ package frc.robot.subsystems.io.motor.CTRE.Sim;
 
 import java.util.Map;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
@@ -15,7 +13,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants.SimMotor;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
-import frc.robot.util.Conversions;
 
 public class SimPositionMotorIO extends CtreTalonFxPositionIO {
     private DCMotorSim motorSim;

@@ -1,8 +1,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;
+import frc.robot.util.FuelPhysicsSim;
 
 /** Holds the shooter at a requested speed (RPS) while scheduled. */
 public class FullShoot extends Command {
@@ -11,28 +13,44 @@ public class FullShoot extends Command {
     private final FeedSubsystem agitator;
     private final double feedRPS;
     private final double agitatorRPS;
-    private double flywheelRPS;
+    private final FuelPhysicsSim ballSim;
+    private int i = 0;
 
     public FullShoot(
         FlywheelSubsystem flywheel, FeedSubsystem agitator, 
-        double feedRPS, double agitatorRPS
+        double feedRPS, double agitatorRPS, FuelPhysicsSim ballSim
     ) {
         this.flywheel = flywheel;
         this.agitator = agitator;
+        this.ballSim = ballSim;
         
         this.feedRPS = feedRPS;
         this.agitatorRPS = agitatorRPS;
-        flywheelRPS = flywheel.getSetpointRPS();
 
         addRequirements(flywheel, agitator);
     }
 
     @Override
     public void execute() {
-        flywheelRPS = flywheel.getSetpointRPS();
-        flywheel.bangBang(flywheelRPS, 0.117);
-        agitator.setAgitatorSpeed(agitatorRPS);
-        agitator.setFeedSpeed(feedRPS);
+        if (flywheel.validAutoSpeed()) {
+            flywheel.useAutoSpeed();
+
+            if (flywheel.isAtSpeed(1.0)) {
+                agitator.setAgitatorSpeed(agitatorRPS);
+                agitator.setFeedSpeed(feedRPS);
+            } else {
+                // Coast to not shoot
+                // Brake would use extra power?
+                agitator.stop();
+            }
+
+            if (Constants.currentMode == Constants.Mode.SIM) {
+                if (i%4 == 0) {
+                    ballSim.launchBall(flywheel.launchPosSim, flywheel.launchSpeedSim, 0.0);
+                }
+                i++;
+            }
+        }
     }
 
     @Override

@@ -12,6 +12,7 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
@@ -62,6 +63,14 @@ public class CtreTalonFxIO {
         setters.put("kV", value -> this.config.Slot0.kV = (double) value);
         setters.put("kS", value -> this.config.Slot0.kS = (double) value);
         setters.put("kG", value -> this.config.Slot0.kG = (double) value);
+        setters.put(
+            "useClosedLoopFFSign", 
+            value -> this.config.Slot0.StaticFeedforwardSign = (((boolean) value) ? 
+            StaticFeedforwardSignValue.UseClosedLoopSign : StaticFeedforwardSignValue.UseVelocitySign));
+        setters.put(
+            "gravityTypeIsArm",
+            value -> this.config.Slot0.GravityType = (((boolean) value) ? 
+            GravityTypeValue.Arm_Cosine : GravityTypeValue.Elevator_Static));
 
         setters.put(
             "forwardLimitEnabled",
@@ -102,10 +111,7 @@ public class CtreTalonFxIO {
         setters.put(
             "isRioCANBUS", 
             value -> this.isRioCANBUS = (boolean) value);
-        setters.put(
-            "useClosedLoopFFSign", 
-            value -> this.config.Slot0.StaticFeedforwardSign = (((boolean) value) ? 
-            StaticFeedforwardSignValue.UseClosedLoopSign : StaticFeedforwardSignValue.UseVelocitySign));
+
 
         setConfiguration(cfg);
 
@@ -183,7 +189,8 @@ public class CtreTalonFxIO {
 
     public void applyConfiguration() {
         motor.getConfigurator().apply(config);
-        Logger.recordOutput(NTPath+"/Config", config.Slot0.toString());
+        Logger.recordOutput(NTPath+"/ConfigSlot0", config.Slot0.toString());
+        Logger.recordOutput(NTPath+"/ConfigSlot1", config.Slot1.toString());
         if (hasFollower) {
             followerMotor.getConfigurator().apply(config);
             //followerMotor.setControl(new Follower(this.motorId, followerAligned));

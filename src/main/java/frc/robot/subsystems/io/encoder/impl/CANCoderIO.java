@@ -1,8 +1,10 @@
 package frc.robot.subsystems.io.encoder.impl;
 
+import com.ctre.phoenix6.configs.CANcoderConfigurator;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 import frc.robot.Constants;
 
@@ -11,11 +13,16 @@ public class CANCoderIO implements AbsEncoderIO {
 
   public CANCoderIO(int encoderPort) {
     encoder = new CANcoder(encoderPort, Constants.CANBUS);
+
+    MagnetSensorConfigs config = new MagnetSensorConfigs();
+    encoder.getConfigurator().refresh(config);
+    config.withAbsoluteSensorDiscontinuityPoint(1.0);
+    encoder.getConfigurator().apply(config);
   }
 
   @Override
   public double getRotations() {
-    return encoder.getPosition().getValueAsDouble();
+    return encoder.getAbsolutePosition().getValueAsDouble();
   }
 
   @Override
@@ -30,6 +37,12 @@ public class CANCoderIO implements AbsEncoderIO {
 
   @Override
   public void setInverted(boolean isInverted) {
-    return;
+    CANcoderConfigurator configurator =  encoder.getConfigurator();
+    SensorDirectionValue directionValue = isInverted ? SensorDirectionValue.CounterClockwise_Positive : SensorDirectionValue.Clockwise_Positive;
+    MagnetSensorConfigs config = new MagnetSensorConfigs();
+    
+    configurator.refresh(config);
+    config.withSensorDirection(directionValue);
+    configurator.apply(config);
   }
 }
