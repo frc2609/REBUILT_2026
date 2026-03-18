@@ -21,4 +21,11 @@ public interface PositionMotorIO {
     void resetToZero();
 
     void stop();
+
+    /** Sends a 0% DutyCycleOut — an active (non-neutral) request with zero output.
+     *  Use when a live control request is needed (e.g. to trigger soft-limit faults)
+     *  without actually driving the motor. No-op by default for non-CTRE implementations. */
+    default void setOutputZero() {}
+
+
 }

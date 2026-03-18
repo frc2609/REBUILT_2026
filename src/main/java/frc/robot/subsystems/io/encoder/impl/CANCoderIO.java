@@ -12,11 +12,21 @@ public class CANCoderIO implements AbsEncoderIO {
   private final CANcoder encoder;
 
   public CANCoderIO(int encoderPort) {
+    this(encoderPort, 0.0, false);
+  }
+
+  /** Configures MagnetOffset and direction in one hardware apply — use for FusedCANcoder motors
+   *  so the absolute position reads 0 at mechanical zero without any software reset at boot. */
+  public CANCoderIO(int encoderPort, double magnetOffset, boolean inverted) {
     encoder = new CANcoder(encoderPort, Constants.CANBUS);
 
     MagnetSensorConfigs config = new MagnetSensorConfigs();
     encoder.getConfigurator().refresh(config);
     config.withAbsoluteSensorDiscontinuityPoint(1.0);
+    config.withMagnetOffset(magnetOffset);
+    config.withSensorDirection(inverted
+        ? SensorDirectionValue.CounterClockwise_Positive
+        : SensorDirectionValue.Clockwise_Positive);
     encoder.getConfigurator().apply(config);
   }
 

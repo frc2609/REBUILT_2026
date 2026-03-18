@@ -91,8 +91,9 @@ public final class Constants {
             53, "Turret/Azimuth"
         );
 
-    public static final String[] tunableKeys = 
-        {"kP", "kI", "kD", "kA", "kV", "kS", "kG"};
+    public static final String[] tunableKeys =
+        {"kP", "kI", "kD", "kA", "kV", "kS", "kG",
+         "MotionMagicCruiseVelocity", "MotionMagicAcceleration", "MotionMagicJerk"};
 
     public static final VelocityMotorType FLYWHEEL_VELOCITY_MOTOR_TYPE =
         VelocityMotorType.CTRE_TALON_FX;
@@ -235,27 +236,33 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 60.0;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.788; // 0.242 unrestricted
+            public static final double ZERO_OFFSET = 0.782; // 0.242 unrestricted
             public static final double RANGE_DEG = 110.0; // 160
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
-            public static final Map<String, Object> config = new HashMap<>(Map.of(
+
+public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
                 "kP", 0.2,
                 "kD", 0.0,
                 "kS", 0.005
             ));
             static {
-                // config.put("MotionMagicCruiseVelocity", 100.0);
-                // config.put("MotionMagicAcceleration", 200.0);
-                // config.put("MotionMagicJerk", 0.0); //trapezoid
+                config.put("MotionMagicCruiseVelocity", 0.2); // Stage 2 slow: sensor rot/s ≈ 72°/s
+                config.put("MotionMagicAcceleration",   0.4);
+                config.put("MotionMagicJerk",           0.0);
+
+                // FusedCANcoder — position feedback is now output-shaft (sensor) rotations
+                config.put("feedbackSensorId", Constants.Turret.EncoderChannel); // CANCoder ID 32
+                config.put("rotorToSensorRatio", GEAR_RATIO);                    // 60:1
 
                 config.put("forwardLimitEnabled", true);
+                // Soft limits in sensor-space (output shaft rotations, not rotor)
                 config.put("forwardLimitRotations",
-                    Conversions.degreesToRotations(RANGE_DEG, GEAR_RATIO));
+                    Conversions.degreesToRotations(RANGE_DEG, 1.0));
                 config.put("reverseLimitEnabled", true);
                 config.put("reverseLimitRotations",
-                    Conversions.degreesToRotations(-RANGE_DEG, GEAR_RATIO));
-                
+                    Conversions.degreesToRotations(-RANGE_DEG, 1.0));
+
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 config.put("inverted", false);
                 config.put("supplyCurrentLimit", 120.0);

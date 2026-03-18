@@ -13,7 +13,7 @@ public class TurretSubsystem extends SubsystemBase {
     private final AbsEncoderIO aimEncoder;
 
     public TurretSubsystem(
-        PositionMotorIO aimMotor, PositionMotorIO hoodMotor, 
+        PositionMotorIO aimMotor, PositionMotorIO hoodMotor,
         AbsEncoderIO aimEncoder, DriveSubsystem swerve
     ) {
         this.aimMotor = aimMotor;
@@ -61,7 +61,7 @@ public class TurretSubsystem extends SubsystemBase {
         aimMotor.stop();
         hoodMotor.stop();
     }
-    
+
     @Override
     public void periodic()
     {

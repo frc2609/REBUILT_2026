@@ -100,12 +100,12 @@ public class RobotContainer {
                 () -> driveSubsystem.getPose(), () -> driveSubsystem.getChassisSpeeds());
         }
 
-        turretSubsystem.setEncoderInvert(true);
+        // Turret encoder: MagnetOffset + inversion are now baked into CANCoderIO constructor
+        // in RobotFactory. FusedCANcoder reads 0 at mechanical zero without a software reset.
         intakeSubsystem.setEncoderInvert(true);
-            
+
         climberSubsystem.resetPositionToAbsolute();
         intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
-        turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
 
         configureBindings();
     }
@@ -115,28 +115,28 @@ public class RobotContainer {
     }
     
 
-    private void configureBindings() {        
+    private void configureBindings() {
         // Main controls
 
         turretSubsystem.setDefaultCommand(autoAimHubCommand);
         shootTrigger.whileTrue(new FullShoot(
-            flywheelSubsystem, 
-            feedSubsystem, 
-            Constants.Controls.FEED_HOLD_RPM / 60.0, 
+            flywheelSubsystem,
+            feedSubsystem,
+            Constants.Controls.FEED_HOLD_RPM / 60.0,
             Constants.Controls.AGITATOR_HOLD_RPM / 60.0
         ));
         startIntakeTrigger.onTrue(new SetIntakeSpeedRPS(
-            intakeSubsystem, 
+            intakeSubsystem,
             Constants.Controls.INTAKE_RUN_RPM / 60.0
         ));
         stopIntakeTrigger.onTrue(new SetIntakeSpeedRPS(
-            intakeSubsystem, 
+            intakeSubsystem,
             Constants.Controls.INTAKE_IDLE_RPM / 60.0
         ));
         pushIntakeTrigger.whileTrue(new PushIntake(
-            intakeSubsystem, 
-            driverController::getLeftTriggerAxis, 
-            Constants.Controls.INTAKE_DEPLOYED_DEG, 
+            intakeSubsystem,
+            driverController::getLeftTriggerAxis,
+            Constants.Controls.INTAKE_DEPLOYED_DEG,
             Constants.Controls.INTAKE_RETRACT_DEG
         ));
 
@@ -152,7 +152,7 @@ public class RobotContainer {
         setIntakeTrigger.onTrue(Commands.runOnce(intakeSubsystem::setDeployPosition, intakeSubsystem));
         turretSubsystem.setSetpoints(Constants.Controls.TURRET_AIM_DEG,Constants.Controls.TURRET_HOOD_DEG);
         //setHoodTrigger.onTrue(Commands.runOnce(turretSubsystem::setHoodPosition,turretSubsystem));
-        
+
         // Drive commands
 
         driveSubsystem.setDefaultCommand(

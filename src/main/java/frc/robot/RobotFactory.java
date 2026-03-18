@@ -19,6 +19,7 @@ import frc.robot.subsystems.io.encoder.impl.SimAbsEncoderIO;
 import frc.robot.subsystems.io.encoder.impl.WpiDutyCycleEncoderIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
+import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxFusedPositionIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxVelocityIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimPositionMotorIO;
@@ -188,7 +189,7 @@ public class RobotFactory {
         }
         switch (Constants.TURRET_AIM_POSITION_MOTOR_TYPE) {
             case CTRE_TALON_FX:
-                return new CtreTalonFxPositionIO(
+                return new CtreTalonFxFusedPositionIO(
                     Constants.Turret.Aim.config,
                     Constants.Turret.Aim.GEAR_RATIO,
                     Constants.Turret.Aim.ENCODER_RATIO);
@@ -221,7 +222,10 @@ public class RobotFactory {
             return new SimAbsEncoderIO(0);
         }
 
-        return new CANCoderIO(Constants.Turret.EncoderChannel);
+        // MagnetOffset = -ZERO_OFFSET so absolute position reads 0 at mechanical zero.
+        // inverted=true matches the existing setEncoderInvert(true) in RobotContainer.
+        // With FusedCANcoder this eliminates any need for a software reset at boot.
+        return new CANCoderIO(Constants.Turret.EncoderChannel, -Constants.Turret.Aim.ZERO_OFFSET, true);
     }
 
     // INTAKE

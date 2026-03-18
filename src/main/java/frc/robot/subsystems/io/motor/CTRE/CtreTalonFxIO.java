@@ -12,6 +12,7 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
@@ -109,9 +110,15 @@ public class CtreTalonFxIO {
             value -> config.CurrentLimits.StatorCurrentLimitEnable = (boolean) value);
         
         setters.put(
-            "isRioCANBUS", 
+            "isRioCANBUS",
             value -> this.isRioCANBUS = (boolean) value);
 
+        setters.put("feedbackSensorId", value -> {
+            config.Feedback.FeedbackRemoteSensorID = (int) value;
+            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
+        });
+        setters.put("rotorToSensorRatio", value ->
+            config.Feedback.RotorToSensorRatio = (double) value);
 
         setConfiguration(cfg);
 
