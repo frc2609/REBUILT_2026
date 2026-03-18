@@ -171,7 +171,16 @@ public class RobotContainer {
                 driveSubsystem,
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
-                () -> -driverController.getRightX()));
+                () -> -driverController.getRightX(),
+                1.0));
+        shootTrigger.whileTrue(
+            DriveCommands.joystickDrive(
+                driveSubsystem,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX(),
+                Constants.Controls.SHOOTING_SPEED_PERCENT)
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
         xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
         resetGyroTrigger.onTrue(

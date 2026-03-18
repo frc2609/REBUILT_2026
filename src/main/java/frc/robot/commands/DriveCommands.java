@@ -64,7 +64,9 @@ public class DriveCommands {
       DriveSubsystem drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier) {
+      DoubleSupplier omegaSupplier,
+      double speedFactor
+    ) {
     return Commands.run(
         () -> {
           // Get linear velocity
@@ -80,9 +82,9 @@ public class DriveCommands {
           // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
               new ChassisSpeeds(
-                  linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec());
+                  linearVelocity.getX() * speedFactor * drive.getMaxLinearSpeedMetersPerSec(),
+                  linearVelocity.getY() * speedFactor * drive.getMaxLinearSpeedMetersPerSec(),
+                  omega * speedFactor * drive.getMaxAngularSpeedRadPerSec());
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;

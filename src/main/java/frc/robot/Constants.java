@@ -130,6 +130,7 @@ public final class Constants {
 
     public static final class Controls {
         public static final int DRIVER_CONTROLLER_PORT = 0;
+        public static final double SHOOTING_SPEED_PERCENT = 0.5;
         public static final double UNJAM_FACTOR = 10.0; // kP multiplier when unjamming
 
         // Rotation values are OUTPUT degrees
