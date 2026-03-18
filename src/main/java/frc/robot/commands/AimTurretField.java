@@ -26,7 +26,7 @@ public class AimTurretField extends Command {
     private final FlywheelSubsystem flywheel;
     private final ShotCalculator shotCalc;
     private final LoggedNetworkNumber power; 
-    private final LoggedNetworkNumber kVTarget; 
+    private final LoggedNetworkNumber kVTarget, headingOffset; 
 
     public AimTurretField(
         DriveSubsystem swerve, TurretSubsystem turret,
@@ -38,8 +38,9 @@ public class AimTurretField extends Command {
         this.shotCalc = shotCalc;
 
         // magic number
-        power = new LoggedNetworkNumber("shotPower", 0.67);
-        kVTarget = new LoggedNetworkNumber("turretAimkV", 0.0);
+        power = new LoggedNetworkNumber("SimPower", 0.51);
+        kVTarget = new LoggedNetworkNumber("turretAimkV", -.7);
+        headingOffset = new LoggedNetworkNumber("headingOffset",188.0);
 
         addRequirements(turret);
     }
@@ -58,7 +59,7 @@ public class AimTurretField extends Command {
 
         if (alliance == Alliance.Blue)
         {
-            if (robotPose.getX() < Constants.Field.BLUE_ZONE_X) {
+            if (robotPose.getX() <= Constants.Field.BLUE_ZONE_X) {
                 target = Constants.Field.BLUE_HUB;
                 targetForward = new Translation2d(1,0);
             } else {
@@ -66,7 +67,7 @@ public class AimTurretField extends Command {
                 targetForward = new Translation2d(-1,0);
             }
         } else {
-            if (robotPose.getX() > Constants.Field.RED_ZONE_X) {
+            if (robotPose.getX() >= Constants.Field.RED_ZONE_X) {
                 target = Constants.Field.RED_HUB;
                 targetForward = new Translation2d(-1,0);
             } else {
@@ -74,6 +75,8 @@ public class AimTurretField extends Command {
                 targetForward = new Translation2d(1,0);
             }
         }
+
+        Logger.recordOutput("TARGET", target);
 
         ChassisSpeeds fieldRelativeSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(
             swerve.getChassisSpeeds(),
@@ -93,7 +96,8 @@ public class AimTurretField extends Command {
         // Set turret aim independant of shot
         
         double turretAngleDeg = shot.launcherAngle()
-            .minus(Rotation2d.fromDegrees(Constants.Turret.Aim.HEADING_OFFSET_DEG))
+            //.minus(Rotation2d.fromDegrees(Constants.Turret.Aim.HEADING_OFFSET_DEG))
+            .minus(Rotation2d.fromDegrees(headingOffset.get()))
             .minus(swerve.getRotation())
             .getDegrees();
 
@@ -115,7 +119,7 @@ public class AimTurretField extends Command {
                 flywheel.setAutoSpeed(Constants.Controls.FLYWHEEL_LOB_RPM/60.0);
             } else {
                 turret.setHoodPosition(Constants.Controls.TURRET_HOOD_DEG);
-                flywheel.setAutoSpeed(power.get()*shot.rpm()/60.0);
+                flywheel.setAutoSpeed(shot.rpm()/60.0);
             }
         } else {
             flywheel.setAutoSpeed(0.0);

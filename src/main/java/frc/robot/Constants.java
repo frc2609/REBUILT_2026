@@ -118,8 +118,8 @@ public final class Constants {
         public static final Translation2d BLUE_HUB = new Translation2d(4.625, 4.033);
         public static final Translation2d BLUE_HUB_FORWARD = new Translation2d(1.0, 0.0);
 
-        public static final double BLUE_ZONE_X = 4.47;
-        public static final double RED_ZONE_X = 0.0;
+        public static final double BLUE_ZONE_X = 5.5;
+        public static final double RED_ZONE_X = 11.3;
 
         public static final double CENTER_Y = 4.1;
         public static final double PASS_LEFT_Y = 6.3;
@@ -135,9 +135,10 @@ public final class Constants {
         // Rotation values are OUTPUT degrees
         // RPM values are INPUT RPM, will be geared down
 
-        public static final double INTAKE_DEPLOYED_DEG = 0.0;
+
+        public static final double INTAKE_DEPLOYED_DEG = -15.0;
         public static final double INTAKE_RETRACT_DEG  = 90.0; // for push
-        public static final double INTAKE_AUTO_PUSH_TIME = 2.5; // seconds to retract
+        public static final double INTAKE_AUTO_PUSH_TIME = 2.0; // seconds to retract
         
         public static final double INTAKE_RUN_RPM = 4000.0;
         public static final double INTAKE_IDLE_RPM = 0.0;
@@ -146,7 +147,7 @@ public final class Constants {
 
         public static final double TURRET_HOOD_DEG = 15.0;
 
-        public static final double AGITATOR_HOLD_RPM = 4000.0;
+        public static final double AGITATOR_HOLD_RPM = 2400.0;
         public static final double FEED_HOLD_RPM = 3000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
@@ -195,9 +196,9 @@ public final class Constants {
             0.2,     // Magnus coeff
             1.225,   // air density
             0.482,    // exit height (m), floor to where the ball leaves the shooter
-            0.0762,  // flywheel diameter (m), measure with calipers
+            0.077,  // flywheel diameter (m), measure with calipers
             1.83,    // target height (m), from game manual
-            0.6,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
+            0.9,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
             65.0,    // launch angle from horizontal, measure from CAD
             0.001,   // sim timestep
             1500, 6000, 25, 5.0  // RPM search range, iterations, max sim time
@@ -220,7 +221,7 @@ public final class Constants {
         public static final double INERTIA = 0.01;
         public static final double GEAR_RATIO = 25.0/12.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
-        public static final double JAM_CURRENT = 150.0; // stator limit before unjam
+        public static final double JAM_CURRENT = 100.0; // stator limit before unjam
         public static final double UNJAM_TIME  = 3.0; // seconds
         public static final Map<String, Object> config = new HashMap<>(Map.of(
             "motorId", 21,
@@ -252,13 +253,13 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 60.0;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.03; // 0.242 unrestricted
-            public static final double RANGE_DEG = 110.0; // 160
-            public static final double HEADING_OFFSET_DEG = -170.0; // robot front to turret zero
+            public static final double ZERO_OFFSET = 0.541; // 0.242 unrestricted
+            public static final double RANGE_DEG = 105.0; // 160
+            public static final double HEADING_OFFSET_DEG = 170.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
-                "kP", 0.2,
+                "kP", 0.06,
                 "kD", 0.0,
                 "kS", 0.005
             ));
@@ -276,9 +277,9 @@ public final class Constants {
                 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 config.put("inverted", false);
-                config.put("supplyCurrentLimit", 120.0);
+                config.put("supplyCurrentLimit", 60.0);
                 config.put("supplyCurrentLimitEnabled", true);
-                config.put("statorCurrentLimit", 160.0);
+                config.put("statorCurrentLimit", 40.0);
                 config.put("statorCurrentLimitEnabled", true);
                 config.put("useClosedLoopFFSign", true);
             }
@@ -315,7 +316,7 @@ public final class Constants {
 
     public static final class Agitator {
         public static final double INERTIA = 0.001;
-        public static final double GEAR_RATIO = 4.0;
+        public static final double GEAR_RATIO = 80.0/9.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 
         public static final Map<String, Object> config = new HashMap<>(Map.of(
@@ -339,13 +340,15 @@ public final class Constants {
                 "isRioCANBUS",true,
                 "inverted", true,
                 "kP", 0.032,
-                "kV", 0.0097
+                "kV", 0.0097,
+                "statorCurrentLimit", 120.0,
+                "statorCurrentLimitEnabled", true
             ));
         }
 
         public static final class Deploy {
             public static final double INERTIA = 0.001;
-            public static final double ZERO_OFFSET = 0.78;
+            public static final double ZERO_OFFSET = 0.798;
             public static final double GEAR_RATIO = 27.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
@@ -353,7 +356,7 @@ public final class Constants {
             // NOTE: Cuts off at 10 key-value pairs
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId",30,
-                "kP", 0.04,
+                "kP", 0.08,
                 "kD", 0.0,
                 "kG", 0.03,
                 "kS", 0.06
@@ -368,7 +371,7 @@ public final class Constants {
                 config.put("forwardLimitRotations", 
                     Conversions.degreesToRotations(140.0, GEAR_RATIO)
                 );
-                config.put("reverseLimitRotations", -0.05);
+                config.put("reverseLimitRotations", -1.5);
 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 

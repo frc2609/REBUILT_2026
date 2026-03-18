@@ -38,8 +38,11 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void resetDeployPositionToAbsolute(double offsetRotations) {
-        System.out.println("DEPLOY ZEROED, ENCODER: "+deployEncoder.getRotations()+" - OFFSET: "+offsetRotations);
-        deployMotor.resetToAbsolute(deployEncoder.getRotations()-offsetRotations);
+        double motorRotations = deployEncoder.getRotations()-offsetRotations;
+        if (motorRotations <= -0.1) { motorRotations += 1.0; }
+
+        System.out.println("DEPLOY ZEROED, rotor offset: "+motorRotations);
+        deployMotor.resetToAbsolute(motorRotations);
     }
 
     public boolean deployIsAtPosition(double toleranceDegrees) {

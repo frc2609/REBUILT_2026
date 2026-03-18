@@ -28,7 +28,7 @@ public class AutoPushIntake extends Command {
         if (t < maxTime) {
             return t/maxTime;
         } else {
-            return 0.8+0.2*Math.sin(2.8*(0.55+t-maxTime));
+            return 0.75+0.25*Math.sin(3.3*(0.55+t-maxTime));
         }
     }
 

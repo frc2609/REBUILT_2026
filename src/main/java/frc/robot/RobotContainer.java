@@ -52,15 +52,15 @@ public class RobotContainer {
     private final Trigger startIntakeTrigger = driverController.a();
     private final Trigger stopIntakeTrigger = driverController.start();
 
+    private final Trigger rpmUpTrigger = driverController.povUp();
+    private final Trigger rpmDownTrigger = driverController.povDown();
+
     // Tuning controls
 
     // private final Trigger holdAgitatorTrigger = driverController.b();
     // private final Trigger holdFeedTrigger = driverController.y();
     // private final Trigger holdFlywheelTrigger = driverController.rightBumper();
     // private final Trigger setIntakeTrigger = driverController.povDown();
-
-    // Dashboard inputs (later)
-    // private final LoggedDashboardChooser<Command> autoChooser;
 
     private final RobotFactory robotFactory = new RobotFactory();
     public final TurretSubsystem turretSubsystem;
@@ -104,6 +104,7 @@ public class RobotContainer {
             
         climberSubsystem.resetPositionToAbsolute();
         intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
+        
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
 
         configureBindings();
@@ -148,6 +149,10 @@ public class RobotContainer {
         )
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
     
+        // RPM trim (POV up/down)
+        rpmUpTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(50)));
+        rpmDownTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(-50)));
+
         // Tuning commands
 
         // feedSubsystem.setSetpoints(Constants.Controls.FEED_HOLD_RPM,Constants.Controls.AGITATOR_HOLD_RPM);
