@@ -134,7 +134,7 @@ public final class Constants {
         public static final double TURRET_AIM_DEG = 45.0;
         public static final double TURRET_HOOD_DEG = 15.0;
 
-        public static final double AGITATOR_HOLD_RPM = 2000.0;
+        public static final double AGITATOR_HOLD_RPM = 4000.0;
         public static final double FEED_HOLD_RPM = 3000.0; // max speed
         public static final double FLYWHEEL_HOLD_RPM = 2200.0;
     }
@@ -235,7 +235,7 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 60.0;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.788; // 0.242 unrestricted
+            public static final double ZERO_OFFSET = 0.03; // 0.242 unrestricted
             public static final double RANGE_DEG = 110.0; // 160
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
@@ -326,7 +326,7 @@ public final class Constants {
 
         public static final class Deploy {
             public static final double INERTIA = 0.001;
-            public static final double ZERO_OFFSET = 0.8;
+            public static final double ZERO_OFFSET = 0.78;
             public static final double GEAR_RATIO = 27.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
