@@ -254,7 +254,7 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 60.0;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.541; // 0.242 unrestricted
+            public static final double ZERO_OFFSET = 0.666; // 0.242 unrestricted
             public static final double RANGE_DEG = 105.0; // 160
             public static final double HEADING_OFFSET_DEG = 170.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
