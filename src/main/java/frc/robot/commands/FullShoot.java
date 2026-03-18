@@ -34,15 +34,10 @@ public class FullShoot extends Command {
     public void execute() {
         if (flywheel.validAutoSpeed()) {
             flywheel.useAutoSpeed();
+            agitator.setAgitatorSpeed(agitatorRPS);
+            agitator.setFeedSpeed(feedRPS);
 
-            if (flywheel.isAtSpeed(1.0)) {
-                agitator.setAgitatorSpeed(agitatorRPS);
-                agitator.setFeedSpeed(feedRPS);
-            } else {
-                // Coast to not shoot
-                // Brake would use extra power?
-                agitator.stop();
-            }
+            // if (flywheel.isAtSpeed(1.0)) // coast or brake feed to not shoot
 
             if (Constants.currentMode == Constants.Mode.SIM) {
                 if (i%4 == 0) {
@@ -50,6 +45,9 @@ public class FullShoot extends Command {
                 }
                 i++;
             }
+        }
+        else {
+            agitator.stop();
         }
     }
 

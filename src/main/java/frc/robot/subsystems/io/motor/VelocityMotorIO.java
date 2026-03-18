@@ -13,6 +13,9 @@ public interface VelocityMotorIO {
     double getSetpointRPM();
     void setSetpoint(double value);
 
+    double getStatorCurrent();
+    void setIsUnjamSlot(boolean unjam);
+
     void set(double percent);
 
     boolean isAtSpeed(double toleranceRps);

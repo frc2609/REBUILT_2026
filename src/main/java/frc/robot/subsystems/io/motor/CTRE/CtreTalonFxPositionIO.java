@@ -101,6 +101,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         measuredLogged.set(getPositionDegrees());
         rotationsLogged.set(motor.getPosition().getValueAsDouble());
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
+        statorLogged.set(motor.getStatorCurrent().getValueAsDouble());
     }
 
     @Override
@@ -109,6 +110,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         absRotationsLogged.set(absRotations);
         rotationsLogged.set(motor.getPosition().getValueAsDouble());
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
+        statorLogged.set(motor.getStatorCurrent().getValueAsDouble());
     }
 
 

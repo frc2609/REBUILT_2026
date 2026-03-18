@@ -5,11 +5,14 @@ import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
 import java.util.Map;
 
+import org.littletonrobotics.junction.Logger;
+
 public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMotorIO {
 
     private VelocityDutyCycle control;
     //private TorqueCurrentFOC torqueControl;
     public double setpointRps = 0.0;
+    private int currentSlot = 0;
 
     public CtreTalonFxVelocityIO(Map<String, Object> cfg) {
         super(cfg);
@@ -19,11 +22,8 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
 
     @Override
     public void setVelocityRps(double velocity) {
-        if (setpointRps != velocity) {
-            setpointRps = velocity;
-            control = control.withVelocity(setpointRps);
-            motor.setControl(control);
-        }
+        control = control.withVelocity(velocity).withSlot(this.currentSlot);
+        motor.setControl(control);
     }
 
     @Override
@@ -34,6 +34,16 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
     @Override
     public double getVelocityRps() {
         return motor.getVelocity().getValueAsDouble();
+    }
+
+    @Override
+    public double getStatorCurrent() {
+        return motor.getStatorCurrent().getValueAsDouble();
+    }
+
+    @Override
+    public void setIsUnjamSlot(boolean unjam) {
+        this.currentSlot = unjam? 1 : 0;
     }
 
     @Override
@@ -51,6 +61,7 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
     public void logMotorPID() {
         measuredLogged.set(getVelocityRps()*60.0);
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
+        statorLogged.set(getStatorCurrent());
     }
 
     @Override

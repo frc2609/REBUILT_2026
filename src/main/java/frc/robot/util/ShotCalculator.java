@@ -20,6 +20,8 @@
 
 package frc.robot.util;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -551,6 +553,7 @@ public class ShotCalculator {
 
   /** Bump the RPM offset by delta. Clamped to +/- 200. Bind this to copilot D-pad. */
   public void adjustOffset(double delta) {
+    Logger.recordOutput("RPMTrim", rpmOffset);
     rpmOffset = MathUtil.clamp(rpmOffset + delta, -200, 200);
   }
 
