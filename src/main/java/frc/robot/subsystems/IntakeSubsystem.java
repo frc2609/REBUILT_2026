@@ -61,4 +61,8 @@ public class IntakeSubsystem extends SubsystemBase {
         deployMotor.updateFromTunables();
         driveMotor.updateFromTunables();
     }
+
+    public void setEncoderInvert(boolean inverted) {
+        this.deployEncoder.setInverted(inverted);
+    }
 }

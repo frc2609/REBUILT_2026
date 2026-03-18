@@ -30,6 +30,10 @@ public class Robot extends LoggedRobot {
     private RobotContainer robotContainer;
 
     public Robot() {
+    // Load AprilTag field layout eagerly so it doesn't stall later init
+        @SuppressWarnings("unused")
+        var unused = Constants.Vision.aprilTagLayout;
+
         // Record metadata
         Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
