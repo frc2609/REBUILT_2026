@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
-import frc.robot.util.FuelPhysicsSim;
-import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 
 /** Shooter Subsystem using velocity control (rotations per second). */
@@ -14,7 +12,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     public TurretSubsystem(
         PositionMotorIO aimMotor, PositionMotorIO hoodMotor, 
-        AbsEncoderIO aimEncoder, DriveSubsystem swerve
+        AbsEncoderIO aimEncoder
     ) {
         this.aimMotor = aimMotor;
         this.hoodMotor = hoodMotor;
@@ -35,6 +33,9 @@ public class TurretSubsystem extends SubsystemBase {
     public void setAimPosition(double degrees) {
         aimMotor.setTargetPositionDegrees(degrees);
     }
+    public void setAimPositionFF(double degrees, double ff) {
+        aimMotor.setTargetPositionDegrees(degrees, ff);
+    }
 
     public void setEncoderInvert(boolean invert){
         this.aimEncoder.setInverted(invert);
@@ -51,6 +52,9 @@ public class TurretSubsystem extends SubsystemBase {
     }
     public void setHoodPosition(double degrees) {
         hoodMotor.setTargetPositionDegrees(degrees);
+    }
+    public double getHoodPosition() {
+        return hoodMotor.getPositionDegrees();
     }
 
     public boolean hoodIsAtPosition(double toleranceDegrees) {
