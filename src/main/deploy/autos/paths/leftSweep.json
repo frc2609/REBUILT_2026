@@ -13,6 +13,11 @@
       }
     },
     {
+      "type": "event_trigger",
+      "t_ratio": 0.1,
+      "lib_key": "startRoller"
+    },
+    {
       "type": "waypoint",
       "translation_target": {
         "x_meters": 7.805373061603216,
@@ -50,7 +55,7 @@
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
-        "rotation_radians": 1.5707963267948966,
+        "rotation_radians": 0.0,
         "profiled_rotation": true
       }
     },
