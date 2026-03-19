@@ -54,6 +54,8 @@ public class RobotContainer {
 
     private final Trigger rpmUpTrigger = driverController.povUp();
     private final Trigger rpmDownTrigger = driverController.povDown();
+    private final Trigger aimLeftTrigger = driverController.povLeft();
+    private final Trigger aimRightTrigger = driverController.povRight();
 
     // Tuning controls
 
@@ -153,6 +155,10 @@ public class RobotContainer {
         // RPM trim (POV up/down)
         rpmUpTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(50)));
         rpmDownTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(-50)));
+
+        // Aim angle trim (POV left/right)
+        aimLeftTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(2.0)));
+        aimRightTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(-2.0)));
 
         // Tuning commands
 
