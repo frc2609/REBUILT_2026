@@ -28,35 +28,29 @@ public class LeftSweepAuto extends SequentialCommandGroup {
         FuelPhysicsSim ballSim
     ) {
         addCommands(
-            // // Phase 1: Aim turret and shoot preloaded ball
-            // Commands.parallel(
-            //     new AimTurretField(drive, turret, flywheel, shotCalc),
-            //     new FullShoot(
-            //         flywheel, feed,
-            //         Constants.Controls.FEED_HOLD_RPM / 60.0,
-            //         Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-            //         ballSim
-            //     )
-            // ).withTimeout(1.5),
+            // Phase 1: Aim turret and shoot preloaded ball
+            new FullShoot(
+                flywheel, feed,
+                Constants.Controls.FEED_HOLD_RPM / 60.0,
+                Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
+                ballSim
+            ).withTimeout(1.5),
 
-            // // Phase 2: Follow leftSweep path while aiming and running intake
-            // Commands.parallel(
-            //     drive.followPath(new Path("leftSweep")),
-            //     new AimTurretField(drive, turret, flywheel, shotCalc),
-            //     new SetIntakeSpeedRPS(intake, Constants.Controls.INTAKE_RUN_RPM / 60.0),
-            //     new HoldIntakeDeployed(intake, Constants.Controls.INTAKE_DEPLOYED_DEG)
-            // ),
+            // Phase 2: Follow leftSweep path while aiming and running intake
+            Commands.deadline(
+                drive.followPath(new Path("leftSweep")),
+                Commands.sequence(
+                    new SetIntakeSpeedRPS(intake, Constants.Controls.INTAKE_RUN_RPM / 60.0),
+                    new HoldIntakeDeployed(intake, Constants.Controls.INTAKE_DEPLOYED_DEG)
+                )
+            ),
 
-            // // Phase 3: Aim turret and shoot collected balls
-            // Commands.parallel(
-            //     new AimTurretField(drive, turret, flywheel, shotCalc),
-            //     new FullShoot(
-            //         flywheel, feed,
-            //         Constants.Controls.FEED_HOLD_RPM / 60.0,
-            //         Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-            //         ballSim
-            //     )
-            // ).withTimeout(3.0)
+            new FullShoot(
+                flywheel, feed,
+                Constants.Controls.FEED_HOLD_RPM / 60.0,
+                Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
+                ballSim
+            ).withTimeout(3.0)
         );
     }
 }

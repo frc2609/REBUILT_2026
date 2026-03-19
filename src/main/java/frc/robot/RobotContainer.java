@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AimTurretField;
 import frc.robot.commands.AutoPushIntake;
 import frc.robot.lib.BLine.FollowPath;
-// import frc.robot.commands.Autos.LeftSweepAuto;
+import frc.robot.commands.Autos.LeftSweepAuto;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FullShoot;
 import frc.robot.commands.HoldIntakeDeployed;
@@ -145,10 +145,10 @@ public class RobotContainer {
 
     private void configureAutoChooser() {
         autoChooser.addDefaultOption("None", Commands.none());
-        // autoChooser.addOption("Left Sweep", new LeftSweepAuto(
-        //     driveSubsystem, turretSubsystem, flywheelSubsystem,
-        //     feedSubsystem, intakeSubsystem, shotCalculator, ballSim
-        // ));
+        autoChooser.addOption("Left Sweep", new LeftSweepAuto(
+            driveSubsystem, turretSubsystem, flywheelSubsystem,
+            feedSubsystem, intakeSubsystem, shotCalculator, ballSim
+        ));
         Logger.registerDashboardInput(autoChooser);
         SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
     }
