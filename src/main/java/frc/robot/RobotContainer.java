@@ -85,7 +85,7 @@ public class RobotContainer {
         // SOTM Setup
         
         ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
-        ProjectileSimulator.GeneratedLUT lut = sim.generateLUT();
+        ProjectileSimulator.GeneratedLUT lut = sim.generateLUT(0.5, 90, 0.15);
         this.shotCalculator = new ShotCalculator(Constants.shotConfig);
 
         for (var entry : lut.entries()) {
@@ -95,16 +95,17 @@ public class RobotContainer {
                 shotCalculator.loadLUTEntry(entry.distanceM(), entry.rpm(), entry.tof());
             }
         }
+        shotCalculator.adjustOffset(-150.0);
 
         autoAimCommand = new AimTurretField(
             driveSubsystem, turretSubsystem, flywheelSubsystem, shotCalculator);
 
         turretSubsystem.setEncoderInvert(true);
         intakeSubsystem.setEncoderInvert(true);
+
             
         climberSubsystem.resetPositionToAbsolute();
         intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
-        
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
 
         configureBindings();

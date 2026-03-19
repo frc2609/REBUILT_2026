@@ -202,7 +202,7 @@ public final class Constants {
             0.9,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
             65.0,    // launch angle from horizontal, measure from CAD
             0.001,   // sim timestep
-            1500, 6000, 25, 5.0  // RPM search range, iterations, max sim time
+            1500, 6000, 25, 10.0  // RPM search range, iterations, max sim time
         );
 
     public static ShotCalculator.Config shotConfig = new ShotCalculator.Config();
@@ -214,6 +214,8 @@ public final class Constants {
         shotConfig.maxTiltDeg = 5.0;        // suppress firing when chassis tilts past this (bumps/ramps)
         shotConfig.headingSpeedScalar = 1.0; // heading tolerance tightens with robot speed (0 to disable)
         shotConfig.headingReferenceDistance = 2.5; // heading tolerance scales with distance from hub
+        shotConfig.maxScoringDistance = 20.0;
+        shotConfig.tofMax = 10.0;
     }
     
     // Subsystems

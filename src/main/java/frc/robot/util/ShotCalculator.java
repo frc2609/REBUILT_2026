@@ -126,7 +126,7 @@ public class ShotCalculator {
     public int maxIterations = 25;
     public double convergenceTolerance = 0.001; // seconds
     public double tofMin = 0.05;
-    public double tofMax = 5.0;
+    public double tofMax = 10.0;
 
     // Below this speed (m/s), don't bother with SOTM, just aim straight
     public double minSOTMSpeed = 0.1;
