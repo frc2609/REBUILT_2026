@@ -9,16 +9,18 @@ package frc.robot;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.AimTurretField;
+import frc.robot.commands.AutoAimTurret;
 import frc.robot.commands.AutoPushIntake;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.FullShoot;
+import frc.robot.commands.AutoShoot;
 import frc.robot.commands.HoldIntakeDeployed;
+import frc.robot.commands.Shoot;
 import frc.robot.commands.PushIntake;
 import frc.robot.commands.SetIntakeSpeedRPS;
 import frc.robot.subsystems.FeedSubsystem;
@@ -45,8 +47,9 @@ public class RobotContainer {
     private final Trigger xTrigger = driverController.x();
     private final Trigger resetGyroTrigger = driverController.back();
 
-    private final Trigger shootTrigger = driverController.rightTrigger(0.15);
-    private final Trigger autoIntakeTrigger = driverController.rightTrigger(0.9);
+    private final Trigger shootTrigger = driverController.rightTrigger(0.1);
+    private final Trigger autoIntakeTrigger = driverController.rightTrigger(0.95);
+    private final Trigger manualShootTrigger = driverController.rightBumper();
     private final Trigger pushIntakeTrigger = driverController.leftBumper();
     private final Supplier<Double> pushIntakeAxis = driverController::getLeftTriggerAxis;
     private final Trigger startIntakeTrigger = driverController.a();
@@ -54,13 +57,6 @@ public class RobotContainer {
 
     private final Trigger rpmUpTrigger = driverController.povUp();
     private final Trigger rpmDownTrigger = driverController.povDown();
-
-    // Tuning controls
-
-    // private final Trigger holdAgitatorTrigger = driverController.b();
-    // private final Trigger holdFeedTrigger = driverController.y();
-    // private final Trigger holdFlywheelTrigger = driverController.rightBumper();
-    // private final Trigger setIntakeTrigger = driverController.povDown();
 
     private final RobotFactory robotFactory = new RobotFactory();
     public final TurretSubsystem turretSubsystem;
@@ -85,7 +81,7 @@ public class RobotContainer {
         // SOTM Setup
         
         ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
-        ProjectileSimulator.GeneratedLUT lut = sim.generateLUT(0.5, 90, 0.15);
+        ProjectileSimulator.GeneratedLUT lut = sim.generateLUT(2.2, 40, 0.55);
         this.shotCalculator = new ShotCalculator(Constants.shotConfig);
 
         for (var entry : lut.entries()) {
@@ -95,9 +91,10 @@ public class RobotContainer {
                 shotCalculator.loadLUTEntry(entry.distanceM(), entry.rpm(), entry.tof());
             }
         }
-        shotCalculator.adjustOffset(-150.0);
+        
+        //shotCalculator.addRpmCorrection(5.5, -150.0);
 
-        autoAimCommand = new AimTurretField(
+        autoAimCommand = new AutoAimTurret(
             driveSubsystem, turretSubsystem, flywheelSubsystem, shotCalculator);
 
         turretSubsystem.setEncoderInvert(true);
@@ -115,12 +112,24 @@ public class RobotContainer {
         // Main controls
 
         turretSubsystem.setDefaultCommand(autoAimCommand);
-        shootTrigger.whileTrue(new FullShoot(
+        shootTrigger.whileTrue(new AutoShoot(
             flywheelSubsystem, 
             feedSubsystem, 
             Constants.Controls.FEED_HOLD_RPM / 60.0, 
             Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-            ballSim
+            ballSim,
+            t -> {driverController.setRumble(RumbleType.kBothRumble, t);}
+        ));
+
+        flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOB_RPM/60.0);
+        feedSubsystem.setSetpoints(
+            Constants.Controls.FEED_HOLD_RPM / 60.0, 
+            Constants.Controls.AGITATOR_HOLD_RPM / 60.0);
+        manualShootTrigger.whileTrue(new Shoot(
+            flywheelSubsystem, 
+            feedSubsystem, 
+            ballSim,
+            t -> {driverController.setRumble(RumbleType.kBothRumble, t);}
         ));
 
         startIntakeTrigger.onTrue(new SetIntakeSpeedRPS(
@@ -139,8 +148,7 @@ public class RobotContainer {
         autoIntakeTrigger.whileTrue(new AutoPushIntake(
             intakeSubsystem,
             Constants.Controls.INTAKE_DEPLOYED_DEG, 
-            Constants.Controls.INTAKE_RETRACT_DEG,
-            Constants.Controls.INTAKE_AUTO_PUSH_TIME
+            Constants.Controls.INTAKE_RETRACT_DEG
         ));
         pushIntakeTrigger.whileTrue(new PushIntake(
             intakeSubsystem, 
@@ -153,17 +161,6 @@ public class RobotContainer {
         // RPM trim (POV up/down)
         rpmUpTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(50)));
         rpmDownTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(-50)));
-
-        // Tuning commands
-
-        // feedSubsystem.setSetpoints(Constants.Controls.FEED_HOLD_RPM,Constants.Controls.AGITATOR_HOLD_RPM);
-        // flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOB_RPM);
-        // intakeSubsystem.setDeploySetpoint(0);
-        // holdAgitatorTrigger.whileTrue(Commands.runEnd(feedSubsystem::setAgitatorSpeed,feedSubsystem::stop,feedSubsystem));
-        // holdFeedTrigger.whileTrue(Commands.runEnd(feedSubsystem::setFeedSpeed,feedSubsystem::stop,feedSubsystem));
-        // holdFlywheelTrigger.whileTrue(Commands.runEnd(flywheelSubsystem::setSpeed,flywheelSubsystem::stop,flywheelSubsystem));
-        // setIntakeTrigger.onTrue(Commands.runOnce(intakeSubsystem::setDeployPosition, intakeSubsystem));
-        // setHoodTrigger.onTrue(Commands.runOnce(turretSubsystem::setHoodPosition,turretSubsystem));
         
         // Drive commands
 

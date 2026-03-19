@@ -5,8 +5,6 @@ import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
 import java.util.Map;
 
-import org.littletonrobotics.junction.Logger;
-
 public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMotorIO {
 
     private VelocityDutyCycle control;
