@@ -9,27 +9,20 @@ import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.util.FuelPhysicsSim;
 
 /** Holds the shooter at a requested speed (RPS) while scheduled. */
-public class FullShoot extends Command {
+public class Shoot extends Command {
     private final FlywheelSubsystem flywheel;
     private final FeedSubsystem agitator;
-    private final double feedRPS;
-    private final double agitatorRPS;
     private final FuelPhysicsSim ballSim;
     private int i = 0;
     private final Consumer<Double> controllerRumble;
 
-    public FullShoot(
+    public Shoot(
         FlywheelSubsystem flywheel, FeedSubsystem agitator, 
-        double feedRPS, double agitatorRPS, FuelPhysicsSim ballSim,
-        Consumer<Double> controllerRumble
+        FuelPhysicsSim ballSim, Consumer<Double> controllerRumble
     ) {
         this.flywheel = flywheel;
         this.agitator = agitator;
         this.ballSim = ballSim;
-        
-        this.feedRPS = feedRPS;
-        this.agitatorRPS = agitatorRPS;
-
         this.controllerRumble = controllerRumble;
 
         addRequirements(flywheel, agitator);
@@ -37,28 +30,20 @@ public class FullShoot extends Command {
 
     @Override
     public void execute() {
-        if (flywheel.validShotDetected()) {
-            flywheel.useAutoSpeed();
-            agitator.setAgitatorSpeed(agitatorRPS);
-            agitator.setFeedSpeed(feedRPS);
+        flywheel.setSpeed();
+        agitator.setAgitatorSpeed();
+        agitator.setFeedSpeed();
 
-            // if (flywheel.isAtSpeed(1.0)) // coast or brake feed to not shoot
-
-            if (Constants.currentMode == Constants.Mode.SIM) {
-                if (i%4 == 0) {
-                    ballSim.launchBall(flywheel.launchPosSim, flywheel.launchSpeedSim, 0.0);
-                    controllerRumble.accept(0.5);
-                    i++;
-                    return;
-                }
+        if (Constants.currentMode == Constants.Mode.SIM) {
+            if (i%4 == 0) {
+                ballSim.launchBall(flywheel.launchPosSim, flywheel.launchSpeedSim, 0.0);
+                controllerRumble.accept(0.5);
                 i++;
+                return;
             }
-            controllerRumble.accept(0.0);
+            i++;
         }
-        else {
-            controllerRumble.accept(1.0);
-            agitator.stop();
-        }
+        controllerRumble.accept(0.0);
     }
 
     @Override

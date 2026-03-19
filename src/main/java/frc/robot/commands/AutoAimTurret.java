@@ -22,14 +22,14 @@ import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.ShotCalculator;
 
-public class AimTurretField extends Command {
+public class AutoAimTurret extends Command {
     private final TurretSubsystem turret;
     private final DriveSubsystem swerve;
     private final FlywheelSubsystem flywheel;
     private final ShotCalculator shotCalc;
     private final LoggedNetworkNumber kVTarget, headingOffset; 
 
-    public AimTurretField(
+    public AutoAimTurret(
         DriveSubsystem swerve, TurretSubsystem turret,
         FlywheelSubsystem flywheel, ShotCalculator shotCalc
     ) {
@@ -120,11 +120,10 @@ public class AimTurretField extends Command {
         }
 
         if (Constants.currentMode == Constants.Mode.SIM) {
-            // 71% is magic number to match sim to reality
-            double ballSpeed = 0.71*(shot.rpm()/60.0)*Math.PI*Constants.simParameters.ballDiameterM();
+            double ballSpeed = 1.25*(shot.rpm()/60.0)*Math.PI*Constants.simParameters.wheelDiameterM();
             Translation3d launchVector = new Translation3d(ballSpeed, new Rotation3d(
                 0.0, 
-                (80.0-0.6*turret.getHoodPosition())*(Math.PI/180.0), 
+                Constants.simParameters.fixedLaunchAngleDeg()*(Math.PI/180.0), 
                 shot.launcherAngle().getRadians()
             ));
             Translation3d ballVel = new Translation3d(

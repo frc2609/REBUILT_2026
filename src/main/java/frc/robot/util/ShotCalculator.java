@@ -436,6 +436,7 @@ public class ShotCalculator {
     );
 
     // Angular velocity feedforward: rate of change of aim angle
+    // TODO: Adjust for launched pos
     double driveAngularVelocity = 0;
     if (!velocityFiltered && distance > 0.1) {
       // tangential velocity / distance gives angular rate

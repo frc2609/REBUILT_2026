@@ -8,27 +8,24 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class AutoPushIntake extends Command {
     private final IntakeSubsystem intake;
     private final Timer timer = new Timer();
-    private final double maxTime;
     private final double min, max;
     
     public AutoPushIntake(
-        IntakeSubsystem intake, double minPosition, double maxPosition,
-        double maxTime
+        IntakeSubsystem intake, double minPosition, double maxPosition
     ){
         this.intake = intake; 
         this.min = minPosition;
         this.max = maxPosition;
-        this.maxTime = maxTime;
         addRequirements(intake);   
     }
 
     private double curve(double t) {
         // return 0.8-Math.pow(2.6, -t-0.1)+0.2*Math.sin(2.8*t-7.0);
         
-        if (t < maxTime) {
-            return t/maxTime;
+        if (t < 1.0) {
+            return 0.0;
         } else {
-            return 0.75+0.25*Math.sin(3.3*(0.55+t-maxTime));
+            return 0.75+0.25*Math.sin(3.3*(t+0.7));
         }
     }
 

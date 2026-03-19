@@ -139,7 +139,6 @@ public final class Constants {
 
         public static final double INTAKE_DEPLOYED_DEG = -15.0;
         public static final double INTAKE_RETRACT_DEG  = 90.0; // for push
-        public static final double INTAKE_AUTO_PUSH_TIME = 2.0; // seconds to retract
         
         public static final double INTAKE_RUN_RPM = 4000.0;
         public static final double INTAKE_IDLE_RPM = 0.0;
@@ -154,6 +153,39 @@ public final class Constants {
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
         public static final double LOB_DISTANCE = 2.0;
     }
+
+    // On the fly settings 
+
+    public static ProjectileSimulator.SimParameters simParameters = 
+        new ProjectileSimulator.SimParameters(
+            0.215,   // ball mass kg
+            0.1501,  // ball diameter m
+            0.47,    // drag coeff (smooth sphere)
+            0.0,     // Magnus coeff
+            1.225,   // air density
+            0.482,    // exit height (m), floor to where the ball leaves the shooter
+            0.0762,  // flywheel diameter, 0.0762
+            1.83,    // target height (m), from game manual
+            0.9,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
+            71.0,    // launch angle from horizontal, 65.0
+            0.001,   // sim timestep
+            1500, 6000, 25, 10.0  // RPM search range, iterations, max sim time
+        );
+
+    public static ShotCalculator.Config shotConfig = new ShotCalculator.Config();
+    static {
+        shotConfig.launcherOffsetX = 0.0;  // how far forward the launcher is from robot center (m)
+        shotConfig.launcherOffsetY = 0.0;   // how far left, 0 if centered
+        shotConfig.phaseDelayMs = 30.0;     // your vision pipeline latency
+        shotConfig.mechLatencyMs = 20.0;    // how long the mechanism takes to respond
+        shotConfig.maxTiltDeg = 5.0;        // suppress firing when chassis tilts past this (bumps/ramps)
+        shotConfig.headingSpeedScalar = 1.0; // heading tolerance tightens with robot speed (0 to disable)
+        shotConfig.headingReferenceDistance = 2.5; // heading tolerance scales with distance from hub
+        shotConfig.maxScoringDistance = 20.0;
+        shotConfig.tofMax = 10.0;
+    }
+    
+    // Subsystems
 
     public static final class Climber {
         public static final int EncoderChannel = 1;
@@ -186,39 +218,6 @@ public final class Constants {
             // config.put("MotionMagicAcceleration", 1.0);
         }
     }
-
-    // On the fly settings 
-
-    public static ProjectileSimulator.SimParameters simParameters = 
-        new ProjectileSimulator.SimParameters(
-            0.215,   // ball mass kg
-            0.1501,  // ball diameter m
-            0.47,    // drag coeff (smooth sphere)
-            0.2,     // Magnus coeff
-            1.225,   // air density
-            0.482,    // exit height (m), floor to where the ball leaves the shooter
-            0.077,  // flywheel diameter (m), measure with calipers
-            1.83,    // target height (m), from game manual
-            0.9,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
-            65.0,    // launch angle from horizontal, measure from CAD
-            0.001,   // sim timestep
-            1500, 6000, 25, 10.0  // RPM search range, iterations, max sim time
-        );
-
-    public static ShotCalculator.Config shotConfig = new ShotCalculator.Config();
-    static {
-        shotConfig.launcherOffsetX = 0.0;  // how far forward the launcher is from robot center (m)
-        shotConfig.launcherOffsetY = 0.0;   // how far left, 0 if centered
-        shotConfig.phaseDelayMs = 30.0;     // your vision pipeline latency
-        shotConfig.mechLatencyMs = 20.0;    // how long the mechanism takes to respond
-        shotConfig.maxTiltDeg = 5.0;        // suppress firing when chassis tilts past this (bumps/ramps)
-        shotConfig.headingSpeedScalar = 1.0; // heading tolerance tightens with robot speed (0 to disable)
-        shotConfig.headingReferenceDistance = 2.5; // heading tolerance scales with distance from hub
-        shotConfig.maxScoringDistance = 20.0;
-        shotConfig.tofMax = 10.0;
-    }
-    
-    // Subsystems
 
     public static final class Feed {
         public static final double INERTIA = 0.01;
