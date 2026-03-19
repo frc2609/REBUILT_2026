@@ -115,12 +115,12 @@ public class ShotCalculator {
   /** Tuning parameters. Set these to match your robot, or wire them to SmartDashboard/TunableNumber. */
   public static class Config {
     // Launcher geometry (measure from CAD)
-    public double launcherOffsetX = 0.0; // meters forward of robot center
-    public double launcherOffsetY = 0.0;  // meters left of robot center
+    public double launcherOffsetX = 0.20; // meters forward of robot center
+    public double launcherOffsetY = 0.10;  // meters left of robot center
 
     // How close/far you can score from (meters)
     public double minScoringDistance = 0.5;
-    public double maxScoringDistance = 5.0;
+    public double maxScoringDistance = 15.0;
 
     // Newton solver tuning
     public int maxIterations = 25;
@@ -551,10 +551,10 @@ public class ShotCalculator {
     correctionRpmMap.clear();
     correctionTofMap.clear();
   }
-
+  
   /** Bump the RPM offset by delta. Clamped to +/- 200. Bind this to copilot D-pad. */
   public void adjustOffset(double delta) {
-    rpmOffset = MathUtil.clamp(rpmOffset + delta, -200.0, 200.0);
+    rpmOffset = MathUtil.clamp(rpmOffset + delta, -200, 200);
     Logger.recordOutput("RPMTrim", rpmOffset);
   }
 

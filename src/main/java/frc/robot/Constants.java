@@ -137,8 +137,8 @@ public final class Constants {
         // RPM values are INPUT RPM, will be geared down
 
 
-        public static final double INTAKE_DEPLOYED_DEG = -15.0;
-        public static final double INTAKE_RETRACT_DEG  = 90.0; // for push
+        public static final double INTAKE_DEPLOYED_DEG = 0.0;
+        public static final double INTAKE_RETRACT_DEG  = 110.0; // for push
         
         public static final double INTAKE_RUN_RPM = 4000.0;
         public static final double INTAKE_IDLE_RPM = 0.0;
@@ -147,7 +147,7 @@ public final class Constants {
 
         public static final double TURRET_HOOD_DEG = 15.0;
 
-        public static final double AGITATOR_HOLD_RPM = 2400.0;
+        public static final double AGITATOR_HOLD_RPM = 3500.0;
         public static final double FEED_HOLD_RPM = 3000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
@@ -255,7 +255,7 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 60.0;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.666; // 0.242 unrestricted
+            public static final double ZERO_OFFSET = 0.375; // 0.242 unrestricted
             public static final double RANGE_DEG = 105.0; // 160
             public static final double HEADING_OFFSET_DEG = 170.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
@@ -350,7 +350,7 @@ public final class Constants {
 
         public static final class Deploy {
             public static final double INERTIA = 0.001;
-            public static final double ZERO_OFFSET = 0.798;
+            public static final double ZERO_OFFSET = 0;
             public static final double GEAR_RATIO = 27.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
