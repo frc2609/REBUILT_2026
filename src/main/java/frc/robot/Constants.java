@@ -130,7 +130,7 @@ public final class Constants {
 
     public static final class Controls {
         public static final int DRIVER_CONTROLLER_PORT = 0;
-        public static final double SHOOTING_SPEED_PERCENT = 0.5;
+        public static final double SHOOTING_SPEED_PERCENT = 0.3;
         public static final double UNJAM_FACTOR = 10.0; // kP multiplier when unjamming
 
         // Rotation values are OUTPUT degrees
@@ -256,7 +256,7 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 60.0;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.375; // 0.242 unrestricted
+            public static final double ZERO_OFFSET = 0.158; // 0.242 unrestricted
             public static final double RANGE_DEG = 105.0; // 160
             public static final double HEADING_OFFSET_DEG = 170.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
