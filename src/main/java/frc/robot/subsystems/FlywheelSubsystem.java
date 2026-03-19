@@ -19,7 +19,7 @@ public class FlywheelSubsystem extends SubsystemBase {
         this.flywheelMotor = flywheelMotor;
     }
 
-    public boolean validAutoSpeed() {
+    public boolean validShotDetected() {
         return this.autoSpeedRPS != 0.0;
     }
     public void setAutoSpeed(double rps) {

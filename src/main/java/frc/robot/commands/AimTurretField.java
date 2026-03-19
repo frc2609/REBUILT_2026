@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import java.util.Optional;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -25,7 +27,6 @@ public class AimTurretField extends Command {
     private final DriveSubsystem swerve;
     private final FlywheelSubsystem flywheel;
     private final ShotCalculator shotCalc;
-    private final LoggedNetworkNumber power; 
     private final LoggedNetworkNumber kVTarget, headingOffset; 
 
     public AimTurretField(
@@ -37,8 +38,6 @@ public class AimTurretField extends Command {
         this.flywheel = flywheel;
         this.shotCalc = shotCalc;
 
-        // magic number
-        power = new LoggedNetworkNumber("SimPower", 0.7);
         kVTarget = new LoggedNetworkNumber("turretAimkV", -0.7);
         headingOffset = new LoggedNetworkNumber("headingOffset",188.0);
 
@@ -76,8 +75,6 @@ public class AimTurretField extends Command {
             }
         }
 
-        Logger.recordOutput("TARGET", target);
-
         ChassisSpeeds fieldRelativeSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(
             swerve.getChassisSpeeds(),
             swerve.getRotation()
@@ -92,28 +89,24 @@ public class AimTurretField extends Command {
         );
 
         ShotCalculator.LaunchParameters shot = shotCalc.calculate(inputs);
-
-        // Set turret aim independant of shot
-        
+        double targetDist = turretPose.getTranslation().getDistance(target);
         double turretAngleDeg = shot.launcherAngle()
             //.minus(Rotation2d.fromDegrees(Constants.Turret.Aim.HEADING_OFFSET_DEG))
             .minus(Rotation2d.fromDegrees(headingOffset.get()))
             .minus(swerve.getRotation())
             .getDegrees();
 
-        if (Math.abs(turretAngleDeg) <= Constants.Turret.Aim.RANGE_DEG) {
+        boolean validShot = shot.isValid() && 
+            Math.abs(turretAngleDeg) <= Constants.Turret.Aim.RANGE_DEG;
+
+        if (validShot) {
             turret.setAimPositionFF(
                 turretAngleDeg, 
                 kVTarget.get()*shot.driveAngularVelocityRadPerSec()
             );
-        }
 
-        // Set hood and flywheel target based on shot 
+            // Set hood and flywheel target based on shot 
 
-        double targetDist = turretPose.getTranslation().getDistance(target);
-        Logger.recordOutput("TargetDistance", targetDist);
-
-        if (shot.isValid()) {
             if (targetDist <= Constants.Controls.LOB_DISTANCE) {
                 turret.setHoodPosition(0.0);
                 flywheel.setAutoSpeed(Constants.Controls.FLYWHEEL_LOB_RPM/60.0);
@@ -123,11 +116,12 @@ public class AimTurretField extends Command {
             }
         } else {
             flywheel.setAutoSpeed(0.0);
+            turret.setAimPosition(0.0);
         }
-        
 
         if (Constants.currentMode == Constants.Mode.SIM) {
-            double ballSpeed = power.get()*(shot.rpm()/60.0)*Math.PI*Constants.simParameters.ballDiameterM();
+            // 71% is magic number to match sim to reality
+            double ballSpeed = 0.71*(shot.rpm()/60.0)*Math.PI*Constants.simParameters.ballDiameterM();
             Translation3d launchVector = new Translation3d(ballSpeed, new Rotation3d(
                 0.0, 
                 (80.0-0.6*turret.getHoodPosition())*(Math.PI/180.0), 
@@ -149,7 +143,11 @@ public class AimTurretField extends Command {
 
         turretPose = new Pose2d(turretPose.getTranslation(), shot.launcherAngle());
         Logger.recordOutput("TurretPose", turretPose);
-        Logger.recordOutput("TurretAngle", turretAngleDeg);
+        Logger.recordOutput("TurretSetpoint", turretAngleDeg);
+        Logger.recordOutput("Target", target);
+        Logger.recordOutput("TargetDistance", targetDist);
+        Logger.recordOutput("ValidShot", validShot);
+        Logger.recordOutput("HubActive", isHubActive());
     }
 
     @Override
@@ -161,4 +159,64 @@ public class AimTurretField extends Command {
     public boolean isFinished() {
         return false;
     }
+
+    public boolean isHubActive() {
+        Optional<Alliance> alliance = DriverStation.getAlliance();
+        // If we have no alliance, we cannot be enabled, therefore no hub.
+        if (alliance.isEmpty()) {
+            return false;
+        }
+        // Hub is always enabled in autonomous.
+        if (DriverStation.isAutonomousEnabled()) {
+            return true;
+        }
+        // At this point, if we're not teleop enabled, there is no hub.
+        if (!DriverStation.isTeleopEnabled()) {
+            return false;
+        }
+
+        // We're teleop enabled, compute.
+        double matchTime = DriverStation.getMatchTime();
+        String gameData = DriverStation.getGameSpecificMessage();
+        // If we have no game data, we cannot compute, assume hub is active, as its likely early in teleop.
+        if (gameData.isEmpty()) {
+            return true;
+        }
+        boolean redInactiveFirst = false;
+        switch (gameData.charAt(0)) {
+            case 'R' -> redInactiveFirst = true;
+            case 'B' -> redInactiveFirst = false;
+            default -> {
+            // If we have invalid game data, assume hub is active.
+            return true;
+            }
+        }
+
+        // Shift was is active for blue if red won auto, or red if blue won auto.
+        boolean shift1Active = switch (alliance.get()) {
+            case Red -> !redInactiveFirst;
+            case Blue -> redInactiveFirst;
+        };
+
+        if (matchTime > 130) {
+            // Transition shift, hub is active.
+            return true;
+        } else if (matchTime > 105) {
+            // Shift 1
+            return shift1Active;
+        } else if (matchTime > 80) {
+            // Shift 2
+            return !shift1Active;
+        } else if (matchTime > 55) {
+            // Shift 3
+            return shift1Active;
+        } else if (matchTime > 30) {
+            // Shift 4
+            return !shift1Active;
+        } else {
+            // End game, hub always active.
+            return true;
+        }
+    }
 }
+

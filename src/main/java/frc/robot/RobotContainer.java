@@ -9,6 +9,7 @@ package frc.robot;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -120,7 +121,8 @@ public class RobotContainer {
             feedSubsystem, 
             Constants.Controls.FEED_HOLD_RPM / 60.0, 
             Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-            ballSim
+            ballSim,
+            t -> {driverController.setRumble(RumbleType.kBothRumble, t);}
         ));
 
         startIntakeTrigger.onTrue(new SetIntakeSpeedRPS(

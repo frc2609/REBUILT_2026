@@ -334,13 +334,19 @@ public class RobotFactory {
                     Constants.Vision.Right.name,
                     Constants.Vision.Right.fromRobot,
                     driveSubsystem::getPose
+                ),
+                new VisionIOPhotonVisionSim(
+                    Constants.Vision.Front.name,
+                    Constants.Vision.Front.fromRobot,
+                    driveSubsystem::getPose
                 )
             };
         case REAL:
             // Limelight needs gyro rotation for MegaTag2 
             return new VisionIO[] {
                 new VisionIOLimelight(Constants.Vision.Left.name, driveSubsystem::getRotation),
-                new VisionIOLimelight(Constants.Vision.Right.name, driveSubsystem::getRotation)
+                new VisionIOLimelight(Constants.Vision.Right.name, driveSubsystem::getRotation),
+                new VisionIOLimelight(Constants.Vision.Front.name, driveSubsystem::getRotation)
             };
         default:
             throw new IllegalStateException("Unsupported mode");
