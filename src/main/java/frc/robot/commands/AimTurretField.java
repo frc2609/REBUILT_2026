@@ -38,8 +38,8 @@ public class AimTurretField extends Command {
         this.shotCalc = shotCalc;
 
         // magic number
-        power = new LoggedNetworkNumber("SimPower", 0.51);
-        kVTarget = new LoggedNetworkNumber("turretAimkV", -.7);
+        power = new LoggedNetworkNumber("SimPower", 0.7);
+        kVTarget = new LoggedNetworkNumber("turretAimkV", -0.7);
         headingOffset = new LoggedNetworkNumber("headingOffset",188.0);
 
         addRequirements(turret);

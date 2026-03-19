@@ -115,7 +115,7 @@ public class ShotCalculator {
   /** Tuning parameters. Set these to match your robot, or wire them to SmartDashboard/TunableNumber. */
   public static class Config {
     // Launcher geometry (measure from CAD)
-    public double launcherOffsetX = 0.20; // meters forward of robot center
+    public double launcherOffsetX = 0.0; // meters forward of robot center
     public double launcherOffsetY = 0.0;  // meters left of robot center
 
     // How close/far you can score from (meters)
@@ -126,7 +126,7 @@ public class ShotCalculator {
     public int maxIterations = 25;
     public double convergenceTolerance = 0.001; // seconds
     public double tofMin = 0.05;
-    public double tofMax = 5.0;
+    public double tofMax = 10.0;
 
     // Below this speed (m/s), don't bother with SOTM, just aim straight
     public double minSOTMSpeed = 0.1;
@@ -553,8 +553,8 @@ public class ShotCalculator {
 
   /** Bump the RPM offset by delta. Clamped to +/- 200. Bind this to copilot D-pad. */
   public void adjustOffset(double delta) {
+    rpmOffset = MathUtil.clamp(rpmOffset + delta, -200.0, 200.0);
     Logger.recordOutput("RPMTrim", rpmOffset);
-    rpmOffset = MathUtil.clamp(rpmOffset + delta, -200, 200);
   }
 
   /** Reset the RPM offset to zero. Call this on mode transitions so trim doesn't carry over. */

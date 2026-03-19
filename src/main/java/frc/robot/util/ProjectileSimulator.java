@@ -245,17 +245,17 @@ public class ProjectileSimulator {
     return new LUTEntry(distanceM, bestRpm, bestTof, bestError < 0.10);
   }
 
-  /** Generate the full lookup table: 0.50m to 5.00m in 5cm steps (91 entries). Takes ~200ms. */
-  public GeneratedLUT generateLUT() {
+  /** Generate the full lookup table. Takes ~200ms for 91 iter. */
+  public GeneratedLUT generateLUT(double minDist, int iter, double step) {
     long startMs = System.currentTimeMillis();
     List<LUTEntry> entries = new ArrayList<>();
     int reachable = 0;
     int unreachable = 0;
     double maxRange = 0;
 
-    // 0.50 to 5.00 at 0.05m steps = 91 entries
-    for (int i = 0; i <= 90; i++) {
-      double distance = 0.50 + i * 0.05;
+    // range changed to dynamic
+    for (int i = 0; i <= iter; i++) {
+      double distance = minDist + i * step;
       // Round to avoid floating-point drift
       distance = Math.round(distance * 100.0) / 100.0;
 

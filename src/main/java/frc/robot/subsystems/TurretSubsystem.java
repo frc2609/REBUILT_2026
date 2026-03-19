@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
+import frc.robot.Constants;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 
 /** Shooter Subsystem using velocity control (rotations per second). */
@@ -41,9 +42,12 @@ public class TurretSubsystem extends SubsystemBase {
         this.aimEncoder.setInverted(invert);
     }
     public void resetAimPositionToAbsolute(double offsetRotations) {
-        if (aimEncoder.getRotations() == 0) {
+        if (aimEncoder.getRotations() == 0.0 && 
+            Constants.currentMode != Constants.Mode.SIM
+        ){
             System.out.println("RETRYING ZERO ON AIM");
             resetAimPositionToAbsolute(offsetRotations);
+            return;
         }
         aimMotor.resetToAbsolute(aimEncoder.getRotations()-offsetRotations);
     }
