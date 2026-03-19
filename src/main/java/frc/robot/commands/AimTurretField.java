@@ -98,6 +98,7 @@ public class AimTurretField extends Command {
         double turretAngleDeg = shot.launcherAngle()
             //.minus(Rotation2d.fromDegrees(Constants.Turret.Aim.HEADING_OFFSET_DEG))
             .minus(Rotation2d.fromDegrees(headingOffset.get()))
+            .minus(Rotation2d.fromDegrees(shotCalc.getAimOffset()))
             .minus(swerve.getRotation())
             .getDegrees();
 
