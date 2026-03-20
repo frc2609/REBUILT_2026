@@ -9,6 +9,7 @@ package frc.robot;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -42,6 +43,8 @@ public class RobotContainer {
 
     private final CommandXboxController driverController =
         new CommandXboxController(Constants.Controls.DRIVER_CONTROLLER_PORT);
+    private final CommandXboxController operatorController =
+        new CommandXboxController(Constants.Controls.OPERATOR_CONTROLLER_PORT);
 
     private final Trigger xTrigger = driverController.x();
     private final Trigger resetGyroTrigger = driverController.back();
@@ -52,12 +55,17 @@ public class RobotContainer {
     private final Supplier<Double> pushIntakeAxis = driverController::getLeftTriggerAxis;
     private final Trigger startIntakeTrigger = driverController.a();
     private final Trigger stopIntakeTrigger = driverController.start();
-
-    private final Trigger rpmUpTrigger = driverController.povUp();
-    private final Trigger rpmDownTrigger = driverController.povDown();
-    private final Trigger aimLeftTrigger = driverController.povLeft();
-    private final Trigger aimRightTrigger = driverController.povRight();
     private final Trigger zeroEncodersTrigger = driverController.b();
+
+    private final Trigger turretOverrideFrontTrigger = driverController.povUp();
+    private final Trigger turretOverrideRightTrigger = driverController.povRight();
+    private final Trigger turretOverrideLeftTrigger = driverController.povLeft();
+    private final Trigger turretAutoAimTrigger = driverController.povDown();
+
+    private final Trigger rpmUpTrigger = operatorController.povUp();
+    private final Trigger rpmDownTrigger = operatorController.povDown();
+    private final Trigger aimLeftTrigger = operatorController.povLeft();
+    private final Trigger aimRightTrigger = operatorController.povRight();
 
     // Tuning controls
 
@@ -74,7 +82,7 @@ public class RobotContainer {
     public final FeedSubsystem feedSubsystem;
     public final ClimberSubsystem climberSubsystem;
 
-    private final Command autoAimCommand;
+    private final AimTurretField autoAimCommand;
     private final ShotCalculator shotCalculator;
     private final FuelPhysicsSim ballSim = new FuelPhysicsSim("Sim/Fuel");
 
@@ -99,7 +107,7 @@ public class RobotContainer {
                 shotCalculator.loadLUTEntry(entry.distanceM(), entry.rpm(), entry.tof());
             }
         }
-        shotCalculator.adjustOffset(-150.0);
+        shotCalculator.adjustOffset(50.0);
 
         autoAimCommand = new AimTurretField(
             driveSubsystem, turretSubsystem, flywheelSubsystem, shotCalculator);
@@ -161,6 +169,27 @@ public class RobotContainer {
         // Aim angle trim (POV left/right)
         aimLeftTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(2.0)));
         aimRightTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(-2.0)));
+
+        // Turret manual override (driver POV up/left/right) — holds turret at a fixed robot-relative angle
+        turretOverrideFrontTrigger.onTrue(
+            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_FRONT_DEG), turretSubsystem));
+        turretOverrideRightTrigger.onTrue(
+            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_RIGHT_DEG), turretSubsystem));
+        turretOverrideLeftTrigger.onTrue(
+            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_LEFT_DEG), turretSubsystem));
+
+        // Driver POV down — cancel override and restore auto-aim default command
+        turretAutoAimTrigger.onTrue(Commands.runOnce(() -> {
+            Command current = turretSubsystem.getCurrentCommand();
+            if (current != null && current != autoAimCommand) current.cancel();
+        }));
+
+        // Rumble when robot is in scoring zone and turret can reach the target
+        new Trigger(autoAimCommand::isReadyToScore)
+            .whileTrue(Commands.startEnd(
+                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5),
+                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0)
+            ));
 
         // Zero encoders to current positions (B button)
         zeroEncodersTrigger.onTrue(Commands.runOnce(() -> {
