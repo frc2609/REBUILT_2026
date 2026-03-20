@@ -132,7 +132,7 @@ public final class Constants {
 
         // Tune these two - all other pass targets are derived from them.
         // RIGHT = low Y side (near scoring table), LEFT = high Y side.
-        public static final Translation2d BLUE_CLOSE_PASS_RIGHT = new Translation2d(4.5, 3.0);
+        public static final Translation2d BLUE_CLOSE_PASS_RIGHT = new Translation2d(4.5, 2.5);
         public static final Translation2d BLUE_PASS_RIGHT       = new Translation2d(2.0, 2.0);
 
         // Derived: Y mirror = FIELD_WIDTH - Y, X mirror = FIELD_LENGTH - X
