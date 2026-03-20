@@ -115,6 +115,11 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
 
 
     @Override
+    public double getStatorCurrentAmps() {
+        return motor.getStatorCurrent().getValueAsDouble();
+    }
+
+    @Override
     public void stop() {
         motor.stopMotor();
         // if (hasFollower) {

@@ -20,5 +20,7 @@ public interface PositionMotorIO {
     void resetToAbsolute(double absolutePositionRotations);
     void resetToZero();
 
+    double getStatorCurrentAmps();
+
     void stop();
 }

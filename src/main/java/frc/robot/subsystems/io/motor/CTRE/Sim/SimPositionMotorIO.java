@@ -100,6 +100,11 @@ public class SimPositionMotorIO extends CtreTalonFxPositionIO {
     }
 
     @Override
+    public double getStatorCurrentAmps() {
+        return talonFXSim.getTorqueCurrent();
+    }
+
+    @Override
     public void stop() {
         // No-op for simple sim.
     }
