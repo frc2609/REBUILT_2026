@@ -26,7 +26,10 @@ public class AimTurretField extends Command {
     private final FlywheelSubsystem flywheel;
     private final ShotCalculator shotCalc;
     private final LoggedNetworkNumber power; 
-    private final LoggedNetworkNumber kVTarget, headingOffset; 
+    private final LoggedNetworkNumber kVTarget, headingOffset;
+
+    private boolean inScoringZone = false;
+    private boolean turretInLimits = false;
 
     public AimTurretField(
         DriveSubsystem swerve, TurretSubsystem turret,
@@ -40,7 +43,7 @@ public class AimTurretField extends Command {
         // magic number
         power = new LoggedNetworkNumber("SimPower", .85);
         kVTarget = new LoggedNetworkNumber("turretAimkV", -0.7);
-        headingOffset = new LoggedNetworkNumber("headingOffset",188.0);
+        headingOffset = new LoggedNetworkNumber("headingOffset",170.0);
 
         addRequirements(turret);
     }
@@ -51,27 +54,37 @@ public class AimTurretField extends Command {
         Pose2d turretPose = robotPose.plus(new Transform2d(-0.144, -0.177, robotPose.getRotation()));
 
         Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-        if (Constants.currentMode == Mode.SIM) { alliance = Alliance.Blue; }
         Translation2d target, targetForward;
 
-        double passY = (robotPose.getY() > Constants.Field.CENTER_Y) ? 
-            Constants.Field.PASS_LEFT_Y : Constants.Field.PASS_RIGHT_Y;
+        boolean isLeft = robotPose.getY() > Constants.Field.CENTER_Y;
 
         if (alliance == Alliance.Blue)
         {
             if (robotPose.getX() <= Constants.Field.BLUE_ZONE_X) {
+                inScoringZone = true;
                 target = Constants.Field.BLUE_HUB;
                 targetForward = new Translation2d(1,0);
+            } else if (robotPose.getX() <= Constants.Field.BLUE_CLOSE_ZONE_X) {
+                inScoringZone = false;
+                target = isLeft ? Constants.Field.BLUE_CLOSE_PASS_LEFT : Constants.Field.BLUE_CLOSE_PASS_RIGHT;
+                targetForward = new Translation2d(-1,0);
             } else {
-                target = new Translation2d(Constants.Field.BLUE_PASS_X, passY);
+                inScoringZone = false;
+                target = isLeft ? Constants.Field.BLUE_PASS_LEFT : Constants.Field.BLUE_PASS_RIGHT;
                 targetForward = new Translation2d(-1,0);
             }
         } else {
             if (robotPose.getX() >= Constants.Field.RED_ZONE_X) {
+                inScoringZone = true;
                 target = Constants.Field.RED_HUB;
                 targetForward = new Translation2d(-1,0);
+            } else if (robotPose.getX() >= Constants.Field.RED_CLOSE_ZONE_X) {
+                inScoringZone = false;
+                target = isLeft ? Constants.Field.RED_CLOSE_PASS_LEFT : Constants.Field.RED_CLOSE_PASS_RIGHT;
+                targetForward = new Translation2d(1,0);
             } else {
-                target = new Translation2d(Constants.Field.RED_PASS_X, passY);
+                inScoringZone = false;
+                target = isLeft ? Constants.Field.RED_PASS_LEFT : Constants.Field.RED_PASS_RIGHT;
                 targetForward = new Translation2d(1,0);
             }
         }
@@ -102,7 +115,8 @@ public class AimTurretField extends Command {
             .minus(swerve.getRotation())
             .getDegrees();
 
-        if (Math.abs(turretAngleDeg) <= Constants.Turret.Aim.RANGE_DEG) {
+        turretInLimits = Math.abs(turretAngleDeg) <= Constants.Turret.Aim.RANGE_DEG;
+        if (turretInLimits) {
             turret.setAimPositionFF(
                 turretAngleDeg, 
                 kVTarget.get()*shot.driveAngularVelocityRadPerSec()
@@ -153,9 +167,14 @@ public class AimTurretField extends Command {
         Logger.recordOutput("TurretAngle", turretAngleDeg);
     }
 
+    public boolean isReadyToScore() {
+        return inScoringZone && turretInLimits;
+    }
+
     @Override
     public void end(boolean interrupted) {
-        
+        inScoringZone = false;
+        turretInLimits = false;
     }
 
     @Override
