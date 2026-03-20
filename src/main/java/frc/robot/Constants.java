@@ -291,6 +291,11 @@ public final class Constants {
         public static final class Hood {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 19.0;
+
+            // Homing: drive the hood past zero until current spikes, then zero there
+            public static final double HOME_TARGET_DEG = -90.0;        // well below the down stop
+            public static final double HOME_CURRENT_THRESHOLD_AMPS = 20.0; // stall spike threshold
+            public static final int    HOME_CONFIRM_CYCLES = 3;        // cycles above threshold to confirm stall
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 52,

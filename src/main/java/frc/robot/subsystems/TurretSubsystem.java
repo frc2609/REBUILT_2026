@@ -51,6 +51,18 @@ public class TurretSubsystem extends SubsystemBase {
         }
         aimMotor.resetToAbsolute(aimEncoder.getRotations()-offsetRotations);
     }
+
+    public void zeroCurrentAimPosition() {
+        aimMotor.resetToZero();
+    }
+
+    public double getHoodCurrentAmps() {
+        return hoodMotor.getStatorCurrentAmps();
+    }
+
+    public void zeroHoodPosition() {
+        hoodMotor.resetToZero();
+    }
     public boolean aimIsAtPosition(double toleranceDegrees) {
         return aimMotor.isAtPosition(toleranceDegrees);
     }

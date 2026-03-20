@@ -18,6 +18,7 @@ import frc.robot.commands.AimTurretField;
 import frc.robot.commands.AutoPushIntake;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FullShoot;
+import frc.robot.commands.HomeHood;
 import frc.robot.commands.HoldIntakeDeployed;
 import frc.robot.commands.PushIntake;
 import frc.robot.commands.SetIntakeSpeedRPS;
@@ -56,6 +57,7 @@ public class RobotContainer {
     private final Trigger rpmDownTrigger = driverController.povDown();
     private final Trigger aimLeftTrigger = driverController.povLeft();
     private final Trigger aimRightTrigger = driverController.povRight();
+    private final Trigger zeroEncodersTrigger = driverController.b();
 
     // Tuning controls
 
@@ -160,6 +162,13 @@ public class RobotContainer {
         aimLeftTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(2.0)));
         aimRightTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(-2.0)));
 
+        // Zero encoders to current positions (B button)
+        zeroEncodersTrigger.onTrue(Commands.runOnce(() -> {
+            climberSubsystem.zeroCurrentPosition();
+            intakeSubsystem.zeroCurrentDeployPosition();
+            turretSubsystem.zeroCurrentAimPosition();
+        }).ignoringDisable(true));
+
         // Tuning commands
 
         // feedSubsystem.setSetpoints(Constants.Controls.FEED_HOLD_RPM,Constants.Controls.AGITATOR_HOLD_RPM);
@@ -205,6 +214,10 @@ public class RobotContainer {
     }
     public void updateSim() {
         ballSim.tick();
+    }
+
+    public Command getHoodHomeCommand() {
+        return new HomeHood(turretSubsystem);
     }
 
     public Command getAutonomousCommand() {
