@@ -3,7 +3,6 @@ package frc.robot.commands.Autos;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
-import frc.robot.commands.AimTurretField;
 import frc.robot.commands.FullShoot;
 import frc.robot.commands.HoldIntakeDeployed;
 import frc.robot.commands.SetIntakeSpeedRPS;
@@ -11,24 +10,21 @@ import frc.robot.lib.BLine.Path;
 import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FuelPhysicsSim;
-import frc.robot.util.ShotCalculator;
 
-public class LeftSweepAuto extends SequentialCommandGroup {
+public class OneCycleAuto extends SequentialCommandGroup {
 
-    public LeftSweepAuto(
+    public OneCycleAuto(
+        String pathName,
         DriveSubsystem drive,
-        TurretSubsystem turret,
         FlywheelSubsystem flywheel,
         FeedSubsystem feed,
         IntakeSubsystem intake,
-        ShotCalculator shotCalc,
         FuelPhysicsSim ballSim
     ) {
         addCommands(
-            // Phase 1: Aim turret and shoot preloaded ball
+            // Shoot preloaded ball
             new FullShoot(
                 flywheel, feed,
                 Constants.Controls.FEED_HOLD_RPM / 60.0,
@@ -36,15 +32,16 @@ public class LeftSweepAuto extends SequentialCommandGroup {
                 ballSim
             ).withTimeout(1.5),
 
-            // Phase 2: Follow leftSweep path while aiming and running intake
+            // Follow path while running intake to collect a ball
             Commands.deadline(
-                drive.followPath(new Path("leftSweep")),
+                drive.followPath(new Path(pathName)),
                 Commands.sequence(
                     new SetIntakeSpeedRPS(intake, Constants.Controls.INTAKE_RUN_RPM / 60.0),
                     new HoldIntakeDeployed(intake, Constants.Controls.INTAKE_DEPLOYED_DEG)
                 )
             ),
 
+            // Shoot collected ball
             new FullShoot(
                 flywheel, feed,
                 Constants.Controls.FEED_HOLD_RPM / 60.0,
