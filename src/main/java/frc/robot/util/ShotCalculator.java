@@ -175,6 +175,9 @@ public class ShotCalculator {
   // Copilot RPM trim (flat offset applied during match)
   private double rpmOffset = 0;
 
+  // Copilot aim angle trim in degrees (flat offset applied during match)
+  private double aimAngleOffset = 0;
+
   // Solver state (reused across cycles to avoid allocation)
   private double previousTOF = -1;
   private double previousSpeed = 0;
@@ -565,6 +568,21 @@ public class ShotCalculator {
 
   public double getOffset() {
     return rpmOffset;
+  }
+
+  /** Bump the aim angle offset by delta degrees. Clamped to +/- 30. Bind this to copilot D-pad left/right. */
+  public void adjustAimOffset(double delta) {
+    aimAngleOffset = aimAngleOffset + delta;
+    Logger.recordOutput("AimAngleTrim", aimAngleOffset);
+  }
+
+  /** Reset the aim angle offset to zero. Call this on mode transitions so trim doesn't carry over. */
+  public void resetAimOffset() {
+    aimAngleOffset = 0;
+  }
+
+  public double getAimOffset() {
+    return aimAngleOffset;
   }
 
   /** Raw time-of-flight from the LUT at this distance (no velocity compensation). */

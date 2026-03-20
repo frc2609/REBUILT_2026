@@ -1,7 +1,9 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import java.util.Map;
@@ -113,6 +115,19 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         statorLogged.set(motor.getStatorCurrent().getValueAsDouble());
     }
 
+
+    @Override
+    public double getStatorCurrentAmps() {
+        return motor.getStatorCurrent().getValueAsDouble();
+    }
+
+    @Override
+    public void setCoastMode(boolean coast) {
+        MotorOutputConfigs cfg = new MotorOutputConfigs();
+        motor.getConfigurator().refresh(cfg);
+        cfg.NeutralMode = coast ? NeutralModeValue.Coast : NeutralModeValue.Brake;
+        motor.getConfigurator().apply(cfg);
+    }
 
     @Override
     public void stop() {

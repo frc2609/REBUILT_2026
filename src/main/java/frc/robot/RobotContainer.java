@@ -10,6 +10,7 @@ package frc.robot;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
@@ -17,12 +18,15 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoAimTurret;
 import frc.robot.commands.AutoPushIntake;
+import frc.robot.lib.BLine.FollowPath;
+import frc.robot.commands.Autos.OneCycleAuto;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.AutoShoot;
+import frc.robot.commands.HomeHood;
 import frc.robot.commands.HoldIntakeDeployed;
-import frc.robot.commands.Shoot;
 import frc.robot.commands.PushIntake;
 import frc.robot.commands.SetIntakeSpeedRPS;
+import frc.robot.commands.Shoot;
 import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -32,7 +36,8 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FuelPhysicsSim;
 import frc.robot.util.ProjectileSimulator;
 import frc.robot.util.ShotCalculator;
-
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -43,6 +48,8 @@ public class RobotContainer {
 
     private final CommandXboxController driverController =
         new CommandXboxController(Constants.Controls.DRIVER_CONTROLLER_PORT);
+    private final CommandXboxController operatorController =
+        new CommandXboxController(Constants.Controls.OPERATOR_CONTROLLER_PORT);
 
     private final Trigger xTrigger = driverController.x();
     private final Trigger resetGyroTrigger = driverController.back();
@@ -54,9 +61,25 @@ public class RobotContainer {
     private final Supplier<Double> pushIntakeAxis = driverController::getLeftTriggerAxis;
     private final Trigger startIntakeTrigger = driverController.a();
     private final Trigger stopIntakeTrigger = driverController.start();
+    private final Trigger zeroEncodersTrigger = driverController.b();
 
-    private final Trigger rpmUpTrigger = driverController.povUp();
-    private final Trigger rpmDownTrigger = driverController.povDown();
+    private final Trigger turretOverrideFrontTrigger = driverController.povUp();
+    private final Trigger turretOverrideRightTrigger = driverController.povRight();
+    private final Trigger turretOverrideLeftTrigger = driverController.povLeft();
+    private final Trigger turretAutoAimTrigger = driverController.povDown();
+
+    private final Trigger rpmUpTrigger = operatorController.povUp();
+    private final Trigger rpmDownTrigger = operatorController.povDown();
+    private final Trigger aimLeftTrigger = operatorController.povLeft();
+    private final Trigger aimRightTrigger = operatorController.povRight();
+
+    // Tuning controls
+
+    // private final Trigger holdAgitatorTrigger = driverController.b();
+    // private final Trigger holdFeedTrigger = driverController.y();
+    // private final Trigger holdFlywheelTrigger = driverController.rightBumper();
+    // private final Trigger setHoodTrigger = driverController.povUp();
+    // private final Trigger setIntakeTrigger = driverController.povDown();
 
     private final RobotFactory robotFactory = new RobotFactory();
     public final TurretSubsystem turretSubsystem;
@@ -66,10 +89,15 @@ public class RobotContainer {
     public final FeedSubsystem feedSubsystem;
     public final ClimberSubsystem climberSubsystem;
 
-    private final Command autoAimCommand;
+    private final AutoAimTurret autoAimCommand;
     private final ShotCalculator shotCalculator;
     private final FuelPhysicsSim ballSim = new FuelPhysicsSim("Sim/Fuel");
-
+    private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine") ;
+    private AutoShoot autoShootCommand;
+    private SetIntakeSpeedRPS startRollerCommand;
+    private AutoPushIntake autoIntakePushCommand;
+                    
+                
     public RobotContainer() {
         turretSubsystem = robotFactory.getTurretSubsystem();
         flywheelSubsystem = robotFactory.getFlywheelSubsystem();
@@ -91,8 +119,6 @@ public class RobotContainer {
                 shotCalculator.loadLUTEntry(entry.distanceM(), entry.rpm(), entry.tof());
             }
         }
-        
-        //shotCalculator.addRpmCorrection(5.5, -150.0);
 
         autoAimCommand = new AutoAimTurret(
             driveSubsystem, turretSubsystem, flywheelSubsystem, shotCalculator);
@@ -105,37 +131,55 @@ public class RobotContainer {
         intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
 
+        autoShootCommand = new AutoShoot(
+            flywheelSubsystem, 
+            feedSubsystem, 
+            Constants.Controls.FEED_HOLD_RPM / 60.0, 
+            Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
+            ballSim
+        );
+
+        FollowPath.registerEventTrigger("autoShoot", autoShootCommand);
+            
+        startRollerCommand = new SetIntakeSpeedRPS(
+            intakeSubsystem, 
+            Constants.Controls.INTAKE_RUN_RPM / 60.0
+        );
+        FollowPath.registerEventTrigger("startRoller", startRollerCommand);
+
+        autoIntakePushCommand = new AutoPushIntake(
+            intakeSubsystem,
+            Constants.Controls.INTAKE_DEPLOYED_DEG, 
+            Constants.Controls.INTAKE_RETRACT_DEG
+        );
+        FollowPath.registerEventTrigger("autoIntakePush", autoIntakePushCommand);
+
+        configureAutoChooser();
         configureBindings();
+    }
+
+    private void configureAutoChooser() {
+        autoChooser.addDefaultOption("None", Commands.none());
+        autoChooser.addOption("Left Sweep", new OneCycleAuto(
+            "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+        ));
+        Logger.registerDashboardInput(autoChooser);
+        SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
     }
     
     private void configureBindings() {        
         // Main controls
 
         turretSubsystem.setDefaultCommand(autoAimCommand);
-        shootTrigger.whileTrue(new AutoShoot(
-            flywheelSubsystem, 
-            feedSubsystem, 
-            Constants.Controls.FEED_HOLD_RPM / 60.0, 
-            Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-            ballSim,
-            t -> {driverController.setRumble(RumbleType.kBothRumble, t);}
-        ));
+        shootTrigger.whileTrue(autoShootCommand);
 
-        flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOB_RPM/60.0);
-        feedSubsystem.setSetpoints(
-            Constants.Controls.FEED_HOLD_RPM / 60.0, 
-            Constants.Controls.AGITATOR_HOLD_RPM / 60.0);
         manualShootTrigger.whileTrue(new Shoot(
             flywheelSubsystem, 
             feedSubsystem, 
-            ballSim,
-            t -> {driverController.setRumble(RumbleType.kBothRumble, t);}
+            ballSim
         ));
 
-        startIntakeTrigger.onTrue(new SetIntakeSpeedRPS(
-            intakeSubsystem, 
-            Constants.Controls.INTAKE_RUN_RPM / 60.0
-        ));
+        startIntakeTrigger.onTrue(startRollerCommand);
         stopIntakeTrigger.onTrue(new SetIntakeSpeedRPS(
             intakeSubsystem, 
             Constants.Controls.INTAKE_IDLE_RPM / 60.0
@@ -145,11 +189,7 @@ public class RobotContainer {
             intakeSubsystem, 
             Constants.Controls.INTAKE_DEPLOYED_DEG
         ));
-        autoIntakeTrigger.whileTrue(new AutoPushIntake(
-            intakeSubsystem,
-            Constants.Controls.INTAKE_DEPLOYED_DEG, 
-            Constants.Controls.INTAKE_RETRACT_DEG
-        ));
+        autoIntakeTrigger.whileTrue(autoIntakePushCommand);
         pushIntakeTrigger.whileTrue(new PushIntake(
             intakeSubsystem, 
             pushIntakeAxis, 
@@ -161,6 +201,47 @@ public class RobotContainer {
         // RPM trim (POV up/down)
         rpmUpTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(50)));
         rpmDownTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(-50)));
+
+        // Aim angle trim (POV left/right)
+        aimLeftTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(2.0)));
+        aimRightTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(-2.0)));
+
+        // Turret manual override (driver POV up/left/right) — holds turret at a fixed robot-relative angle
+        turretOverrideFrontTrigger.onTrue(
+            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_FRONT_DEG), turretSubsystem));
+        turretOverrideRightTrigger.onTrue(
+            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_RIGHT_DEG), turretSubsystem));
+        turretOverrideLeftTrigger.onTrue(
+            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_LEFT_DEG), turretSubsystem));
+
+        // Driver POV down — cancel override and restore auto-aim default command
+        turretAutoAimTrigger.onTrue(Commands.runOnce(() -> {
+            Command current = turretSubsystem.getCurrentCommand();
+            if (current != null && current != autoAimCommand) current.cancel();
+        }));
+
+        new Trigger(autoAimCommand::shouldRumble).whileTrue(Commands.startEnd(
+            () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5),
+            () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0)
+        ));
+
+        // Zero encoders to current positions (B button)
+        zeroEncodersTrigger.onTrue(Commands.runOnce(() -> {
+            climberSubsystem.zeroCurrentPosition();
+            intakeSubsystem.zeroCurrentDeployPosition();
+            turretSubsystem.zeroCurrentAimPosition();
+        }).ignoringDisable(true));
+
+        // Tuning commands
+
+        // feedSubsystem.setSetpoints(Constants.Controls.FEED_HOLD_RPM,Constants.Controls.AGITATOR_HOLD_RPM);
+        // flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOB_RPM);
+        // intakeSubsystem.setDeploySetpoint(0);
+        // holdAgitatorTrigger.whileTrue(Commands.runEnd(feedSubsystem::setAgitatorSpeed,feedSubsystem::stop,feedSubsystem));
+        // holdFeedTrigger.whileTrue(Commands.runEnd(feedSubsystem::setFeedSpeed,feedSubsystem::stop,feedSubsystem));
+        // holdFlywheelTrigger.whileTrue(Commands.runEnd(flywheelSubsystem::setSpeed,flywheelSubsystem::stop,flywheelSubsystem));
+        // setIntakeTrigger.onTrue(Commands.runOnce(intakeSubsystem::setDeployPosition, intakeSubsystem));
+        // setHoodTrigger.onTrue(Commands.runOnce(turretSubsystem::setHoodPosition,turretSubsystem));
         
         // Drive commands
 
@@ -198,7 +279,11 @@ public class RobotContainer {
         ballSim.tick();
     }
 
+    public Command getHoodHomeCommand() {
+        return new HomeHood(turretSubsystem);
+    }
+
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
+        return autoChooser.get();
     }
 }

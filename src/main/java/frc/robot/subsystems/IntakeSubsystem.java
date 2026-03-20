@@ -45,6 +45,10 @@ public class IntakeSubsystem extends SubsystemBase {
         deployMotor.resetToAbsolute(motorRotations);
     }
 
+    public void zeroCurrentDeployPosition() {
+        deployMotor.resetToZero();
+    }
+
     public boolean deployIsAtPosition(double toleranceDegrees) {
         return deployMotor.isAtPosition(toleranceDegrees);
     }

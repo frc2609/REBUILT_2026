@@ -22,6 +22,10 @@ public class ClimberSubsystem extends SubsystemBase {
         climberMotor.resetToAbsolute(climberEncoder.getRotations());
     }
 
+    public void zeroCurrentPosition() {
+        climberMotor.resetToZero();
+    }
+
     public boolean isAtPosition(double tolerance) {
         return climberMotor.isAtPosition(tolerance);
     }

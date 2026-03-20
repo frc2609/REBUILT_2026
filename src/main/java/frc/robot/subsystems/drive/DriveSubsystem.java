@@ -9,6 +9,9 @@ package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.controller.PIDController;
+import frc.robot.lib.BLine.FollowPath;
+import frc.robot.lib.BLine.Path;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
@@ -40,6 +43,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
+import frc.robot.Constants.BLine;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
@@ -98,6 +102,8 @@ public class DriveSubsystem extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
+  private final FollowPath.Builder blinePathBuilder;
+
   public DriveSubsystem(GyroIO gyroIO, ModuleIO... moduleIOs) {
     this.gyroIO = gyroIO;
     modules[0] = new Module(moduleIOs[0], 0, TunerConstants.FrontLeft);
@@ -130,6 +136,22 @@ public class DriveSubsystem extends SubsystemBase {
         (targetPose) -> {
           Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
+
+    // BLine path following (constraints from deploy/autos/config.json; PID from Constants.BLine)
+    blinePathBuilder =
+        new FollowPath.Builder(
+                this,
+                this::getPose,
+                this::getChassisSpeeds,
+                this::runVelocity,
+                new PIDController(
+                    BLine.PID_TRANSLATION_KP, BLine.PID_TRANSLATION_KI, BLine.PID_TRANSLATION_KD),
+                new PIDController(
+                    BLine.PID_ROTATION_KP, BLine.PID_ROTATION_KI, BLine.PID_ROTATION_KD),
+                new PIDController(
+                    BLine.PID_CROSS_TRACK_KP, BLine.PID_CROSS_TRACK_KI, BLine.PID_CROSS_TRACK_KD))
+            .withDefaultShouldFlip()
+            .withPoseReset(this::setPose);
 
     // Configure SysId
     sysId =
@@ -348,6 +370,14 @@ public class DriveSubsystem extends SubsystemBase {
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
     return getMaxLinearSpeedMetersPerSec() / DRIVE_BASE_RADIUS;
+  }
+
+  /**
+   * Returns a command that follows the given BLine path. Paths are loaded from
+   * deploy/autos/paths/ (name without .json). Use for autonomous or testing.
+   */
+  public Command followPath(Path path) {
+    return blinePathBuilder.build(path);
   }
 
   /** Returns an array of module translations. */

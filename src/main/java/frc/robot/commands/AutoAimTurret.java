@@ -29,6 +29,10 @@ public class AutoAimTurret extends Command {
     private final ShotCalculator shotCalc;
     private final LoggedNetworkNumber kVTarget, headingOffset; 
 
+    private boolean disableShoot = false;
+    private boolean turretInLimits = false;
+    private boolean validShot = false;
+
     public AutoAimTurret(
         DriveSubsystem swerve, TurretSubsystem turret,
         FlywheelSubsystem flywheel, ShotCalculator shotCalc
@@ -53,24 +57,35 @@ public class AutoAimTurret extends Command {
         if (Constants.currentMode == Mode.SIM) { alliance = Alliance.Blue; }
         Translation2d target, targetForward;
 
-        double passY = (robotPose.getY() > Constants.Field.CENTER_Y) ? 
-            Constants.Field.PASS_LEFT_Y : Constants.Field.PASS_RIGHT_Y;
+        boolean isLeft = robotPose.getY() > Constants.Field.CENTER_Y;
+        disableShoot = false;
 
-        if (alliance == Alliance.Blue)
-        {
-            if (robotPose.getX() <= Constants.Field.BLUE_ZONE_X) {
+        if (alliance == Alliance.Blue) {
+            if (robotPose.getX() <= Constants.Field.BLUE_BLOCK_X) {
                 target = Constants.Field.BLUE_HUB;
                 targetForward = new Translation2d(1,0);
+                if (robotPose.getX() > Constants.Field.BLUE_ZONE_X) {
+                    disableShoot = true;
+                }
+            } else if (robotPose.getX() <= Constants.Field.BLUE_CLOSE_ZONE_X) {
+                target = isLeft ? Constants.Field.BLUE_CLOSE_PASS_LEFT : Constants.Field.BLUE_CLOSE_PASS_RIGHT;
+                targetForward = new Translation2d(-1,0);
             } else {
-                target = new Translation2d(Constants.Field.BLUE_PASS_X, passY);
+                target = isLeft ? Constants.Field.BLUE_PASS_LEFT : Constants.Field.BLUE_PASS_RIGHT;
                 targetForward = new Translation2d(-1,0);
             }
         } else {
-            if (robotPose.getX() >= Constants.Field.RED_ZONE_X) {
+            if (robotPose.getX() >= Constants.Field.RED_BLOCK_X) {
                 target = Constants.Field.RED_HUB;
                 targetForward = new Translation2d(-1,0);
+                if (robotPose.getX() > Constants.Field.RED_ZONE_X) {
+                    disableShoot = true;
+                }
+            } else if (robotPose.getX() >= Constants.Field.RED_CLOSE_ZONE_X) {
+                target = isLeft ? Constants.Field.RED_CLOSE_PASS_LEFT : Constants.Field.RED_CLOSE_PASS_RIGHT;
+                targetForward = new Translation2d(1,0);
             } else {
-                target = new Translation2d(Constants.Field.RED_PASS_X, passY);
+                target = isLeft ? Constants.Field.RED_PASS_LEFT : Constants.Field.RED_PASS_RIGHT;
                 targetForward = new Translation2d(1,0);
             }
         }
@@ -96,17 +111,20 @@ public class AutoAimTurret extends Command {
             .minus(swerve.getRotation())
             .getDegrees();
 
-        boolean validShot = shot.isValid() && 
-            Math.abs(turretAngleDeg) <= Constants.Turret.Aim.RANGE_DEG;
+        turretInLimits = Math.abs(turretAngleDeg) <= Constants.Turret.Aim.RANGE_DEG;
+        validShot = shot.isValid(); 
 
-        if (validShot) {
+        if (turretInLimits) {
             turret.setAimPositionFF(
                 turretAngleDeg, 
                 kVTarget.get()*shot.driveAngularVelocityRadPerSec()
             );
+        } else {
+            turret.setAimPosition(0.0);
+        }
 
+        if (validShot && turretInLimits && !disableShoot) {
             // Set hood and flywheel target based on shot 
-
             if (targetDist <= Constants.Controls.LOB_DISTANCE) {
                 turret.setHoodPosition(0.0);
                 flywheel.setAutoSpeed(Constants.Controls.FLYWHEEL_LOB_RPM/60.0);
@@ -116,7 +134,6 @@ public class AutoAimTurret extends Command {
             }
         } else {
             flywheel.setAutoSpeed(0.0);
-            turret.setAimPosition(0.0);
         }
 
         if (Constants.currentMode == Constants.Mode.SIM) {
@@ -149,9 +166,8 @@ public class AutoAimTurret extends Command {
         Logger.recordOutput("HubActive", isHubActive());
     }
 
-    @Override
-    public void end(boolean interrupted) {
-        
+    public boolean shouldRumble() {
+        return validShot && turretInLimits && !disableShoot;
     }
 
     @Override
