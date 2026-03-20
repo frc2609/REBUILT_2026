@@ -571,7 +571,7 @@ public class ShotCalculator {
 
   /** Bump the aim angle offset by delta degrees. Clamped to +/- 30. Bind this to copilot D-pad left/right. */
   public void adjustAimOffset(double delta) {
-    aimAngleOffset = MathUtil.clamp(aimAngleOffset + delta, -30, 30);
+    aimAngleOffset = aimAngleOffset + delta;
     Logger.recordOutput("AimAngleTrim", aimAngleOffset);
   }
 
