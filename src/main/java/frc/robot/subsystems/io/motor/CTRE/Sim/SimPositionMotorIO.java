@@ -105,6 +105,11 @@ public class SimPositionMotorIO extends CtreTalonFxPositionIO {
     }
 
     @Override
+    public void setCoastMode(boolean coast) {
+        // no-op in sim
+    }
+
+    @Override
     public void stop() {
         // No-op for simple sim.
     }
