@@ -33,6 +33,7 @@ public class AutoShoot extends Command {
 
     @Override
     public void execute() {
+        //System.out.println("SHOOTING>"+flywheel.validShotDetected())
         if (flywheel.validShotDetected()) {
             flywheel.useAutoSpeed();
             agitator.setAgitatorSpeed(agitatorRPS);

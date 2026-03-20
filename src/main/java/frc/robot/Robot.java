@@ -74,6 +74,7 @@ public class Robot extends LoggedRobot {
         Logger.start();
         DataLogManager.start();
         DriverStation.startDataLog(DataLogManager.getLog());
+        //enableLiveWindowInTest(true);
 
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our autonomous chooser on the dashboard.
@@ -112,7 +113,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
         robotContainer.turretSubsystem.setAimCoastMode(false);
-        CommandScheduler.getInstance().schedule(robotContainer.getHoodHomeCommand());
+        //CommandScheduler.getInstance().schedule(robotContainer.getHoodHomeCommand());
 
         autonomousCommand = robotContainer.getAutonomousCommand();
 

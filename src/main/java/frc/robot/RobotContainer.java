@@ -20,6 +20,7 @@ import frc.robot.commands.AutoAimTurret;
 import frc.robot.commands.AutoPushIntake;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.commands.Autos.OneCycleAuto;
+import frc.robot.commands.Autos.SprintAuto;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.HomeHood;
@@ -162,6 +163,15 @@ public class RobotContainer {
         autoChooser.addDefaultOption("None", Commands.none());
         autoChooser.addOption("Left Sweep", new OneCycleAuto(
             "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+        ));
+        autoChooser.addOption("Right Sweep", new OneCycleAuto(
+            "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+        ));
+        autoChooser.addOption("Left Sprint", new SprintAuto(
+            "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+        ));
+        autoChooser.addOption("Right Sprint", new SprintAuto(
+            "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
         ));
         Logger.registerDashboardInput(autoChooser);
         SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
