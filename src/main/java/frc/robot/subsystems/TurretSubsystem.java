@@ -56,6 +56,10 @@ public class TurretSubsystem extends SubsystemBase {
         aimMotor.resetToZero();
     }
 
+    public void setAimCoastMode(boolean coast) {
+        aimMotor.setCoastMode(coast);
+    }
+
     public double getHoodCurrentAmps() {
         return hoodMotor.getStatorCurrentAmps();
     }

@@ -22,5 +22,7 @@ public interface PositionMotorIO {
 
     double getStatorCurrentAmps();
 
+    void setCoastMode(boolean coast);
+
     void stop();
 }
