@@ -91,59 +91,60 @@ public class RobotContainer {
     private final ShotCalculator shotCalculator;
     private final FuelPhysicsSim ballSim = new FuelPhysicsSim("Sim/Fuel");
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine") ;
-        
-    
-    public RobotContainer() {
-        turretSubsystem = robotFactory.getTurretSubsystem();
-        flywheelSubsystem = robotFactory.getFlywheelSubsystem();
-        intakeSubsystem = robotFactory.getIntakeSubsystem();
-        driveSubsystem = robotFactory.getDriveSubsystem();
-        feedSubsystem = robotFactory.getFeedSubsystem();
-        climberSubsystem = robotFactory.getClimberSubsystem();
-
-        // SOTM Setup
-        
-        ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
-        ProjectileSimulator.GeneratedLUT lut = sim.generateLUT(0.5, 90, 0.15);
-        this.shotCalculator = new ShotCalculator(Constants.shotConfig);
-
-        for (var entry : lut.entries()) {
-            if (entry.reachable()) {
-                System.out.printf("%.2fm -> %.0f RPM, %.3fs TOF%n",
-                    entry.distanceM(), entry.rpm(), entry.tof());
-                shotCalculator.loadLUTEntry(entry.distanceM(), entry.rpm(), entry.tof());
-            }
-        }
-
-        autoAimCommand = new AimTurretField(
-            driveSubsystem, turretSubsystem, flywheelSubsystem, shotCalculator);
-
-        turretSubsystem.setEncoderInvert(true);
-        intakeSubsystem.setEncoderInvert(true);
-
+    private FullShoot autoShootCommand;
+    private SetIntakeSpeedRPS startRollerCommand;
+    private AutoPushIntake autoIntakePushCommand;
+                    
+                
+                public RobotContainer() {
+                    turretSubsystem = robotFactory.getTurretSubsystem();
+                    flywheelSubsystem = robotFactory.getFlywheelSubsystem();
+                    intakeSubsystem = robotFactory.getIntakeSubsystem();
+                    driveSubsystem = robotFactory.getDriveSubsystem();
+                    feedSubsystem = robotFactory.getFeedSubsystem();
+                    climberSubsystem = robotFactory.getClimberSubsystem();
             
-        climberSubsystem.resetPositionToAbsolute();
-        intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
-        turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
-
-        autoAimCommand = new AimTurretField(
-            driveSubsystem, turretSubsystem, flywheelSubsystem, shotCalculator);
-        autoShootCommand = new FullShoot(
-            flywheelSubsystem, 
-            feedSubsystem, 
-            Constants.Controls.FEED_HOLD_RPM / 60.0, 
-            Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-            ballSim
-        );
-        FollowPath.registerEventTrigger("autoShoot", autoShootCommand);
-        
-        startRollerCommand = new SetIntakeSpeedRPS(
-            intakeSubsystem, 
-            Constants.Controls.INTAKE_RUN_RPM / 60.0
-        );
-        FollowPath.registerEventTrigger("startRoller", startRollerCommand);
-
-        autoIntakePushCommand = new AutoPushIntake(
+                    // SOTM Setup
+                    
+                    ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
+                    ProjectileSimulator.GeneratedLUT lut = sim.generateLUT(0.5, 90, 0.15);
+                    this.shotCalculator = new ShotCalculator(Constants.shotConfig);
+            
+                    for (var entry : lut.entries()) {
+                        if (entry.reachable()) {
+                            System.out.printf("%.2fm -> %.0f RPM, %.3fs TOF%n",
+                                entry.distanceM(), entry.rpm(), entry.tof());
+                            shotCalculator.loadLUTEntry(entry.distanceM(), entry.rpm(), entry.tof());
+                        }
+                    }
+            
+                    autoAimCommand = new AimTurretField(
+                        driveSubsystem, turretSubsystem, flywheelSubsystem, shotCalculator);
+            
+                    turretSubsystem.setEncoderInvert(true);
+                    intakeSubsystem.setEncoderInvert(true);
+            
+                        
+                    climberSubsystem.resetPositionToAbsolute();
+                    intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
+                    turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
+            
+                    autoShootCommand = new FullShoot(
+                    flywheelSubsystem, 
+                    feedSubsystem, 
+                    Constants.Controls.FEED_HOLD_RPM / 60.0, 
+                    Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
+                    ballSim
+                );
+                FollowPath.registerEventTrigger("autoShoot", autoShootCommand);
+                
+                startRollerCommand = new SetIntakeSpeedRPS(
+                intakeSubsystem, 
+                Constants.Controls.INTAKE_RUN_RPM / 60.0
+            );
+            FollowPath.registerEventTrigger("startRoller", startRollerCommand);
+    
+            autoIntakePushCommand = new AutoPushIntake(
             intakeSubsystem,
             Constants.Controls.INTAKE_DEPLOYED_DEG, 
             Constants.Controls.INTAKE_RETRACT_DEG,
