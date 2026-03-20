@@ -181,6 +181,21 @@ public final class Constants {
         public static final double LOB_DISTANCE = 2.0;
     }
 
+    /** BLine FollowPath PID gains. Path constraints are in deploy/autos/config.json. */
+    public static final class BLine {
+        public static final double PID_TRANSLATION_KP = 5.0;
+        public static final double PID_TRANSLATION_KI = 0.0;
+        public static final double PID_TRANSLATION_KD = 0.0;
+        public static final double PID_ROTATION_KP = 3.0;
+        public static final double PID_ROTATION_KI = 0.0;
+        public static final double PID_ROTATION_KD = 0.0;
+        public static final double PID_CROSS_TRACK_KP = 2.0;
+        public static final double PID_CROSS_TRACK_KI = 0.0;
+        public static final double PID_CROSS_TRACK_KD = 0.0;
+    }
+
+    // NOTE: the pid values are not correct, nor are the limits
+
     public static final class Climber {
         public static final int EncoderChannel = 1;
         public static final double INERTIA = 0.01;
