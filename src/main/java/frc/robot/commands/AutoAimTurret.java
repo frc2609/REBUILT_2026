@@ -43,7 +43,7 @@ public class AutoAimTurret extends Command {
         this.shotCalc = shotCalc;
 
         kVTarget = new LoggedNetworkNumber("turretAimkV", -0.7);
-        headingOffset = new LoggedNetworkNumber("headingOffset",188.0);
+        headingOffset = new LoggedNetworkNumber("headingOffset",180.0);
 
         addRequirements(turret);
     }
@@ -111,8 +111,9 @@ public class AutoAimTurret extends Command {
             .minus(swerve.getRotation())
             .getDegrees();
 
-        turretInLimits = Math.abs(turretAngleDeg) <= Constants.Turret.Aim.RANGE_DEG;
+        turretInLimits = Math.abs(turretAngleDeg) <= (Constants.Turret.Aim.RANGE_DEG);
         validShot = shot.isValid(); 
+        Logger.recordOutput("turretValid", turretInLimits);
 
         if (turretInLimits) {
             turret.setAimPositionFF(
@@ -123,7 +124,7 @@ public class AutoAimTurret extends Command {
             turret.setAimPosition(0.0);
         }
 
-        if (validShot && turretInLimits && !disableShoot) {
+        if (validShot && turretInLimits) {
             // Set hood and flywheel target based on shot 
             if (targetDist <= Constants.Controls.LOB_DISTANCE) {
                 turret.setHoodPosition(0.0);

@@ -132,8 +132,8 @@ public final class Constants {
 
         // Tune these two - all other pass targets are derived from them.
         // RIGHT = low Y side (near scoring table), LEFT = high Y side.
-        public static final Translation2d BLUE_CLOSE_PASS_RIGHT = new Translation2d(4.5, 2.5);
-        public static final Translation2d BLUE_PASS_RIGHT       = new Translation2d(2.0, 2.0);
+        public static final Translation2d BLUE_CLOSE_PASS_RIGHT = new Translation2d(4.0, 2.5);
+        public static final Translation2d BLUE_PASS_RIGHT       = new Translation2d(2.0, 2.5);
 
         // Derived: Y mirror = FIELD_WIDTH - Y, X mirror = FIELD_LENGTH - X
         public static final Translation2d BLUE_CLOSE_PASS_LEFT = new Translation2d(
@@ -175,7 +175,7 @@ public final class Constants {
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
         public static final double TURRET_OVERRIDE_LEFT_DEG = -90.0;
 
-        public static final double AGITATOR_HOLD_RPM = 3500.0;
+        public static final double AGITATOR_HOLD_RPM = 4000.0;
         public static final double FEED_HOLD_RPM = 3000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
@@ -184,10 +184,10 @@ public final class Constants {
 
     /** BLine FollowPath PID gains. Path constraints are in deploy/autos/config.json. */
     public static final class BLine {
-        public static final double PID_TRANSLATION_KP = 5.0;
+        public static final double PID_TRANSLATION_KP = 10.0;
         public static final double PID_TRANSLATION_KI = 0.0;
         public static final double PID_TRANSLATION_KD = 0.0;
-        public static final double PID_ROTATION_KP = 3.0;
+        public static final double PID_ROTATION_KP = 10.0;
         public static final double PID_ROTATION_KI = 0.0;
         public static final double PID_ROTATION_KD = 0.0;
         public static final double PID_CROSS_TRACK_KP = 2.0;
@@ -298,8 +298,8 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 60.0;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.735; // 0.242 unrestricted
-            public static final double RANGE_DEG = 105.0; // 160
+            public static final double ZERO_OFFSET = 0.636; // 0.242 unrestricted
+            public static final double RANGE_DEG = 118.0; // 160
             public static final double HEADING_OFFSET_DEG = 170.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
@@ -419,7 +419,7 @@ public final class Constants {
 
                 // TalonFX outputted rotations
                 config.put("forwardLimitRotations", 
-                    Conversions.degreesToRotations(140.0, GEAR_RATIO)
+                    Conversions.degreesToRotations(120.0, GEAR_RATIO)
                 );
                 config.put("reverseLimitRotations", -1.5);
 

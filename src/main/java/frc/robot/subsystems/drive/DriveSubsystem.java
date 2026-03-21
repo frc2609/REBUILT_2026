@@ -369,9 +369,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Returns the maximum angular speed in radians per sec. */
   public double getMaxAngularSpeedRadPerSec() {
+    // TODO quick fix, change to accurate later
     return getMaxLinearSpeedMetersPerSec() / DRIVE_BASE_RADIUS;
   }
-
   /**
    * Returns a command that follows the given BLine path. Paths are loaded from
    * deploy/autos/paths/ (name without .json). Use for autonomous or testing.

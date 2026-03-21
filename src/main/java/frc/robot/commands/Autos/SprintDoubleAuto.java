@@ -15,9 +15,9 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FuelPhysicsSim;
 
-public class SprintAuto extends SequentialCommandGroup {
+public class SprintDoubleAuto extends SequentialCommandGroup {
 
-    public SprintAuto(
+    public SprintDoubleAuto(
         String pathName,
         DriveSubsystem drive,
         FlywheelSubsystem flywheel,
@@ -44,7 +44,27 @@ public class SprintAuto extends SequentialCommandGroup {
                     ballSim
                 ),
                 new AutoPushIntake(intake, 0, 110.0)
-            ).withTimeout(4.0)
+            ).withTimeout(3.5),
+
+            // Follow path while running intake to collect a ball
+            Commands.deadline(
+                drive.followPath(new Path(pathName)),
+                Commands.sequence(
+                    new SetIntakeSpeedRPS(intake, Constants.Controls.INTAKE_RUN_RPM / 60.0),
+                    new HoldIntakeDeployed(intake, Constants.Controls.INTAKE_DEPLOYED_DEG)
+                )
+            ).withTimeout(10.0),
+
+            // Shoot collected ball
+            new ParallelCommandGroup(
+                new AutoShoot(
+                    flywheel, feed,
+                    Constants.Controls.FEED_HOLD_RPM / 60.0,
+                    Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
+                    ballSim
+                ),
+                new AutoPushIntake(intake, 0, 110.0)
+            ).withTimeout(3.5)
         );
     }
 }

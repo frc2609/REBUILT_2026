@@ -21,6 +21,7 @@ import frc.robot.commands.AutoPushIntake;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.commands.Autos.OneCycleAuto;
 import frc.robot.commands.Autos.SprintAuto;
+import frc.robot.commands.Autos.SprintDoubleAuto;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.HomeHood;
@@ -110,7 +111,7 @@ public class RobotContainer {
         // SOTM Setup
         
         ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
-        ProjectileSimulator.GeneratedLUT lut = sim.generateLUT(2.2, 40, 0.55);
+        ProjectileSimulator.GeneratedLUT lut = sim.generateLUT(2.0, 45, 0.5);
         this.shotCalculator = new ShotCalculator(Constants.shotConfig);
 
         for (var entry : lut.entries()) {
@@ -129,7 +130,8 @@ public class RobotContainer {
 
             
         climberSubsystem.resetPositionToAbsolute();
-        intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
+        intakeSubsystem.zeroCurrentDeployPosition(); //TEMP
+        //intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
 
         autoShootCommand = new AutoShoot(
@@ -172,6 +174,15 @@ public class RobotContainer {
         ));
         autoChooser.addOption("Right Sprint", new SprintAuto(
             "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+        ));
+        autoChooser.addOption("Left SprintD", new SprintDoubleAuto(
+            "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+        ));
+        autoChooser.addOption("Right SprintD", new SprintDoubleAuto(
+            "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+        ));
+        autoChooser.addOption("Back Sprint", new SprintAuto(
+            "centerback", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
         ));
         Logger.registerDashboardInput(autoChooser);
         SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
@@ -238,14 +249,14 @@ public class RobotContainer {
         // Zero encoders to current positions (B button)
         zeroEncodersTrigger.onTrue(Commands.runOnce(() -> {
             climberSubsystem.zeroCurrentPosition();
-            intakeSubsystem.zeroCurrentDeployPosition();
+            //intakeSubsystem.zeroCurrentDeployPosition();
             turretSubsystem.zeroCurrentAimPosition();
         }).ignoringDisable(true));
 
         // Tuning commands
 
-        // feedSubsystem.setSetpoints(Constants.Controls.FEED_HOLD_RPM,Constants.Controls.AGITATOR_HOLD_RPM);
-        // flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOB_RPM);
+        feedSubsystem.setSetpoints(Constants.Controls.FEED_HOLD_RPM,Constants.Controls.AGITATOR_HOLD_RPM);
+        flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOB_RPM);
         // intakeSubsystem.setDeploySetpoint(0);
         // holdAgitatorTrigger.whileTrue(Commands.runEnd(feedSubsystem::setAgitatorSpeed,feedSubsystem::stop,feedSubsystem));
         // holdFeedTrigger.whileTrue(Commands.runEnd(feedSubsystem::setFeedSpeed,feedSubsystem::stop,feedSubsystem));
