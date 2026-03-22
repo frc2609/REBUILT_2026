@@ -1,9 +1,12 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
+import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
 
 /** Intake Subsystem using velocity control (rotations per second). */
 public class IntakeSubsystem extends SubsystemBase {
@@ -43,6 +46,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
         System.out.println("DEPLOY ZEROED, rotor offset: "+motorRotations);
         deployMotor.resetToAbsolute(motorRotations);
+    }
+
+    public void zeroCurrentDeployPosition() {
+        // TEMPORARY
+        //System.out.print
+        deployMotor.resetToAbsolute(9.082/27.0);
+        //((TalonFX) deployMotor).setPosition(9.28);
     }
 
     public boolean deployIsAtPosition(double toleranceDegrees) {

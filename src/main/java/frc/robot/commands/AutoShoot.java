@@ -1,6 +1,9 @@
 package frc.robot.commands;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
@@ -15,30 +18,35 @@ public class AutoShoot extends Command {
     private final double feedRPS;
     private final double agitatorRPS;
     private final FuelPhysicsSim ballSim;
+    private final Supplier<Boolean> turretInPose;
     private int i = 0;
-    private final Consumer<Double> controllerRumble;
 
     public AutoShoot(
         FlywheelSubsystem flywheel, FeedSubsystem agitator, 
         double feedRPS, double agitatorRPS, FuelPhysicsSim ballSim,
-        Consumer<Double> controllerRumble
+        Supplier<Boolean> turretInPose
     ) {
         this.flywheel = flywheel;
         this.agitator = agitator;
         this.ballSim = ballSim;
+        this.turretInPose = turretInPose;
         
         this.feedRPS = feedRPS;
         this.agitatorRPS = agitatorRPS;
-
-        this.controllerRumble = controllerRumble;
 
         addRequirements(flywheel, agitator);
     }
 
     @Override
     public void execute() {
-        if (flywheel.validShotDetected()) {
-            flywheel.useAutoSpeed();
+        //System.out.println("SHOOTING>"+flywheel.validShotDetected())
+
+        flywheel.useAutoSpeed();
+
+        Logger.recordOutput("turretReady", turretInPose.get());
+        Logger.recordOutput("flywheelReady", flywheel.isAtSpeed());
+
+        if (flywheel.validShotDetected()) {//&& turretInPose.get() && flywheel.isAtSpeed()) {
             agitator.setAgitatorSpeed(agitatorRPS);
             agitator.setFeedSpeed(feedRPS);
 
@@ -47,16 +55,13 @@ public class AutoShoot extends Command {
             if (Constants.currentMode == Constants.Mode.SIM) {
                 if (i%4 == 0) {
                     ballSim.launchBall(flywheel.launchPosSim, flywheel.launchSpeedSim, 0.0);
-                    controllerRumble.accept(0.5);
                     i++;
                     return;
                 }
                 i++;
             }
-            controllerRumble.accept(0.0);
         }
         else {
-            controllerRumble.accept(1.0);
             agitator.stop();
         }
     }
@@ -65,7 +70,6 @@ public class AutoShoot extends Command {
     public void end(boolean interrupted) {
         flywheel.stop();
         agitator.stop();
-        controllerRumble.accept(0.0);
     }
 
     @Override

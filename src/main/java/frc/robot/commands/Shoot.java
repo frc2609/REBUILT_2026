@@ -14,16 +14,14 @@ public class Shoot extends Command {
     private final FeedSubsystem agitator;
     private final FuelPhysicsSim ballSim;
     private int i = 0;
-    private final Consumer<Double> controllerRumble;
 
     public Shoot(
         FlywheelSubsystem flywheel, FeedSubsystem agitator, 
-        FuelPhysicsSim ballSim, Consumer<Double> controllerRumble
+        FuelPhysicsSim ballSim
     ) {
         this.flywheel = flywheel;
         this.agitator = agitator;
         this.ballSim = ballSim;
-        this.controllerRumble = controllerRumble;
 
         addRequirements(flywheel, agitator);
     }
@@ -37,20 +35,17 @@ public class Shoot extends Command {
         if (Constants.currentMode == Constants.Mode.SIM) {
             if (i%4 == 0) {
                 ballSim.launchBall(flywheel.launchPosSim, flywheel.launchSpeedSim, 0.0);
-                controllerRumble.accept(0.5);
                 i++;
                 return;
             }
             i++;
         }
-        controllerRumble.accept(0.0);
     }
 
     @Override
     public void end(boolean interrupted) {
         flywheel.stop();
         agitator.stop();
-        controllerRumble.accept(0.0);
     }
 
     @Override

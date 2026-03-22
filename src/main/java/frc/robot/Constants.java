@@ -118,20 +118,47 @@ public final class Constants {
         public static final Translation2d BLUE_HUB = new Translation2d(4.625, 4.033);
         public static final Translation2d BLUE_HUB_FORWARD = new Translation2d(1.0, 0.0);
 
-        public static final double BLUE_ZONE_X = 5.5;
-        public static final double RED_ZONE_X = 11.3;
+        public static final double FIELD_LENGTH = 16.54;
+        public static final double FIELD_WIDTH = 8.07;
+        public static final double CENTER_Y = FIELD_WIDTH / 2.0;
 
-        public static final double CENTER_Y = 4.1;
-        public static final double PASS_LEFT_Y = 6.3;
-        public static final double PASS_RIGHT_Y = 2.0;
-        public static final double BLUE_PASS_X = 2.0;
-        public static final double RED_PASS_X = 13.8;
+        // Zone boundaries - red derived as true field mirror of blue
+        public static final double BLUE_ZONE_X = 4.3;
+        public static final double BLUE_BLOCK_X = 5.5; // under trench, aim but don't shoot
+        public static final double BLUE_CLOSE_ZONE_X = 7.25;
+        public static final double RED_ZONE_X = FIELD_LENGTH - BLUE_ZONE_X;
+        public static final double RED_BLOCK_X = FIELD_LENGTH - BLUE_BLOCK_X;
+        public static final double RED_CLOSE_ZONE_X = FIELD_LENGTH - BLUE_CLOSE_ZONE_X;
+
+        // Tune these two - all other pass targets are derived from them.
+        // RIGHT = low Y side (near scoring table), LEFT = high Y side.
+        public static final Translation2d BLUE_CLOSE_PASS_RIGHT = new Translation2d(4.0, 2.5);
+        public static final Translation2d BLUE_PASS_RIGHT       = new Translation2d(2.0, 2.5);
+
+        // Derived: Y mirror = FIELD_WIDTH - Y, X mirror = FIELD_LENGTH - X
+        public static final Translation2d BLUE_CLOSE_PASS_LEFT = new Translation2d(
+            BLUE_CLOSE_PASS_RIGHT.getX(), FIELD_WIDTH - BLUE_CLOSE_PASS_RIGHT.getY());
+        public static final Translation2d RED_CLOSE_PASS_RIGHT = new Translation2d(
+            FIELD_LENGTH - BLUE_CLOSE_PASS_RIGHT.getX(), BLUE_CLOSE_PASS_RIGHT.getY());
+        public static final Translation2d RED_CLOSE_PASS_LEFT = new Translation2d(
+            FIELD_LENGTH - BLUE_CLOSE_PASS_RIGHT.getX(), FIELD_WIDTH - BLUE_CLOSE_PASS_RIGHT.getY());
+
+        public static final Translation2d BLUE_PASS_LEFT = new Translation2d(
+            BLUE_PASS_RIGHT.getX(), FIELD_WIDTH - BLUE_PASS_RIGHT.getY());
+        public static final Translation2d RED_PASS_RIGHT = new Translation2d(
+            FIELD_LENGTH - BLUE_PASS_RIGHT.getX(), BLUE_PASS_RIGHT.getY());
+        public static final Translation2d RED_PASS_LEFT = new Translation2d(
+            FIELD_LENGTH - BLUE_PASS_RIGHT.getX(), FIELD_WIDTH - BLUE_PASS_RIGHT.getY());
     }
 
     public static final class Controls {
         public static final int DRIVER_CONTROLLER_PORT = 0;
+        public static final int OPERATOR_CONTROLLER_PORT = 1;
         public static final double SHOOTING_SPEED_PERCENT = 0.3;
         public static final double UNJAM_FACTOR = 10.0; // kP multiplier when unjamming
+
+        public static final double TURRET_READY_TOLERANCE = 15.0; // deg
+        public static final double FLYWHEEL_TOLERANCE_RPM = 150.0; // rpm
 
         // Rotation values are OUTPUT degrees
         // RPM values are INPUT RPM, will be geared down
@@ -147,12 +174,31 @@ public final class Constants {
 
         public static final double TURRET_HOOD_DEG = 15.0;
 
-        public static final double AGITATOR_HOLD_RPM = 3500.0;
-        public static final double FEED_HOLD_RPM = 3000.0; // max speed
+        public static final double TURRET_OVERRIDE_FRONT_DEG = 0.0;
+        public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
+        public static final double TURRET_OVERRIDE_LEFT_DEG = -90.0;
+
+        public static final double AGITATOR_HOLD_RPM = 4500.0;
+        public static final double FEED_HOLD_RPM = 4000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
         public static final double LOB_DISTANCE = 2.0;
     }
+
+    /** BLine FollowPath PID gains. Path constraints are in deploy/autos/config.json. */
+    public static final class BLine {
+        public static final double PID_TRANSLATION_KP = 10.0;
+        public static final double PID_TRANSLATION_KI = 0.0;
+        public static final double PID_TRANSLATION_KD = 0.0;
+        public static final double PID_ROTATION_KP = 10.0;
+        public static final double PID_ROTATION_KI = 0.0;
+        public static final double PID_ROTATION_KD = 0.0;
+        public static final double PID_CROSS_TRACK_KP = 2.0;
+        public static final double PID_CROSS_TRACK_KI = 0.0;
+        public static final double PID_CROSS_TRACK_KD = 0.0;
+    }
+
+    // NOTE: the pid values are not correct, nor are the limits
 
     // On the fly settings 
 
@@ -223,8 +269,6 @@ public final class Constants {
         public static final double INERTIA = 0.01;
         public static final double GEAR_RATIO = 25.0/12.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
-        public static final double JAM_CURRENT = 100.0; // stator limit before unjam
-        public static final double UNJAM_TIME  = 3.0; // seconds
         public static final Map<String, Object> config = new HashMap<>(Map.of(
             "motorId", 21,
             "kP", 0.04,
@@ -244,7 +288,9 @@ public final class Constants {
             "followerAligned", false,
             "kP", 0.04,
             "kV", 0.0117,
-            "inverted", false
+            "inverted", false,
+            "statorCurrentLimit", 90.0,
+            "statorCurrentLimitEnabled", true
         ));
     }
 
@@ -255,8 +301,8 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 60.0;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.158; // 0.242 unrestricted
-            public static final double RANGE_DEG = 105.0; // 160
+            public static final double ZERO_OFFSET = 0.515; // 0.242 unrestricted
+            public static final double RANGE_DEG = 118.0; // 160
             public static final double HEADING_OFFSET_DEG = 170.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
@@ -279,9 +325,9 @@ public final class Constants {
                 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 config.put("inverted", false);
-                config.put("supplyCurrentLimit", 60.0);
+                config.put("supplyCurrentLimit", 30.0);
                 config.put("supplyCurrentLimitEnabled", true);
-                config.put("statorCurrentLimit", 40.0);
+                config.put("statorCurrentLimit", 30.0);
                 config.put("statorCurrentLimitEnabled", true);
                 config.put("useClosedLoopFFSign", true);
             }
@@ -290,6 +336,11 @@ public final class Constants {
         public static final class Hood {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 19.0;
+
+            // Homing: drive the hood past zero until current spikes, then zero there
+            public static final double HOME_TARGET_DEG = -90.0;        // well below the down stop
+            public static final double HOME_CURRENT_THRESHOLD_AMPS = 20.0; // stall spike threshold
+            public static final int    HOME_CONFIRM_CYCLES = 3;        // cycles above threshold to confirm stall
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 52,
@@ -307,9 +358,9 @@ public final class Constants {
                 config.put("reverseLimitRotations", 0.0);
                 
                 config.put("inverted", true);
-                config.put("supplyCurrentLimit", 120.0);
+                config.put("supplyCurrentLimit", 40.0);
                 config.put("supplyCurrentLimitEnabled", true);
-                config.put("statorCurrentLimit", 160.0);
+                config.put("statorCurrentLimit", 40.0);
                 config.put("statorCurrentLimitEnabled", true);
                 config.put("useClosedLoopFFSign", true);
             }
@@ -320,13 +371,17 @@ public final class Constants {
         public static final double INERTIA = 0.001;
         public static final double GEAR_RATIO = 80.0/9.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
+        public static final double JAM_CURRENT = 100.0; // stator limit before unjam
+        public static final double UNJAM_TIME  = 3.0; // seconds
 
         public static final Map<String, Object> config = new HashMap<>(Map.of(
             "motorId", 20,
             "kP", 0.05,
             "kV", 0.012,
             "inverted", false,
-            "neutralMode", NeutralMode.COAST
+            "neutralMode", NeutralMode.COAST,
+            "statorCurrentLimit", 120.0,
+            "statorCurrentLimitEnabled", true
         ));
     }
 
@@ -343,7 +398,7 @@ public final class Constants {
                 "inverted", true,
                 "kP", 0.032,
                 "kV", 0.0097,
-                "statorCurrentLimit", 120.0,
+                "statorCurrentLimit", 50.0,
                 "statorCurrentLimitEnabled", true
             ));
         }
@@ -371,7 +426,7 @@ public final class Constants {
 
                 // TalonFX outputted rotations
                 config.put("forwardLimitRotations", 
-                    Conversions.degreesToRotations(140.0, GEAR_RATIO)
+                    Conversions.degreesToRotations(120.0, GEAR_RATIO)
                 );
                 config.put("reverseLimitRotations", -1.5);
 

@@ -18,7 +18,12 @@ public interface PositionMotorIO {
     void setSetpoint(double value);
 
     void resetToAbsolute(double absolutePositionRotations);
+    //void resetMotorRotations(double rotations);
     void resetToZero();
+
+    double getStatorCurrentAmps();
+
+    void setCoastMode(boolean coast);
 
     void stop();
 }

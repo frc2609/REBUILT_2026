@@ -345,8 +345,8 @@ public class RobotFactory {
             // Limelight needs gyro rotation for MegaTag2 
             return new VisionIO[] {
                 new VisionIOLimelight(Constants.Vision.Left.name, driveSubsystem::getRotation),
-                new VisionIOLimelight(Constants.Vision.Right.name, driveSubsystem::getRotation),
-                new VisionIOLimelight(Constants.Vision.Front.name, driveSubsystem::getRotation)
+                new VisionIOLimelight(Constants.Vision.Right.name, driveSubsystem::getRotation)
+                //new VisionIOLimelight(Constants.Vision.Front.name, driveSubsystem::getRotation)
             };
         default:
             throw new IllegalStateException("Unsupported mode");

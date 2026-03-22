@@ -22,7 +22,11 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.DriveSubsystem;
+
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -79,11 +83,13 @@ public class DriveCommands {
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
 
+          double maxSpeed = TunerConstants.kLinearSpeedAt12Volts.in(MetersPerSecond);
+
           // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
               new ChassisSpeeds(
-                  linearVelocity.getX() * speedFactor * drive.getMaxLinearSpeedMetersPerSec(),
-                  linearVelocity.getY() * speedFactor * drive.getMaxLinearSpeedMetersPerSec(),
+                  linearVelocity.getX() * speedFactor * maxSpeed,
+                  linearVelocity.getY() * speedFactor * maxSpeed,
                   omega * speedFactor * drive.getMaxAngularSpeedRadPerSec());
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
