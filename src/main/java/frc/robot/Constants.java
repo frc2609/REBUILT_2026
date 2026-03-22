@@ -167,7 +167,7 @@ public final class Constants {
         public static final double INTAKE_DEPLOYED_DEG = 0.0;
         public static final double INTAKE_RETRACT_DEG  = 110.0; // for push
         
-        public static final double INTAKE_RUN_RPM = 4000.0;
+        public static final double INTAKE_RUN_RPM = 3000.0;
         public static final double INTAKE_IDLE_RPM = 0.0;
 
         public static final double CLIMBER_DEPLOYED_DEG = 360.0;
@@ -451,7 +451,7 @@ public final class Constants {
 
         // Standard deviation baselines, for 1 meter distance and 1 tag
         // (Adjusted automatically based on distance and # of tags)
-        public static double linearStdDevBaseline = 0.02; // Meters
+        public static double linearStdDevBaseline = 0.06; // Meters
         public static double angularStdDevBaseline = 0.06; // Radians
 
         public static double[] cameraStdDevFactors = {1.0, 1.0};

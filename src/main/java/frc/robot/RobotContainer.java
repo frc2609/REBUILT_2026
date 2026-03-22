@@ -9,6 +9,7 @@ package frc.robot;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoAimTurret;
 import frc.robot.commands.AutoPushIntake;
 import frc.robot.lib.BLine.FollowPath;
+import frc.robot.commands.Autos.DifferentAuto;
 import frc.robot.commands.Autos.OneCycleAuto;
 import frc.robot.commands.Autos.SprintAuto;
 import frc.robot.commands.Autos.SprintDoubleAuto;
@@ -41,7 +43,7 @@ import frc.robot.util.ProjectileSimulator;
 import frc.robot.util.ShotCalculator;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 /**
  * This class is where the bulk of the robot should be declared. Since
  * Command-based is a
@@ -106,6 +108,9 @@ public class RobotContainer {
     private SetIntakeSpeedRPS startRollerCommand;
     private AutoPushIntake autoIntakePushCommand;
 
+    private SlewRateLimiter filterX = new SlewRateLimiter(3.0);
+    private SlewRateLimiter filterY = new SlewRateLimiter(3.0);            
+                
     public RobotContainer() {
         turretSubsystem = robotFactory.getTurretSubsystem();
         flywheelSubsystem = robotFactory.getFlywheelSubsystem();
@@ -188,8 +193,14 @@ public class RobotContainer {
                 "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim,
                 turretSubsystem));
         autoChooser.addOption("Back Sprint", new SprintAuto(
-                "centerback", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim,
-                turretSubsystem));
+            "centerback", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
+        ));
+        autoChooser.addOption("Left Diff", new DifferentAuto(
+            "leftSweep", "leftClose", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
+        ));
+        autoChooser.addOption("Right Diff", new DifferentAuto(
+            "rightSweep", "rightClose", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
+        ));
         Logger.registerDashboardInput(autoChooser);
         SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
     }
@@ -226,8 +237,8 @@ public class RobotContainer {
         rpmDownTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(-50)));
 
         // Aim angle trim (POV left/right)
-        aimLeftTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(2.0)));
-        aimRightTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(-2.0)));
+        aimLeftTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(10.0)));
+        aimRightTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(-10.0)));
 
         // Turret manual override (driver POV up/left/right) — holds turret at a fixed
         // robot-relative angle
@@ -259,6 +270,10 @@ public class RobotContainer {
         // turretSubsystem.zeroCurrentAimPosition();
         // }).ignoringDisable(true));
 
+        operatorController.b().onTrue(Commands.runOnce(() -> {
+            turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
+        }));
+
         // Tuning commands
 
         feedSubsystem.setSetpoints(Constants.Controls.FEED_HOLD_RPM, Constants.Controls.AGITATOR_HOLD_RPM);
@@ -274,20 +289,20 @@ public class RobotContainer {
         // Drive commands
 
         driveSubsystem.setDefaultCommand(
-                DriveCommands.joystickDrive(
-                        driveSubsystem,
-                        () -> -driverController.getLeftY(),
-                        () -> -driverController.getLeftX(),
-                        () -> -driverController.getRightX(),
-                        1.0));
+            DriveCommands.joystickDrive(
+                driveSubsystem,
+                () -> filterY.calculate(-driverController.getLeftY()),
+                () -> filterX.calculate(-driverController.getLeftX()),
+                () -> -driverController.getRightX(),
+                1.0));
         shootTrigger.whileTrue(
-                DriveCommands.joystickDrive(
-                        driveSubsystem,
-                        () -> -driverController.getLeftY(),
-                        () -> -driverController.getLeftX(),
-                        () -> -driverController.getRightX(),
-                        Constants.Controls.SHOOTING_SPEED_PERCENT)
-                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+            DriveCommands.joystickDrive(
+                driveSubsystem,
+                () -> filterY.calculate(-driverController.getLeftY()),
+                () -> filterX.calculate(-driverController.getLeftX()),
+                () -> -driverController.getRightX(),
+                Constants.Controls.SHOOTING_SPEED_PERCENT)
+        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
         xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
         resetGyroTrigger.onTrue(
@@ -307,7 +322,6 @@ public class RobotContainer {
     public void updateSim() {
         ballSim.tick();
     }
-
     public Command getHoodHomeCommand() {
         return new HomeHood(turretSubsystem);
     }
