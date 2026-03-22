@@ -1,6 +1,9 @@
 package frc.robot.commands;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
@@ -15,15 +18,18 @@ public class AutoShoot extends Command {
     private final double feedRPS;
     private final double agitatorRPS;
     private final FuelPhysicsSim ballSim;
+    private final Supplier<Boolean> turretInPose;
     private int i = 0;
 
     public AutoShoot(
         FlywheelSubsystem flywheel, FeedSubsystem agitator, 
-        double feedRPS, double agitatorRPS, FuelPhysicsSim ballSim
+        double feedRPS, double agitatorRPS, FuelPhysicsSim ballSim,
+        Supplier<Boolean> turretInPose
     ) {
         this.flywheel = flywheel;
         this.agitator = agitator;
         this.ballSim = ballSim;
+        this.turretInPose = turretInPose;
         
         this.feedRPS = feedRPS;
         this.agitatorRPS = agitatorRPS;
@@ -34,8 +40,13 @@ public class AutoShoot extends Command {
     @Override
     public void execute() {
         //System.out.println("SHOOTING>"+flywheel.validShotDetected())
-        if (flywheel.validShotDetected()) {
-            flywheel.useAutoSpeed();
+
+        flywheel.useAutoSpeed();
+
+        Logger.recordOutput("turretReady", turretInPose.get());
+        Logger.recordOutput("flywheelReady", flywheel.isAtSpeed());
+
+        if (flywheel.validShotDetected()) {//&& turretInPose.get() && flywheel.isAtSpeed()) {
             agitator.setAgitatorSpeed(agitatorRPS);
             agitator.setFeedSpeed(feedRPS);
 

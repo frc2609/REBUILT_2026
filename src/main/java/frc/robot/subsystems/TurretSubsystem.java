@@ -67,8 +67,8 @@ public class TurretSubsystem extends SubsystemBase {
     public void zeroHoodPosition() {
         hoodMotor.resetToZero();
     }
-    public boolean aimIsAtPosition(double toleranceDegrees) {
-        return aimMotor.isAtPosition(toleranceDegrees);
+    public boolean aimIsAtPosition() {
+        return aimMotor.isAtPosition(Constants.Controls.TURRET_READY_TOLERANCE);
     }
 
     public void setHoodPosition() {

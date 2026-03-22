@@ -10,6 +10,7 @@ import frc.robot.lib.BLine.Path;
 import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FuelPhysicsSim;
 
@@ -21,7 +22,8 @@ public class PreloadAuto extends SequentialCommandGroup {
         FlywheelSubsystem flywheel,
         FeedSubsystem feed,
         IntakeSubsystem intake,
-        FuelPhysicsSim ballSim
+        FuelPhysicsSim ballSim,
+        TurretSubsystem turret
     ) {
         addCommands(
             Commands.waitSeconds(3.0),
@@ -31,7 +33,8 @@ public class PreloadAuto extends SequentialCommandGroup {
                 flywheel, feed,
                 Constants.Controls.FEED_HOLD_RPM / 60.0,
                 Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-                ballSim
+                ballSim,
+                turret::aimIsAtPosition
             ).withTimeout(4.0)
         );
     }

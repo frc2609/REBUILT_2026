@@ -157,6 +157,9 @@ public final class Constants {
         public static final double SHOOTING_SPEED_PERCENT = 0.3;
         public static final double UNJAM_FACTOR = 10.0; // kP multiplier when unjamming
 
+        public static final double TURRET_READY_TOLERANCE = 15.0; // deg
+        public static final double FLYWHEEL_TOLERANCE_RPM = 150.0; // rpm
+
         // Rotation values are OUTPUT degrees
         // RPM values are INPUT RPM, will be geared down
 
@@ -175,8 +178,8 @@ public final class Constants {
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
         public static final double TURRET_OVERRIDE_LEFT_DEG = -90.0;
 
-        public static final double AGITATOR_HOLD_RPM = 4000.0;
-        public static final double FEED_HOLD_RPM = 3000.0; // max speed
+        public static final double AGITATOR_HOLD_RPM = 4500.0;
+        public static final double FEED_HOLD_RPM = 4000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
         public static final double LOB_DISTANCE = 2.0;
@@ -266,8 +269,6 @@ public final class Constants {
         public static final double INERTIA = 0.01;
         public static final double GEAR_RATIO = 25.0/12.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
-        public static final double JAM_CURRENT = 100.0; // stator limit before unjam
-        public static final double UNJAM_TIME  = 3.0; // seconds
         public static final Map<String, Object> config = new HashMap<>(Map.of(
             "motorId", 21,
             "kP", 0.04,
@@ -287,7 +288,9 @@ public final class Constants {
             "followerAligned", false,
             "kP", 0.04,
             "kV", 0.0117,
-            "inverted", false
+            "inverted", false,
+            "statorCurrentLimit", 90.0,
+            "statorCurrentLimitEnabled", true
         ));
     }
 
@@ -298,7 +301,7 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 60.0;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.636; // 0.242 unrestricted
+            public static final double ZERO_OFFSET = 0.515; // 0.242 unrestricted
             public static final double RANGE_DEG = 118.0; // 160
             public static final double HEADING_OFFSET_DEG = 170.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
@@ -322,9 +325,9 @@ public final class Constants {
                 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 config.put("inverted", false);
-                config.put("supplyCurrentLimit", 60.0);
+                config.put("supplyCurrentLimit", 30.0);
                 config.put("supplyCurrentLimitEnabled", true);
-                config.put("statorCurrentLimit", 40.0);
+                config.put("statorCurrentLimit", 30.0);
                 config.put("statorCurrentLimitEnabled", true);
                 config.put("useClosedLoopFFSign", true);
             }
@@ -355,9 +358,9 @@ public final class Constants {
                 config.put("reverseLimitRotations", 0.0);
                 
                 config.put("inverted", true);
-                config.put("supplyCurrentLimit", 120.0);
+                config.put("supplyCurrentLimit", 40.0);
                 config.put("supplyCurrentLimitEnabled", true);
-                config.put("statorCurrentLimit", 160.0);
+                config.put("statorCurrentLimit", 40.0);
                 config.put("statorCurrentLimitEnabled", true);
                 config.put("useClosedLoopFFSign", true);
             }
@@ -368,13 +371,17 @@ public final class Constants {
         public static final double INERTIA = 0.001;
         public static final double GEAR_RATIO = 80.0/9.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
+        public static final double JAM_CURRENT = 100.0; // stator limit before unjam
+        public static final double UNJAM_TIME  = 3.0; // seconds
 
         public static final Map<String, Object> config = new HashMap<>(Map.of(
             "motorId", 20,
             "kP", 0.05,
             "kV", 0.012,
             "inverted", false,
-            "neutralMode", NeutralMode.COAST
+            "neutralMode", NeutralMode.COAST,
+            "statorCurrentLimit", 120.0,
+            "statorCurrentLimitEnabled", true
         ));
     }
 
@@ -391,7 +398,7 @@ public final class Constants {
                 "inverted", true,
                 "kP", 0.032,
                 "kV", 0.0097,
-                "statorCurrentLimit", 120.0,
+                "statorCurrentLimit", 50.0,
                 "statorCurrentLimitEnabled", true
             ));
         }

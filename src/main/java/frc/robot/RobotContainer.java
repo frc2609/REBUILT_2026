@@ -139,7 +139,8 @@ public class RobotContainer {
             feedSubsystem, 
             Constants.Controls.FEED_HOLD_RPM / 60.0, 
             Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-            ballSim
+            ballSim,
+            turretSubsystem::aimIsAtPosition
         );
 
         FollowPath.registerEventTrigger("autoShoot", autoShootCommand);
@@ -164,25 +165,25 @@ public class RobotContainer {
     private void configureAutoChooser() {
         autoChooser.addDefaultOption("None", Commands.none());
         autoChooser.addOption("Left Sweep", new OneCycleAuto(
-            "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+            "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
         autoChooser.addOption("Right Sweep", new OneCycleAuto(
-            "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+            "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
         autoChooser.addOption("Left Sprint", new SprintAuto(
-            "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+            "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
         autoChooser.addOption("Right Sprint", new SprintAuto(
-            "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+            "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
         autoChooser.addOption("Left SprintD", new SprintDoubleAuto(
-            "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+            "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
         autoChooser.addOption("Right SprintD", new SprintDoubleAuto(
-            "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+            "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
         autoChooser.addOption("Back Sprint", new SprintAuto(
-            "centerback", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim
+            "centerback", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
         Logger.registerDashboardInput(autoChooser);
         SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
@@ -247,11 +248,11 @@ public class RobotContainer {
         ));
 
         // Zero encoders to current positions (B button)
-        zeroEncodersTrigger.onTrue(Commands.runOnce(() -> {
-            climberSubsystem.zeroCurrentPosition();
-            //intakeSubsystem.zeroCurrentDeployPosition();
-            turretSubsystem.zeroCurrentAimPosition();
-        }).ignoringDisable(true));
+        // zeroEncodersTrigger.onTrue(Commands.runOnce(() -> {
+        //     climberSubsystem.zeroCurrentPosition();
+        //     //intakeSubsystem.zeroCurrentDeployPosition();
+        //     turretSubsystem.zeroCurrentAimPosition();
+        // }).ignoringDisable(true));
 
         // Tuning commands
 

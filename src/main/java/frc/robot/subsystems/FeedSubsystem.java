@@ -61,15 +61,15 @@ public class FeedSubsystem extends SubsystemBase {
         feedMotor.updateFromTunables();
 
         if (unjamming) {
-            if (unjamTimer.get() > Constants.Feed.UNJAM_TIME) {
+            if (unjamTimer.get() > Constants.Agitator.UNJAM_TIME) {
                 unjamTimer.reset();
                 unjamming = false;
                 agitatorMotor.setIsUnjamSlot(false);
                 Logger.recordOutput("Feed Unjamming", false);
             }
         } else if (
-            agitatorMotor.getStatorCurrent() > Constants.Feed.JAM_CURRENT &&
-            unjamTimer.get() > Constants.Feed.UNJAM_TIME // debounce
+            agitatorMotor.getStatorCurrent() > Constants.Agitator.JAM_CURRENT &&
+            unjamTimer.get() > Constants.Agitator.UNJAM_TIME // debounce
         ){
             unjamTimer.reset();
             unjamming = true;
