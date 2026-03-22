@@ -41,18 +41,22 @@ import frc.robot.util.ProjectileSimulator;
 import frc.robot.util.ShotCalculator;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
 
-    private final CommandXboxController driverController =
-        new CommandXboxController(Constants.Controls.DRIVER_CONTROLLER_PORT);
-    private final CommandXboxController operatorController =
-        new CommandXboxController(Constants.Controls.OPERATOR_CONTROLLER_PORT);
+    private final CommandXboxController driverController = new CommandXboxController(
+            Constants.Controls.DRIVER_CONTROLLER_PORT);
+    private final CommandXboxController operatorController = new CommandXboxController(
+            Constants.Controls.OPERATOR_CONTROLLER_PORT);
 
     private final Trigger xTrigger = driverController.x();
     private final Trigger resetGyroTrigger = driverController.back();
@@ -91,17 +95,17 @@ public class RobotContainer {
     public final DriveSubsystem driveSubsystem;
     public final FeedSubsystem feedSubsystem;
     public final ClimberSubsystem climberSubsystem;
-    public final LedSubsystem ledSubsystem; boolean hasRun;
+    public final LedSubsystem ledSubsystem;
+    boolean hasRun;
 
     private final AutoAimTurret autoAimCommand;
     private final ShotCalculator shotCalculator;
     private final FuelPhysicsSim ballSim = new FuelPhysicsSim("Sim/Fuel");
-    private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine") ;
+    private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine");
     private AutoShoot autoShootCommand;
     private SetIntakeSpeedRPS startRollerCommand;
     private AutoPushIntake autoIntakePushCommand;
-                    
-                
+
     public RobotContainer() {
         turretSubsystem = robotFactory.getTurretSubsystem();
         flywheelSubsystem = robotFactory.getFlywheelSubsystem();
@@ -109,10 +113,12 @@ public class RobotContainer {
         driveSubsystem = robotFactory.getDriveSubsystem();
         feedSubsystem = robotFactory.getFeedSubsystem();
         climberSubsystem = robotFactory.getClimberSubsystem();
-        ledSubsystem = new LedSubsystem(Constants.LedConstants.Length,Constants.LedConstants.Port); hasRun = false;
+        ledSubsystem = new LedSubsystem(Constants.LedConstants.Length, Constants.LedConstants.Port,
+                Constants.LedConstants.travelTime);
+        hasRun = false;
 
         // SOTM Setup
-        
+
         ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
         ProjectileSimulator.GeneratedLUT lut = sim.generateLUT(2.0, 45, 0.5);
         this.shotCalculator = new ShotCalculator(Constants.shotConfig);
@@ -120,45 +126,41 @@ public class RobotContainer {
         for (var entry : lut.entries()) {
             if (entry.reachable()) {
                 System.out.printf("%.2fm -> %.0f RPM, %.3fs TOF%n",
-                    entry.distanceM(), entry.rpm(), entry.tof());
+                        entry.distanceM(), entry.rpm(), entry.tof());
                 shotCalculator.loadLUTEntry(entry.distanceM(), entry.rpm(), entry.tof());
             }
         }
 
         autoAimCommand = new AutoAimTurret(
-            driveSubsystem, turretSubsystem, flywheelSubsystem, shotCalculator);
+                driveSubsystem, turretSubsystem, flywheelSubsystem, shotCalculator);
 
         turretSubsystem.setEncoderInvert(true);
         intakeSubsystem.setEncoderInvert(true);
 
-            
         climberSubsystem.resetPositionToAbsolute();
-        intakeSubsystem.zeroCurrentDeployPosition(); //TEMP
-        //intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
+        intakeSubsystem.zeroCurrentDeployPosition(); // TEMP
+        // intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
 
         autoShootCommand = new AutoShoot(
-            flywheelSubsystem, 
-            feedSubsystem, 
-            Constants.Controls.FEED_HOLD_RPM / 60.0, 
-            Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-            ballSim,
-            turretSubsystem::aimIsAtPosition
-        );
+                flywheelSubsystem,
+                feedSubsystem,
+                Constants.Controls.FEED_HOLD_RPM / 60.0,
+                Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
+                ballSim,
+                turretSubsystem::aimIsAtPosition);
 
         FollowPath.registerEventTrigger("autoShoot", autoShootCommand);
-            
+
         startRollerCommand = new SetIntakeSpeedRPS(
-            intakeSubsystem, 
-            Constants.Controls.INTAKE_RUN_RPM / 60.0
-        );
+                intakeSubsystem,
+                Constants.Controls.INTAKE_RUN_RPM / 60.0);
         FollowPath.registerEventTrigger("startRoller", startRollerCommand);
 
         autoIntakePushCommand = new AutoPushIntake(
-            intakeSubsystem,
-            Constants.Controls.INTAKE_DEPLOYED_DEG, 
-            Constants.Controls.INTAKE_RETRACT_DEG
-        );
+                intakeSubsystem,
+                Constants.Controls.INTAKE_DEPLOYED_DEG,
+                Constants.Controls.INTAKE_RETRACT_DEG);
         FollowPath.registerEventTrigger("autoIntakePush", autoIntakePushCommand);
 
         configureAutoChooser();
@@ -168,61 +170,57 @@ public class RobotContainer {
     private void configureAutoChooser() {
         autoChooser.addDefaultOption("None", Commands.none());
         autoChooser.addOption("Left Sweep", new OneCycleAuto(
-            "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
-        ));
+                "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim,
+                turretSubsystem));
         autoChooser.addOption("Right Sweep", new OneCycleAuto(
-            "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
-        ));
+                "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim,
+                turretSubsystem));
         autoChooser.addOption("Left Sprint", new SprintAuto(
-            "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
-        ));
+                "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim,
+                turretSubsystem));
         autoChooser.addOption("Right Sprint", new SprintAuto(
-            "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
-        ));
+                "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim,
+                turretSubsystem));
         autoChooser.addOption("Left SprintD", new SprintDoubleAuto(
-            "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
-        ));
+                "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim,
+                turretSubsystem));
         autoChooser.addOption("Right SprintD", new SprintDoubleAuto(
-            "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
-        ));
+                "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim,
+                turretSubsystem));
         autoChooser.addOption("Back Sprint", new SprintAuto(
-            "centerback", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
-        ));
+                "centerback", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim,
+                turretSubsystem));
         Logger.registerDashboardInput(autoChooser);
         SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
     }
-    
-    private void configureBindings() {        
+
+    private void configureBindings() {
         // Main controls
 
         turretSubsystem.setDefaultCommand(autoAimCommand);
         shootTrigger.whileTrue(autoShootCommand);
 
         manualShootTrigger.whileTrue(new Shoot(
-            flywheelSubsystem, 
-            feedSubsystem, 
-            ballSim
-        ));
+                flywheelSubsystem,
+                feedSubsystem,
+                ballSim));
 
         startIntakeTrigger.onTrue(startRollerCommand);
         stopIntakeTrigger.onTrue(new SetIntakeSpeedRPS(
-            intakeSubsystem, 
-            Constants.Controls.INTAKE_IDLE_RPM / 60.0
-        ));
+                intakeSubsystem,
+                Constants.Controls.INTAKE_IDLE_RPM / 60.0));
 
         intakeSubsystem.setDefaultCommand(new HoldIntakeDeployed(
-            intakeSubsystem, 
-            Constants.Controls.INTAKE_DEPLOYED_DEG
-        ));
+                intakeSubsystem,
+                Constants.Controls.INTAKE_DEPLOYED_DEG));
         autoIntakeTrigger.whileTrue(autoIntakePushCommand);
         pushIntakeTrigger.whileTrue(new PushIntake(
-            intakeSubsystem, 
-            pushIntakeAxis, 
-            Constants.Controls.INTAKE_DEPLOYED_DEG, 
-            Constants.Controls.INTAKE_RETRACT_DEG
-        )
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
-    
+                intakeSubsystem,
+                pushIntakeAxis,
+                Constants.Controls.INTAKE_DEPLOYED_DEG,
+                Constants.Controls.INTAKE_RETRACT_DEG)
+                .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+
         // RPM trim (POV up/down)
         rpmUpTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(50)));
         rpmDownTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(-50)));
@@ -231,75 +229,81 @@ public class RobotContainer {
         aimLeftTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(2.0)));
         aimRightTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(-2.0)));
 
-        // Turret manual override (driver POV up/left/right) — holds turret at a fixed robot-relative angle
+        // Turret manual override (driver POV up/left/right) — holds turret at a fixed
+        // robot-relative angle
         turretOverrideFrontTrigger.onTrue(
-            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_FRONT_DEG), turretSubsystem));
+                Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_FRONT_DEG),
+                        turretSubsystem));
         turretOverrideRightTrigger.onTrue(
-            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_RIGHT_DEG), turretSubsystem));
+                Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_RIGHT_DEG),
+                        turretSubsystem));
         turretOverrideLeftTrigger.onTrue(
-            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_LEFT_DEG), turretSubsystem));
+                Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_LEFT_DEG),
+                        turretSubsystem));
 
         // Driver POV down — cancel override and restore auto-aim default command
         turretAutoAimTrigger.onTrue(Commands.runOnce(() -> {
             Command current = turretSubsystem.getCurrentCommand();
-            if (current != null && current != autoAimCommand) current.cancel();
+            if (current != null && current != autoAimCommand)
+                current.cancel();
         }));
 
         new Trigger(autoAimCommand::shouldRumble).whileTrue(Commands.startEnd(
-            () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5),
-            () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0)
-        ));
+                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5),
+                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0)));
 
         // Zero encoders to current positions (B button)
         // zeroEncodersTrigger.onTrue(Commands.runOnce(() -> {
-        //     climberSubsystem.zeroCurrentPosition();
-        //     //intakeSubsystem.zeroCurrentDeployPosition();
-        //     turretSubsystem.zeroCurrentAimPosition();
+        // climberSubsystem.zeroCurrentPosition();
+        // //intakeSubsystem.zeroCurrentDeployPosition();
+        // turretSubsystem.zeroCurrentAimPosition();
         // }).ignoringDisable(true));
 
         // Tuning commands
 
-        feedSubsystem.setSetpoints(Constants.Controls.FEED_HOLD_RPM,Constants.Controls.AGITATOR_HOLD_RPM);
+        feedSubsystem.setSetpoints(Constants.Controls.FEED_HOLD_RPM, Constants.Controls.AGITATOR_HOLD_RPM);
         flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOB_RPM);
         // intakeSubsystem.setDeploySetpoint(0);
         // holdAgitatorTrigger.whileTrue(Commands.runEnd(feedSubsystem::setAgitatorSpeed,feedSubsystem::stop,feedSubsystem));
         // holdFeedTrigger.whileTrue(Commands.runEnd(feedSubsystem::setFeedSpeed,feedSubsystem::stop,feedSubsystem));
         // holdFlywheelTrigger.whileTrue(Commands.runEnd(flywheelSubsystem::setSpeed,flywheelSubsystem::stop,flywheelSubsystem));
-        // setIntakeTrigger.onTrue(Commands.runOnce(intakeSubsystem::setDeployPosition, intakeSubsystem));
+        // setIntakeTrigger.onTrue(Commands.runOnce(intakeSubsystem::setDeployPosition,
+        // intakeSubsystem));
         // setHoodTrigger.onTrue(Commands.runOnce(turretSubsystem::setHoodPosition,turretSubsystem));
-        
+
         // Drive commands
 
         driveSubsystem.setDefaultCommand(
-            DriveCommands.joystickDrive(
-                driveSubsystem,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> -driverController.getRightX(),
-                1.0));
+                DriveCommands.joystickDrive(
+                        driveSubsystem,
+                        () -> -driverController.getLeftY(),
+                        () -> -driverController.getLeftX(),
+                        () -> -driverController.getRightX(),
+                        1.0));
         shootTrigger.whileTrue(
-            DriveCommands.joystickDrive(
-                driveSubsystem,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> -driverController.getRightX(),
-                Constants.Controls.SHOOTING_SPEED_PERCENT)
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+                DriveCommands.joystickDrive(
+                        driveSubsystem,
+                        () -> -driverController.getLeftY(),
+                        () -> -driverController.getLeftX(),
+                        () -> -driverController.getRightX(),
+                        Constants.Controls.SHOOTING_SPEED_PERCENT)
+                        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
         xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
         resetGyroTrigger.onTrue(
-            Commands.runOnce(driveSubsystem::zeroHeading, driveSubsystem).ignoringDisable(true));
-    } 
+                Commands.runOnce(driveSubsystem::zeroHeading, driveSubsystem).ignoringDisable(true));
+    }
 
     // Called from Robot.java
 
     public void simInit() {
         ballSim.enable();
-        //ballSim.placeFieldBalls(); 
+        // ballSim.placeFieldBalls();
 
         ballSim.configureRobot(0.5, 0.5, 0.01,
-            () -> driveSubsystem.getPose(), () -> driveSubsystem.getChassisSpeeds());
+                () -> driveSubsystem.getPose(), () -> driveSubsystem.getChassisSpeeds());
     }
+
     public void updateSim() {
         ballSim.tick();
     }
@@ -313,11 +317,12 @@ public class RobotContainer {
     }
 
     public void disabledPeriodic() {
-    if (!hasRun && ledSubsystem.deployedWait.get() > 5 ) {
-      ledSubsystem.SignalEndDeploy();
-      hasRun = true;
-    };
+        if (!hasRun && ledSubsystem.deployedWait.get() > 5) {
+            ledSubsystem.SignalEndDeploy();
+            hasRun = true;
+        }
+        ;
 
-    ledSubsystem.pattern();// not tested
-  }
+        ledSubsystem.pattern();
+    }
 }
