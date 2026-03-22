@@ -27,6 +27,7 @@ import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LedSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FuelPhysicsSim;
@@ -65,6 +66,7 @@ public class RobotContainer {
     public final DriveSubsystem driveSubsystem;
     public final FeedSubsystem feedSubsystem;
     public final ClimberSubsystem climberSubsystem;
+    public final LedSubsystem ledSubsystem; boolean hasRun;
 
     private final Command autoAimCommand;
     private final ShotCalculator shotCalculator;
@@ -77,6 +79,7 @@ public class RobotContainer {
         driveSubsystem = robotFactory.getDriveSubsystem();
         feedSubsystem = robotFactory.getFeedSubsystem();
         climberSubsystem = robotFactory.getClimberSubsystem();
+        ledSubsystem = new LedSubsystem(Constants.LedConstants.Length,Constants.LedConstants.Port); hasRun = false;
 
         // SOTM Setup
         
@@ -201,4 +204,13 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
     }
+
+    public void disabledPeriodic() {
+    if (!hasRun && ledSubsystem.deployedWait.get() > 5 ) {
+      ledSubsystem.SignalEndDeploy();
+      hasRun = true;
+    };
+
+    ledSubsystem.pattern();// not tested
+  }
 }

@@ -438,5 +438,11 @@ public final class Constants {
                     Units.inchesToMeters(16.25)),  // WPILib Z = user Z (up)
                 new Rotation3d(0.0, 0.0, 0.0));
         }
+
+    }
+
+    public static final class LedConstants{
+        public static final int Length = 10;
+        public static final int Port = 0;
     }
 }
