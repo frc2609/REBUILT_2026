@@ -167,7 +167,7 @@ public final class Constants {
         public static final double INTAKE_DEPLOYED_DEG = 0.0;
         public static final double INTAKE_RETRACT_DEG  = 110.0; // for push
         
-        public static final double INTAKE_RUN_RPM = 4000.0;
+        public static final double INTAKE_RUN_RPM = 3000.0;
         public static final double INTAKE_IDLE_RPM = 0.0;
 
         public static final double CLIMBER_DEPLOYED_DEG = 360.0;

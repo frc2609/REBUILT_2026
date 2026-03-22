@@ -225,8 +225,8 @@ public class RobotContainer {
         rpmDownTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(-50)));
 
         // Aim angle trim (POV left/right)
-        aimLeftTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(2.0)));
-        aimRightTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(-2.0)));
+        aimLeftTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(10.0)));
+        aimRightTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(-10.0)));
 
         // Turret manual override (driver POV up/left/right) — holds turret at a fixed robot-relative angle
         turretOverrideFrontTrigger.onTrue(
@@ -253,6 +253,10 @@ public class RobotContainer {
         //     //intakeSubsystem.zeroCurrentDeployPosition();
         //     turretSubsystem.zeroCurrentAimPosition();
         // }).ignoringDisable(true));
+
+        operatorController.b().onTrue(Commands.runOnce(() -> {
+            turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
+        }));
 
         // Tuning commands
 
