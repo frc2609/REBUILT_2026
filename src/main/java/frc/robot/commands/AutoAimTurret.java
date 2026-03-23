@@ -96,23 +96,24 @@ public class AutoAimTurret extends Command {
         );
 
         ShotCalculator.ShotInputs inputs = new ShotCalculator.ShotInputs(
-            turretPose,
+            swerve.getPose(),
             fieldRelativeSpeed,
             swerve.getChassisSpeeds(),
-            target, targetForward,
+            target, 
+            targetForward,
             0.9 // vision confidence, 0 to 1
         );
 
         ShotCalculator.LaunchParameters shot = shotCalc.calculate(inputs);
         double targetDist = turretPose.getTranslation().getDistance(target);
-        double turretAngleDeg = shot.launcherAngle()
+        double turretAngleDeg = shot.driveAngle()
             //.minus(Rotation2d.fromDegrees(Constants.Turret.Aim.HEADING_OFFSET_DEG))
-            .minus(Rotation2d.fromDegrees(headingOffset.get()))
-            .minus(swerve.getRotation())
+            // .minus(Rotation2d.fromDegrees(headingOffset.get()))
+            // .minus(swerve.getRotation())
             .getDegrees();
 
         turretInLimits = Math.abs(turretAngleDeg) <= (Constants.Turret.Aim.RANGE_DEG);
-        validShot = shot.isValid(); 
+        validShot = shot.isValid() && (shot.confidence() > 50.0); 
         Logger.recordOutput("turretValid", turretInLimits);
 
         if (turretInLimits) {
@@ -142,7 +143,7 @@ public class AutoAimTurret extends Command {
             Translation3d launchVector = new Translation3d(ballSpeed, new Rotation3d(
                 0.0, 
                 Constants.simParameters.fixedLaunchAngleDeg()*(Math.PI/180.0), 
-                shot.launcherAngle().getRadians()
+                shot.driveAngle().getRadians()
             ));
             Translation3d ballVel = new Translation3d(
                 fieldRelativeSpeed.vxMetersPerSecond, 
@@ -158,7 +159,7 @@ public class AutoAimTurret extends Command {
             flywheel.launchSpeedSim = ballVel;
         }
 
-        turretPose = new Pose2d(turretPose.getTranslation(), shot.launcherAngle());
+        turretPose = new Pose2d(turretPose.getTranslation(), shot.driveAngle());
         Logger.recordOutput("TurretPose", turretPose);
         Logger.recordOutput("TurretSetpoint", turretAngleDeg);
         Logger.recordOutput("Target", target);

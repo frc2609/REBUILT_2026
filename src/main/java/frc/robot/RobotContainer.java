@@ -41,6 +41,8 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FuelPhysicsSim;
 import frc.robot.util.ProjectileSimulator;
 import frc.robot.util.ShotCalculator;
+import frc.robot.util.ShotLUT;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -119,8 +121,22 @@ public class RobotContainer {
         // SOTM Setup
         
         ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
-        ProjectileSimulator.GeneratedLUT lut = sim.generateLUT(2.0, 45, 0.5);
+        ProjectileSimulator.GeneratedLUT lut = sim.generateLUT(2.0, 20.0, 0.5);
         this.shotCalculator = new ShotCalculator(Constants.shotConfig);
+
+        // // Option 1: basic path (RPM + TOF only, fixed angle)
+        // ShotCalculator shotCalc = new ShotCalculator(config);
+        // shotCalc.loadLUTEntry(1.0, 2000, 0.45);
+        // shotCalc.loadLUTEntry(2.0, 2800, 0.62);
+        // shotCalc.loadLUTEntry(3.0, 3500, 0.78);
+        // // ShotCalculator interpolates between these points
+
+        // // Option 2: ShotLUT (RPM + angle + TOF, for adjustable hoods)
+        // ShotLUT lut = new ShotLUT();
+        // lut.put(1.0, 2000, 45.0, 0.45);  // distance, RPM, angle, TOF
+        // lut.put(2.0, 2800, 42.0, 0.62);
+        // lut.put(3.0, 3500, 38.0, 0.78);
+        // shotCalc.loadShotLUT(lut);
 
         for (var entry : lut.entries()) {
             if (entry.reachable()) {
@@ -239,8 +255,8 @@ public class RobotContainer {
         rpmDownTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(-50)));
 
         // Aim angle trim (POV left/right)
-        aimLeftTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(10.0)));
-        aimRightTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(-10.0)));
+        // aimLeftTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(10.0)));
+        // aimRightTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustAimOffset(-10.0)));
 
         // Turret manual override (driver POV up/left/right) — holds turret at a fixed robot-relative angle
         turretOverrideFrontTrigger.onTrue(

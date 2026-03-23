@@ -212,16 +212,17 @@ public final class Constants {
             0.482,    // exit height (m), floor to where the ball leaves the shooter
             0.0762,  // flywheel diameter, 0.0762
             1.83,    // target height (m), from game manual
-            0.9,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
-            71.0,    // launch angle from horizontal, 65.0
+            0.5,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
+            65.0,    // launch angle from horizontal, 65.0
             0.001,   // sim timestep
             1500, 6000, 25, 10.0  // RPM search range, iterations, max sim time
         );
 
     public static ShotCalculator.Config shotConfig = new ShotCalculator.Config();
     static {
-        shotConfig.launcherOffsetX = 0.0;  // how far forward the launcher is from robot center (m)
-        shotConfig.launcherOffsetY = 0.0;   // how far left, 0 if centered
+        shotConfig.launcherOffsetX = -0.177;  // how far forward the launcher is from robot center (m)
+        shotConfig.launcherOffsetY = -0.144;   // how far left, 0 if centered
+        shotConfig.shooterAngleOffsetRad = Math.PI;
         shotConfig.phaseDelayMs = 30.0;     // your vision pipeline latency
         shotConfig.mechLatencyMs = 20.0;    // how long the mechanism takes to respond
         shotConfig.maxTiltDeg = 5.0;        // suppress firing when chassis tilts past this (bumps/ramps)
@@ -229,6 +230,7 @@ public final class Constants {
         shotConfig.headingReferenceDistance = 2.5; // heading tolerance scales with distance from hub
         shotConfig.maxScoringDistance = 20.0;
         shotConfig.tofMax = 10.0;
+        shotConfig.maxSOTMSpeed = 10.0;
     }
     
     // Subsystems
