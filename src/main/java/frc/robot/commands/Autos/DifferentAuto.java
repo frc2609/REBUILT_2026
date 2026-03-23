@@ -48,7 +48,7 @@ public class DifferentAuto extends SequentialCommandGroup {
                     turret::aimIsAtPosition
                 ),
                 new AutoPushIntake(intake, 0, 110.0)
-            ).withTimeout(3.5),
+            ).withTimeout(3.0),
 
             // Follow path while running intake to collect a ball
             Commands.deadline(
@@ -69,7 +69,7 @@ public class DifferentAuto extends SequentialCommandGroup {
                     turret::aimIsAtPosition
                 ),
                 new AutoPushIntake(intake, 0, 110.0)
-            ).withTimeout(3.5)
+            )
         );
     }
 }

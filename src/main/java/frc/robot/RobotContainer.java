@@ -288,15 +288,15 @@ public class RobotContainer {
         driveSubsystem.setDefaultCommand(
             DriveCommands.joystickDrive(
                 driveSubsystem,
-                () -> filterY.calculate(-driverController.getLeftY()),
-                () -> filterX.calculate(-driverController.getLeftX()),
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
                 1.0));
         shootTrigger.whileTrue(
             DriveCommands.joystickDrive(
                 driveSubsystem,
-                () -> filterY.calculate(-driverController.getLeftY()),
-                () -> filterX.calculate(-driverController.getLeftX()),
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
                 Constants.Controls.SHOOTING_SPEED_PERCENT)
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
