@@ -20,6 +20,7 @@ import frc.robot.Constants.Mode;
 import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
+import frc.robot.util.ProjectileSimulator;
 import frc.robot.util.ShotCalculator;
 
 public class AutoAimTurret extends Command {
@@ -42,8 +43,8 @@ public class AutoAimTurret extends Command {
         this.flywheel = flywheel;
         this.shotCalc = shotCalc;
 
-        kVTarget = new LoggedNetworkNumber("turretAimkV", -0.7);
-        headingOffset = new LoggedNetworkNumber("headingOffset",180.0);
+        kVTarget = new LoggedNetworkNumber("SOTM/turretAimkV", -0.7);
+        headingOffset = new LoggedNetworkNumber("SOTM/headingOffset",180.0);
 
         addRequirements(turret);
     }
@@ -95,26 +96,32 @@ public class AutoAimTurret extends Command {
             swerve.getRotation()
         );
 
+        Rotation2d fieldTurretAim = Rotation2d.fromDegrees(turret.getAimPosition())
+                .plus(swerve.getRotation())
+                .plus(Rotation2d.fromDegrees(headingOffset.get()));
+
         ShotCalculator.ShotInputs inputs = new ShotCalculator.ShotInputs(
             swerve.getPose(),
             fieldRelativeSpeed,
             swerve.getChassisSpeeds(),
             target, 
             targetForward,
-            0.9 // vision confidence, 0 to 1
+            0.9, // vision confidence, 0 to 1
+            fieldTurretAim.getRadians()
         );
 
         ShotCalculator.LaunchParameters shot = shotCalc.calculate(inputs);
         double targetDist = turretPose.getTranslation().getDistance(target);
+
         double turretAngleDeg = shot.driveAngle()
             //.minus(Rotation2d.fromDegrees(Constants.Turret.Aim.HEADING_OFFSET_DEG))
-            // .minus(Rotation2d.fromDegrees(headingOffset.get()))
-            // .minus(swerve.getRotation())
+            .minus(Rotation2d.fromDegrees(headingOffset.get()))
+            .minus(swerve.getRotation())
             .getDegrees();
+        turretPose = new Pose2d(turretPose.getTranslation(), fieldTurretAim);
 
         turretInLimits = Math.abs(turretAngleDeg) <= (Constants.Turret.Aim.RANGE_DEG);
-        validShot = shot.isValid() && (shot.confidence() > 50.0); 
-        Logger.recordOutput("turretValid", turretInLimits);
+        validShot = shot.isValid() && (shot.confidence() > 50.0);
 
         if (turretInLimits) {
             turret.setAimPositionFF(
@@ -139,11 +146,15 @@ public class AutoAimTurret extends Command {
         }
 
         if (Constants.currentMode == Constants.Mode.SIM) {
-            double ballSpeed = 1.25*(shot.rpm()/60.0)*Math.PI*Constants.simParameters.wheelDiameterM();
-            Translation3d launchVector = new Translation3d(ballSpeed, new Rotation3d(
+            double ballSpeed = ProjectileSimulator.rpmToExitVelocity(
+                shot.rpm(), 
+                Constants.simParameters.wheelDiameterM(),
+                Constants.simParameters.slipFactor()
+            );
+            Translation3d launchVector = new Translation3d(ballSpeed*1.4, new Rotation3d(
                 0.0, 
                 Constants.simParameters.fixedLaunchAngleDeg()*(Math.PI/180.0), 
-                shot.driveAngle().getRadians()
+                turretPose.getRotation().getRadians()
             ));
             Translation3d ballVel = new Translation3d(
                 fieldRelativeSpeed.vxMetersPerSecond, 
@@ -154,18 +165,19 @@ public class AutoAimTurret extends Command {
             flywheel.launchPosSim = new Translation3d(
                 turretPose.getTranslation().getX(),
                 turretPose.getTranslation().getY(),
-                0.1
+                Constants.simParameters.exitHeightM()
             );
             flywheel.launchSpeedSim = ballVel;
         }
 
-        turretPose = new Pose2d(turretPose.getTranslation(), shot.driveAngle());
-        Logger.recordOutput("TurretPose", turretPose);
-        Logger.recordOutput("TurretSetpoint", turretAngleDeg);
-        Logger.recordOutput("Target", target);
-        Logger.recordOutput("TargetDistance", targetDist);
-        Logger.recordOutput("ValidShot", validShot);
-        Logger.recordOutput("HubActive", isHubActive());
+        Logger.recordOutput("SOTM/TurretPose", turretPose);
+        Logger.recordOutput("SOTM/TurretSetpoint", turretAngleDeg);
+        Logger.recordOutput("SOTM/Target", target);
+        Logger.recordOutput("SOTM/TargetDistance", targetDist);
+        Logger.recordOutput("SOTM/Flags/ValidShot", validShot);
+        Logger.recordOutput("SOTM/Flags/HubActive", isHubActive());
+        Logger.recordOutput("SOTM/Flags/TurretInRange", turretInLimits);
+        Logger.recordOutput("SOTM/Flags/Confidence", shot.confidence());
     }
 
     public boolean shouldRumble() {

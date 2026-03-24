@@ -39,6 +39,7 @@ import frc.robot.subsystems.LedSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FuelPhysicsSim;
+import frc.robot.util.FuelPhysicsSim.PhysicsConfig;
 import frc.robot.util.ProjectileSimulator;
 import frc.robot.util.ShotCalculator;
 import frc.robot.util.ShotLUT;
@@ -326,7 +327,7 @@ public class RobotContainer {
 
     public void simInit() {
         ballSim.enable();
-        //ballSim.placeFieldBalls(); 
+        //ballSim.placeFieldBalls();
 
         ballSim.configureRobot(0.5, 0.5, 0.01,
             () -> driveSubsystem.getPose(), () -> driveSubsystem.getChassisSpeeds());

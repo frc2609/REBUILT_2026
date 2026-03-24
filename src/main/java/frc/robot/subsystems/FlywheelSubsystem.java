@@ -25,7 +25,7 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
     public void setAutoSpeed(double rps) {
         this.autoSpeedRPS = rps;
-        Logger.recordOutput("OnTheFly Setpoint", this.autoSpeedRPS*60.0);
+        Logger.recordOutput("SOTM/FlywheelSetpoint", this.autoSpeedRPS*60.0);
     }
     public void useAutoSpeed(){
         setSpeed(this.autoSpeedRPS);

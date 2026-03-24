@@ -97,6 +97,7 @@ public class ShotCalculator {
       Translation2d hubCenter,
       Translation2d hubForward,
       double visionConfidence,
+      double launcherHeading,
       double pitchDeg,
       double rollDeg) {
 
@@ -107,8 +108,9 @@ public class ShotCalculator {
         ChassisSpeeds robotVelocity,
         Translation2d hubCenter,
         Translation2d hubForward,
-        double visionConfidence) {
-      this(robotPose, fieldVelocity, robotVelocity, hubCenter, hubForward, visionConfidence, 0.0, 0.0);
+        double visionConfidence,
+        double launcherHeading) {
+      this(robotPose, fieldVelocity, robotVelocity, hubCenter, hubForward, visionConfidence, launcherHeading, 0.0, 0.0);
     }
   }
 
@@ -280,6 +282,8 @@ public class ShotCalculator {
     double robotY = compensatedPose.getY();
     double heading = compensatedPose.getRotation().getRadians();
 
+    Logger.recordOutput("compensatedPose", compensatedPose);
+
     Translation2d hubCenter = inputs.hubCenter();
     double hubX = hubCenter.getX();
     double hubY = hubCenter.getY();
@@ -435,15 +439,16 @@ public class ShotCalculator {
       compTargetX = hubX - vx * headingDriftTOF;
       compTargetY = hubY - vy * headingDriftTOF;
     }
-    double aimX = compTargetX - robotX;
-    double aimY = compTargetY - robotY;
+    double aimX = compTargetX - launcherX;
+    double aimY = compTargetY - launcherY;
     Rotation2d driveAngle = new Rotation2d(aimX, aimY);
-    if (config.shooterAngleOffsetRad != 0.0) {
-      driveAngle = driveAngle.plus(new Rotation2d(config.shooterAngleOffsetRad));
-    }
+    // if (config.shooterAngleOffsetRad != 0.0) {
+    //   driveAngle = driveAngle.plus(new Rotation2d(config.shooterAngleOffsetRad));
+    // }
 
     // Heading error for confidence calculation
-    double headingErrorRad = MathUtil.angleModulus(driveAngle.getRadians() - heading);
+    double headingErrorRad = MathUtil.angleModulus(driveAngle.getRadians() - inputs.launcherHeading());
+    Logger.recordOutput("HeadingError", headingErrorRad);
 
     // Angular velocity feedforward: rate of change of aim angle
     double driveAngularVelocity = 0;
@@ -452,6 +457,7 @@ public class ShotCalculator {
       double tangentialVel = (ry * vx - rx * vy) / distance;
       driveAngularVelocity = tangentialVel / distance;
     }
+    Logger.recordOutput("FF", driveAngularVelocity);
 
     // Solver convergence quality
     double solverQuality;
