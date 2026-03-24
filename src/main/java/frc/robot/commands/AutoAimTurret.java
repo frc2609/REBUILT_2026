@@ -43,7 +43,7 @@ public class AutoAimTurret extends Command {
         this.shotCalc = shotCalc;
 
         kVTarget = new LoggedNetworkNumber("turretAimkV", -0.7);
-        headingOffset = new LoggedNetworkNumber("headingOffset",180.0);
+        headingOffset = new LoggedNetworkNumber("headingOffset",177.0);
 
         addRequirements(turret);
     }

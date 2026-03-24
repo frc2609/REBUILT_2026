@@ -178,7 +178,7 @@ public final class Constants {
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
         public static final double TURRET_OVERRIDE_LEFT_DEG = -90.0;
 
-        public static final double AGITATOR_HOLD_RPM = 3000.0;
+        public static final double AGITATOR_HOLD_RPM = 1600.0;
         public static final double FEED_HOLD_RPM = 4000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
@@ -307,8 +307,8 @@ public final class Constants {
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
-                "kP", 0.06,
-                "kD", 0.0,
+                "kP", 0.3,
+                "kD", 0.02,
                 "kS", 0.005
             ));
             static {
