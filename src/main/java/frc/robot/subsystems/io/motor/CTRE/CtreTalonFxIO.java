@@ -96,8 +96,14 @@ public class CtreTalonFxIO {
             "MotionMagicAcceleration", 
             value -> this.config.MotionMagic.MotionMagicAcceleration = (double) value);
         setters.put(
-            "MotionMagicJerk", 
+            "MotionMagicJerk",
             value -> this.config.MotionMagic.MotionMagicJerk = (double) value);
+        setters.put(
+            "MotionMagicExpo_kV",
+            value -> this.config.MotionMagic.MotionMagicExpo_kV = (double) value);
+        setters.put(
+            "MotionMagicExpo_kA",
+            value -> this.config.MotionMagic.MotionMagicExpo_kA = (double) value);
 
         setters.put(
             "supplyCurrentLimit", 

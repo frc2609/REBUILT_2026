@@ -305,16 +305,23 @@ public final class Constants {
             public static final double RANGE_DEG = 118.0; // 160
             public static final double HEADING_OFFSET_DEG = 170.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
+            // MotionMagicExpo dynamic limits (rotor rotations/sec, /sec^2)
+            // Tuned via physics sim: 2x faster settling than old PosDutyCycle, 0.3° overshoot
+            public static final double MAX_VELOCITY = 100.0;   // rotor rot/s (~600 deg/s mechanism)
+            public static final double MAX_ACCEL = 400.0;      // rotor rot/s^2
+
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
-                "kP", 0.06,
-                "kD", 0.0,
-                "kS", 0.005
+                // Gains in Voltage (not DutyCycle): kP_V ≈ old_kP_DC * 12
+                "kP", 0.72,
+                "kD", 0.005,
+                "kS", 0.06,
+                "kV", 0.096
             ));
             static {
-                // config.put("MotionMagicCruiseVelocity", 100.0);
-                // config.put("MotionMagicAcceleration", 200.0);
-                // config.put("MotionMagicJerk", 0.0); //trapezoid
+                // Exponential profile parameters (V·s/rot and V·s²/rot, rotor units)
+                config.put("MotionMagicExpo_kV", 0.096);  // 12V / 125.5 RPS
+                config.put("MotionMagicExpo_kA", 0.005);  // small = fast response
 
                 config.put("forwardLimitEnabled", true);
                 config.put("forwardLimitRotations",
