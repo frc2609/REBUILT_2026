@@ -55,6 +55,7 @@ public final class Constants {
 
     public enum PositionMotorType {
         CTRE_TALON_FX,
+        CTRE_TALON_FX_FOC,
         REV_SPARK_MAX,
         SIM
     }
@@ -304,24 +305,25 @@ public final class Constants {
             public static final double ZERO_OFFSET = 0.515; // 0.242 unrestricted
             public static final double RANGE_DEG = 118.0; // 160
             public static final double HEADING_OFFSET_DEG = 170.0; // robot front to turret zero
-            public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
-            // MotionMagicExpo dynamic limits (rotor rotations/sec, /sec^2)
-            // Tuned via physics sim: 2x faster settling than old PosDutyCycle, 0.3° overshoot
+            public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
+            // MotionMagic trapezoidal profile limits (rotor rotations/sec, /sec^2, /sec^3)
+            // Tuned via physics sim: 2.2x faster settling, 0.02° overshoot, lowest energy
             public static final double MAX_VELOCITY = 100.0;   // rotor rot/s (~600 deg/s mechanism)
             public static final double MAX_ACCEL = 400.0;      // rotor rot/s^2
 
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
-                // Gains in Voltage (not DutyCycle): kP_V ≈ old_kP_DC * 12
+                // Gains in Voltage: kP_V ≈ old_kP_DC * 12
                 "kP", 0.72,
                 "kD", 0.005,
                 "kS", 0.06,
-                "kV", 0.096
+                "kV", 0.124     // velocity feedforward: 12V / 96.67 RPS (Kraken X60)
             ));
             static {
-                // Exponential profile parameters (V·s/rot and V·s²/rot, rotor units)
-                config.put("MotionMagicExpo_kV", 0.096);  // 12V / 125.5 RPS
-                config.put("MotionMagicExpo_kA", 0.005);  // small = fast response
+                // Trapezoidal profile config (used by MotionMagic firmware)
+                config.put("MotionMagicCruiseVelocity", MAX_VELOCITY);
+                config.put("MotionMagicAcceleration", MAX_ACCEL);
+                config.put("MotionMagicJerk", 0.0);  // 0 = unlimited = pure trapezoidal
 
                 config.put("forwardLimitEnabled", true);
                 config.put("forwardLimitRotations",
@@ -337,6 +339,36 @@ public final class Constants {
                 config.put("statorCurrentLimit", 30.0);
                 config.put("statorCurrentLimitEnabled", true);
                 config.put("useClosedLoopFFSign", true);
+            }
+
+            // FOC (TorqueCurrentFOC) config — gains in Amps, not Volts
+            // Derived from voltage gains: kP_A = kP_V/R, kD_A = Kv*G/R, kS_A = kS_V/R
+            // Kraken X60: R = 0.0248 Ω, Kv = 0.124 V·s/rot
+            public static final Map<String, Object> configFOC = new HashMap<>(Map.of(
+                "motorId", 53,
+                "kP", 29.0,    // 0.72 V / 0.0248 Ω
+                "kD", 5.0,     // Kv * G / R = back-EMF equivalent damping
+                "kS", 2.4      // 0.06 V / 0.0248 Ω
+            ));
+            static {
+                configFOC.put("MotionMagicCruiseVelocity", MAX_VELOCITY);
+                configFOC.put("MotionMagicAcceleration", MAX_ACCEL);
+                configFOC.put("MotionMagicJerk", 0.0);
+
+                configFOC.put("forwardLimitEnabled", true);
+                configFOC.put("forwardLimitRotations",
+                    Conversions.degreesToRotations(RANGE_DEG, GEAR_RATIO));
+                configFOC.put("reverseLimitEnabled", true);
+                configFOC.put("reverseLimitRotations",
+                    Conversions.degreesToRotations(-RANGE_DEG, GEAR_RATIO));
+
+                configFOC.put("neutralMode", Constants.NeutralMode.BRAKE);
+                configFOC.put("inverted", false);
+                configFOC.put("supplyCurrentLimit", 30.0);
+                configFOC.put("supplyCurrentLimitEnabled", true);
+                configFOC.put("statorCurrentLimit", 30.0);
+                configFOC.put("statorCurrentLimitEnabled", true);
+                configFOC.put("useClosedLoopFFSign", true);
             }
         }
 
