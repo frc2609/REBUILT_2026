@@ -211,7 +211,7 @@ public final class Constants {
             1.225,   // air density
             0.376,    // exit height (m), floor to where the ball leaves the shooter
             0.0762,  // flywheel diameter, 0.0762
-            1.83,    // target height (m), from game manual
+            1.95,    // target height (m), from game manual
             0.85,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
             68.0,    // launch angle from horizontal
             0.001,   // sim timestep

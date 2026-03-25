@@ -52,7 +52,7 @@ public class AutoAimTurret extends Command {
     @Override
     public void execute() {
         Pose2d robotPose = swerve.getPose();
-        Pose2d turretPose = robotPose.plus(new Transform2d(-0.144, -0.177, robotPose.getRotation()));
+        Pose2d turretPose = robotPose.plus(new Transform2d(-0.144, -0.165, robotPose.getRotation()));
 
         Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
         if (Constants.currentMode == Mode.SIM) { alliance = Alliance.Blue; }
