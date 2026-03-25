@@ -96,7 +96,7 @@ public class RobotContainer {
     public final IntakeSubsystem intakeSubsystem;
     public final DriveSubsystem driveSubsystem;
     public final FeedSubsystem feedSubsystem;
-    public final ClimberSubsystem climberSubsystem;
+    // public final ClimberSubsystem climberSubsystem;
     public final LedSubsystem ledSubsystem; boolean hasRun;
 
     private final AutoAimTurret autoAimCommand;
@@ -107,8 +107,8 @@ public class RobotContainer {
     private SetIntakeSpeedRPS startRollerCommand;
     private AutoPushIntake autoIntakePushCommand;
 
-    private SlewRateLimiter filterX = new SlewRateLimiter(3.0);
-    private SlewRateLimiter filterY = new SlewRateLimiter(3.0);            
+    // private SlewRateLimiter filterX = new SlewRateLimiter(3.0);
+    // private SlewRateLimiter filterY = new SlewRateLimiter(3.0);            
                 
     public RobotContainer() {
         turretSubsystem = robotFactory.getTurretSubsystem();
@@ -116,7 +116,7 @@ public class RobotContainer {
         intakeSubsystem = robotFactory.getIntakeSubsystem();
         driveSubsystem = robotFactory.getDriveSubsystem();
         feedSubsystem = robotFactory.getFeedSubsystem();
-        climberSubsystem = robotFactory.getClimberSubsystem();
+        // climberSubsystem = robotFactory.getClimberSubsystem();
         ledSubsystem = new LedSubsystem(Constants.LedConstants.Length,Constants.LedConstants.Port); hasRun = false;
 
         // SOTM Setup
@@ -154,7 +154,7 @@ public class RobotContainer {
         intakeSubsystem.setEncoderInvert(true);
 
             
-        climberSubsystem.resetPositionToAbsolute();
+        // climberSubsystem.resetPositionToAbsolute();
         intakeSubsystem.zeroCurrentDeployPosition(); //TEMP
         //intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);

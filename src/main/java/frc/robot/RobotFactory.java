@@ -4,7 +4,6 @@ import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -35,7 +34,7 @@ public class RobotFactory {
     private final DriveSubsystem driveSubsystem;
     private final VisionSubsystem visionSubsystem;
     private final FeedSubsystem feedSubsystem;
-    private final ClimberSubsystem climberSubsystem;
+    //private final ClimberSubsystem climberSubsystem;
 
     private final Mode currentMode;
 
@@ -57,9 +56,9 @@ public class RobotFactory {
         intakeSubsystem = new IntakeSubsystem(
             buildIntakeEncoderIO(), buildIntakeDeployIO(), buildIntakeRollerIO()
         );
-        climberSubsystem = new ClimberSubsystem(
-            buildClimberEncoderIO(), buildClimberMotorIO()
-        );
+        // climberSubsystem = new ClimberSubsystem(
+        //     buildClimberEncoderIO(), buildClimberMotorIO()
+        // );
         feedSubsystem = new FeedSubsystem(
             buildAgitatorIO(), buildFeedIO()
         );
@@ -67,38 +66,38 @@ public class RobotFactory {
 
     // CLIMBER
 
-    public ClimberSubsystem getClimberSubsystem() {
-        return this.climberSubsystem;
-    }
+    // public ClimberSubsystem getClimberSubsystem() {
+    //     return this.climberSubsystem;
+    // }
 
-    private AbsEncoderIO buildClimberEncoderIO() {
-        if (currentMode == Mode.SIM) {
-            return new SimAbsEncoderIO(0);
-        }
+    // private AbsEncoderIO buildClimberEncoderIO() {
+    //     if (currentMode == Mode.SIM) {
+    //         return new SimAbsEncoderIO(0);
+    //     }
 
-        return new WpiDutyCycleEncoderIO(Constants.Climber.EncoderChannel);
-    }
+    //     return new WpiDutyCycleEncoderIO(Constants.Climber.EncoderChannel);
+    // }
 
-    private PositionMotorIO buildClimberMotorIO() {
-        if (currentMode == Mode.SIM) {
-            return new SimPositionMotorIO(
-                Constants.Climber.config,
-                Constants.Climber.INERTIA,
-                Constants.Climber.GEAR_RATIO,
-                Constants.Climber.ENCODER_RATIO, 
-                Constants.Climber.SIM_MOTOR, 
-                Constants.SIM_DELTA);
-        }
-        switch (Constants.CLIMBER_POSITION_MOTOR_TYPE) {
-            case CTRE_TALON_FX:
-                return new CtreTalonFxPositionIO(
-                    Constants.Climber.config,
-                    Constants.Climber.GEAR_RATIO,
-                    Constants.Climber.ENCODER_RATIO);
-            default:
-                throw new IllegalStateException("Unsupported intake deploy motor type");
-        }
-    }
+    // private PositionMotorIO buildClimberMotorIO() {
+    //     if (currentMode == Mode.SIM) {
+    //         return new SimPositionMotorIO(
+    //             Constants.Climber.config,
+    //             Constants.Climber.INERTIA,
+    //             Constants.Climber.GEAR_RATIO,
+    //             Constants.Climber.ENCODER_RATIO, 
+    //             Constants.Climber.SIM_MOTOR, 
+    //             Constants.SIM_DELTA);
+    //     }
+    //     switch (Constants.CLIMBER_POSITION_MOTOR_TYPE) {
+    //         case CTRE_TALON_FX:
+    //             return new CtreTalonFxPositionIO(
+    //                 Constants.Climber.config,
+    //                 Constants.Climber.GEAR_RATIO,
+    //                 Constants.Climber.ENCODER_RATIO);
+    //         default:
+    //             throw new IllegalStateException("Unsupported intake deploy motor type");
+    //     }
+    // }
 
     // FEED / AGITATOR
 
@@ -345,8 +344,8 @@ public class RobotFactory {
             // Limelight needs gyro rotation for MegaTag2 
             return new VisionIO[] {
                 new VisionIOLimelight(Constants.Vision.Left.name, driveSubsystem::getRotation),
-                new VisionIOLimelight(Constants.Vision.Right.name, driveSubsystem::getRotation)
-                //new VisionIOLimelight(Constants.Vision.Front.name, driveSubsystem::getRotation)
+                new VisionIOLimelight(Constants.Vision.Right.name, driveSubsystem::getRotation),
+                new VisionIOLimelight(Constants.Vision.Front.name, driveSubsystem::getRotation)
             };
         default:
             throw new IllegalStateException("Unsupported mode");
