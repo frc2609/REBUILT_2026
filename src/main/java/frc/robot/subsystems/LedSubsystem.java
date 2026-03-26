@@ -4,56 +4,52 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.io.motor.PositionMotorIO;
-import frc.robot.Constants;
-import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 
-/** Shooter Subsystem using velocity control (rotations per second). */
 public class LedSubsystem extends SubsystemBase {
-    private final int LedLength;
-    private final AddressableLED Led;
+    private final int ledLength;
+    private final AddressableLED led;
     private final AddressableLEDBuffer ledBuffer;
     public final Timer deployedWait = new Timer();
-    private boolean LedFree = false;
+    private boolean ledFree = false;
 
-    public LedSubsystem(int LedLength, int LedPort) {
-        Led = new AddressableLED(LedPort);
-        ledBuffer = new AddressableLEDBuffer(LedLength);
-        this.LedLength = LedLength;
+    public LedSubsystem(int ledLength, int ledPort) {
+        led = new AddressableLED(ledPort);
+        ledBuffer = new AddressableLEDBuffer(ledLength);
+        this.ledLength = ledLength;
 
         //sets a default pettern, to make it easier to detect full deploy
-        for (int i=0;i<LedLength;i++) {
+        for (int i=0;i<ledLength;i++) {
           ledBuffer.setHSV(i,0,255,10);
         }
 
-        Led.setLength(LedLength);
-        Led.setData(ledBuffer);
-        Led.start();
+        led.setLength(ledLength);
+        led.setData(ledBuffer);
+        led.start();
         deployedWait.start();
     }
 
     public void SignalEndDeploy() {
-        for(int i = 0; i<LedLength;i++){
-      ledBuffer.setHSV(i, 60, 255, 10);
-    }
-    Led.setData(ledBuffer);
-    LedFree = true;
+        for(int i = 0; i<ledLength;i++){
+            ledBuffer.setHSV(i, 60, 255, 10);
+        }
+
+        led.setData(ledBuffer);
+        ledFree = true;
     }
 
     public void pattern() {
-        if (!LedFree) {
+        if (!ledFree) {
             return;
         }
-        for(int i=0;i<LedLength;i++) {
+        for(int i=0;i<ledLength;i++) {
             ledBuffer.setHSV(i, 0, 255, 10);
-            Led.setData(ledBuffer);
+            led.setData(ledBuffer);
             ledBuffer.setHSV(i, 0, 0, 0);
         }
         for(int i =0; i>0;i-=1){
             ledBuffer.setHSV(i, 0, 255, 10);
-            Led.setData(ledBuffer);
+            led.setData(ledBuffer);
             ledBuffer.setHSV(i, 0, 0, 0);
         }
     }
-
 }

@@ -9,7 +9,6 @@ package frc.robot;
 
 import java.util.function.Supplier;
 
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,20 +32,16 @@ import frc.robot.commands.SetIntakeSpeedRPS;
 import frc.robot.commands.Shoot;
 import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LedSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FuelPhysicsSim;
-import frc.robot.util.FuelPhysicsSim.PhysicsConfig;
 import frc.robot.util.ProjectileSimulator;
 import frc.robot.util.ShotCalculator;
-import frc.robot.util.ShotLUT;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -70,16 +65,20 @@ public class RobotContainer {
     private final Supplier<Double> pushIntakeAxis = driverController::getLeftTriggerAxis;
     private final Trigger startIntakeTrigger = driverController.a();
     private final Trigger stopIntakeTrigger = driverController.start();
-    private final Trigger zeroEncodersTrigger = driverController.b();
-
+    
     private final Trigger turretOverrideFrontTrigger = driverController.povUp();
     private final Trigger turretOverrideRightTrigger = driverController.povRight();
     private final Trigger turretOverrideLeftTrigger = driverController.povLeft();
     private final Trigger turretAutoAimTrigger = driverController.povDown();
-
+    
     private final Trigger rpmUpTrigger = operatorController.povUp();
     private final Trigger rpmDownTrigger = operatorController.povDown();
+    
+    @SuppressWarnings("unused")
+    private final Trigger zeroEncodersTrigger = driverController.b();
+    @SuppressWarnings("unused")
     private final Trigger aimLeftTrigger = operatorController.povLeft();
+    @SuppressWarnings("unused")
     private final Trigger aimRightTrigger = operatorController.povRight();
 
     // Tuning controls
@@ -97,7 +96,8 @@ public class RobotContainer {
     public final DriveSubsystem driveSubsystem;
     public final FeedSubsystem feedSubsystem;
     // public final ClimberSubsystem climberSubsystem;
-    public final LedSubsystem ledSubsystem; boolean hasRun;
+    public final LedSubsystem ledSubsystem; 
+    public boolean hasRun;
 
     private final AutoAimTurret autoAimCommand;
     private final ShotCalculator shotCalculator;
@@ -117,7 +117,8 @@ public class RobotContainer {
         driveSubsystem = robotFactory.getDriveSubsystem();
         feedSubsystem = robotFactory.getFeedSubsystem();
         // climberSubsystem = robotFactory.getClimberSubsystem();
-        ledSubsystem = new LedSubsystem(Constants.LedConstants.Length,Constants.LedConstants.Port); hasRun = false;
+        ledSubsystem = new LedSubsystem(Constants.LedConstants.Length,Constants.LedConstants.Port); 
+        hasRun = false;
 
         // SOTM Setup
         
