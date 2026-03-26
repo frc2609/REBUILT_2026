@@ -19,10 +19,12 @@ import frc.robot.subsystems.io.encoder.impl.SimAbsEncoderIO;
 import frc.robot.subsystems.io.encoder.impl.WpiDutyCycleEncoderIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
+import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicExpoVoltageIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicTorqueCurrentFOCIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicVoltageIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxVelocityIO;
+import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicExpoVoltageIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicTorqueCurrentFOCIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicVoltageIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimPositionMotorIO;
@@ -213,6 +215,24 @@ public class RobotFactory {
                 }
                 return new CtreTalonDynamicMotionMagicTorqueCurrentFOCIO(
                     Constants.Turret.Aim.configFOC,
+                    Constants.Turret.Aim.GEAR_RATIO,
+                    Constants.Turret.Aim.ENCODER_RATIO,
+                    Constants.Turret.Aim.MAX_VELOCITY,
+                    Constants.Turret.Aim.MAX_ACCEL);
+            case CTRE_TALON_FX_EXPO:
+                if (currentMode == Mode.SIM) {
+                    return new SimDynamicMotionMagicExpoVoltageIO(
+                        Constants.Turret.Aim.config,
+                        Constants.Turret.Aim.INERTIA,
+                        Constants.Turret.Aim.GEAR_RATIO,
+                        Constants.Turret.Aim.ENCODER_RATIO,
+                        Constants.Turret.Aim.SIM_MOTOR,
+                        Constants.SIM_DELTA,
+                        Constants.Turret.Aim.MAX_VELOCITY,
+                        Constants.Turret.Aim.MAX_ACCEL);
+                }
+                return new CtreTalonDynamicMotionMagicExpoVoltageIO(
+                    Constants.Turret.Aim.config,
                     Constants.Turret.Aim.GEAR_RATIO,
                     Constants.Turret.Aim.ENCODER_RATIO,
                     Constants.Turret.Aim.MAX_VELOCITY,

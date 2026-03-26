@@ -56,6 +56,7 @@ public final class Constants {
     public enum PositionMotorType {
         CTRE_TALON_FX,
         CTRE_TALON_FX_FOC,
+        CTRE_TALON_FX_EXPO,
         REV_SPARK_MAX,
         SIM
     }
