@@ -47,8 +47,8 @@ public class AutoShoot extends Command {
         Logger.recordOutput("flywheelReady", flywheel.isAtSpeed());
 
         if (flywheel.validShotDetected() && flywheel.isAtSpeed()) {
-            agitator.setAgitatorSpeed(agitatorRPS);
-            agitator.setFeedSpeed(feedRPS);
+            agitator.setAgitatorSpeed();
+            agitator.setFeedSpeed();
 
             // if (flywheel.isAtSpeed(1.0)) // coast or brake feed to not shoot
 

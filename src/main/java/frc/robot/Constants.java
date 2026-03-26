@@ -154,7 +154,7 @@ public final class Constants {
     public static final class Controls {
         public static final int DRIVER_CONTROLLER_PORT = 0;
         public static final int OPERATOR_CONTROLLER_PORT = 1;
-        public static final double SHOOTING_SPEED_PERCENT = 0.3;
+        public static final double SHOOTING_SPEED_PERCENT = 0.1;
         public static final double UNJAM_FACTOR = 10.0; // kP multiplier when unjamming
 
         public static final double TURRET_READY_TOLERANCE = 4.0; // deg
@@ -178,8 +178,8 @@ public final class Constants {
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
         public static final double TURRET_OVERRIDE_LEFT_DEG = -90.0;
 
-        public static final double AGITATOR_HOLD_RPM = 1600.0;
-        public static final double FEED_HOLD_RPM = 4000.0; // max speed
+        public static final double AGITATOR_HOLD_RPM = 2000.0;
+        public static final double FEED_HOLD_RPM = 5000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
         public static final double LOB_DISTANCE = 2.0;

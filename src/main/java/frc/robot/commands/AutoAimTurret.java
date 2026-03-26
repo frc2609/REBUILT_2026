@@ -129,7 +129,7 @@ public class AutoAimTurret extends Command {
                 kVTarget.get()*shot.driveAngularVelocityRadPerSec()
             );
         } else {
-            turret.setAimPosition(0.0);
+            //turret.setAimPosition(0.0);
         }
 
         if (validShot && turretInLimits) {

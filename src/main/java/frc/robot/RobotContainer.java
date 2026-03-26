@@ -291,7 +291,7 @@ public class RobotContainer {
 
         // Tuning commands
 
-        feedSubsystem.setSetpoints(Constants.Controls.FEED_HOLD_RPM,Constants.Controls.AGITATOR_HOLD_RPM);
+        feedSubsystem.setSetpoints(Constants.Controls.AGITATOR_HOLD_RPM,Constants.Controls.FEED_HOLD_RPM);
         flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOB_RPM);
         // intakeSubsystem.setDeploySetpoint(0);
         // holdAgitatorTrigger.whileTrue(Commands.runEnd(feedSubsystem::setAgitatorSpeed,feedSubsystem::stop,feedSubsystem));

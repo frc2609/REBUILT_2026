@@ -3,12 +3,12 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 4.0,
+        "x_meters": 3.9,
         "y_meters": 0.7,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
-        "rotation_radians": 3.141592653589793,
+        "rotation_radians": 0.0,
         "profiled_rotation": true
       }
     },
@@ -16,11 +16,11 @@
       "type": "waypoint",
       "translation_target": {
         "x_meters": 5.539007208472438,
-        "y_meters": 0.6110288535858572,
+        "y_meters": 0.511,
         "intermediate_handoff_radius_meters": 0.1
       },
       "rotation_target": {
-        "rotation_radians": 2.792526803190927,
+        "rotation_radians": 0.3490658503988659,
         "profiled_rotation": true
       }
     },
@@ -39,8 +39,8 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 5.70928712003113,
-        "y_meters": 3.5571410553690495,
+        "x_meters": 5.861900648457647,
+        "y_meters": 3.5740981140831076,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
@@ -51,30 +51,30 @@
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 6.085401514827231,
-        "y_meters": 0.6335211612781606,
+        "x_meters": 5.6784321056898515,
+        "y_meters": 0.6674352787062752,
         "intermediate_handoff_radius_meters": 0.2
       },
       "rotation_target": {
-        "rotation_radians": 3.141592653589793,
+        "rotation_radians": 0.0,
         "profiled_rotation": true
       }
     },
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 4.0,
-        "y_meters": 0.7,
+        "x_meters": 3.8999999999999995,
+        "y_meters": 0.8356564697124593,
         "intermediate_handoff_radius_meters": 0.3
       },
       "rotation_target": {
-        "rotation_radians": 3.141592653589793,
+        "rotation_radians": 0.0,
         "profiled_rotation": true
       }
     }
   ],
   "constraints": {
-    "end_translation_tolerance_meters": 0.3,
+    "end_translation_tolerance_meters": 0.1,
     "end_rotation_tolerance_deg": 4.0
   }
 }
