@@ -345,11 +345,10 @@ public class RobotContainer {
     }
 
     public void disabledPeriodic() {
-    if (!hasRun && ledSubsystem.deployedWait.get() > 5 ) {
-      ledSubsystem.SignalEndDeploy();
-      hasRun = true;
-    };
-
-    ledSubsystem.pattern();// not tested
-  }
+        if (!hasRun && ledSubsystem.deployedWait.get() > 5 ) {
+            ledSubsystem.SignalEndDeploy();
+            hasRun = true;
+        };
+        ledSubsystem.pattern();// not tested
+    }
 }
