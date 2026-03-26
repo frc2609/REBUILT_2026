@@ -448,7 +448,7 @@ public class ShotCalculator {
 
     // Heading error for confidence calculation
     double headingErrorRad = MathUtil.angleModulus(driveAngle.getRadians() - inputs.launcherHeading());
-    Logger.recordOutput("HeadingError", headingErrorRad);
+    Logger.recordOutput("SOTM/HeadingError", headingErrorRad);
 
     // Angular velocity feedforward: rate of change of aim angle
     double driveAngularVelocity = 0;
@@ -457,7 +457,7 @@ public class ShotCalculator {
       double tangentialVel = (ry * vx - rx * vy) / distance;
       driveAngularVelocity = tangentialVel / distance;
     }
-    Logger.recordOutput("FF", driveAngularVelocity);
+    Logger.recordOutput("SOTM/FeedForward", driveAngularVelocity);
 
     // Solver convergence quality
     double solverQuality;

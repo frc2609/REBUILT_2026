@@ -39,17 +39,11 @@ public class AutoShoot extends Command {
 
     @Override
     public void execute() {
-        //System.out.println("SHOOTING>"+flywheel.validShotDetected())
-
         flywheel.useAutoSpeed();
-
-        //Logger.recordOutput("turretReady", turretInPose.get());
 
         if (flywheel.validShotDetected() && flywheel.isAtSpeed()) {
             agitator.setAgitatorSpeed();
             agitator.setFeedSpeed();
-
-            // if (flywheel.isAtSpeed(1.0)) // coast or brake feed to not shoot
 
             if (Constants.currentMode == Constants.Mode.SIM) {
                 if (i%4 == 0) {

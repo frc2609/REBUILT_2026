@@ -226,7 +226,7 @@ public final class Constants {
     static {
         shotConfig.launcherOffsetX = -0.189;  // how far forward the launcher is from robot center (m)
         shotConfig.launcherOffsetY = -0.144;   // how far left, 0 if centered
-        shotConfig.shooterAngleOffsetRad = Math.PI;
+        //shotConfig.shooterAngleOffsetRad = Math.PI; // use LoggedNetworkNumber SOTM/HeadingOffset instead
         shotConfig.phaseDelayMs = 30.0;     // your vision pipeline latency
         shotConfig.mechLatencyMs = 20.0;    // how long the mechanism takes to respond
         shotConfig.maxTiltDeg = 5.0;        // suppress firing when chassis tilts past this (bumps/ramps)
@@ -309,7 +309,7 @@ public final class Constants {
             public static final double ENCODER_RATIO = 1.0;
             public static final double ZERO_OFFSET = 0.515; // 0.242 unrestricted
             public static final double RANGE_DEG = 118.0; // 160
-            public static final double HEADING_OFFSET_DEG = 170.0; // robot front to turret zero
+            public static final double HEADING_OFFSET_DEG = 180.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
             // MotionMagic trapezoidal profile limits (rotor rotations/sec, /sec^2, /sec^3)
             // Tuned via physics sim: 2.2x faster settling, 0.02° overshoot, lowest energy

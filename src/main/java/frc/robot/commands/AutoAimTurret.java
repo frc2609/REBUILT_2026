@@ -36,15 +36,16 @@ public class AutoAimTurret extends Command {
 
     public AutoAimTurret(
         DriveSubsystem swerve, TurretSubsystem turret,
-        FlywheelSubsystem flywheel, ShotCalculator shotCalc
+        FlywheelSubsystem flywheel, ShotCalculator shotCalc,
+        LoggedNetworkNumber headingOffset
     ) {
         this.turret = turret;
         this.swerve = swerve;
         this.flywheel = flywheel;
         this.shotCalc = shotCalc;
+        this.headingOffset = headingOffset;
 
-        kVTarget = new LoggedNetworkNumber("SOTM/turretAimkV", -0.7);
-        headingOffset = new LoggedNetworkNumber("SOTM/headingOffset",180.0);
+        kVTarget = new LoggedNetworkNumber("/Tuning/SOTM/turretAimkV", -0.7);
 
         addRequirements(turret);
     }
@@ -102,9 +103,15 @@ public class AutoAimTurret extends Command {
             swerve.getRotation()
         );
 
+        // do not count trim when calculating heading error
+        Rotation2d trimlessTurretAim = Rotation2d.fromDegrees(turret.getAimPosition())
+                .plus(Rotation2d.fromDegrees(headingOffset.getAsDouble()))
+                .plus(swerve.getRotation());
+
+        // do use it when displaying turret
         Rotation2d fieldTurretAim = Rotation2d.fromDegrees(turret.getAimPosition())
-                .plus(swerve.getRotation())
-                .plus(Rotation2d.fromDegrees(headingOffset.get()));
+                .plus(Rotation2d.fromDegrees(180.0))
+                .plus(swerve.getRotation());
 
         ShotCalculator.ShotInputs inputs = new ShotCalculator.ShotInputs(
             swerve.getPose(),
@@ -113,7 +120,7 @@ public class AutoAimTurret extends Command {
             target, 
             targetForward,
             0.9, // vision confidence, 0 to 1
-            fieldTurretAim.getRadians()
+            trimlessTurretAim.getRadians()
         );
 
         ShotCalculator.LaunchParameters shot = shotCalc.calculate(inputs);
