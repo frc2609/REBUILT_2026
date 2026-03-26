@@ -11,6 +11,8 @@ import static frc.robot.Constants.Vision.*;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,6 +33,8 @@ public class VisionSubsystem extends SubsystemBase {
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
+  private final Debouncer targetDebouncer = new Debouncer(0.3, DebounceType.kFalling);
+  private boolean anyTargetDebounced = false;
 
   public VisionSubsystem(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -58,6 +62,10 @@ public class VisionSubsystem extends SubsystemBase {
    */
   public Rotation2d getTargetX(int cameraIndex) {
     return inputs[cameraIndex].latestTargetObservation.tx();
+  }
+
+  public boolean hasAnyTarget() {
+    return anyTargetDebounced;
   }
 
   @Override
@@ -160,6 +168,13 @@ public class VisionSubsystem extends SubsystemBase {
       allRobotPosesAccepted.addAll(robotPosesAccepted);
       allRobotPosesRejected.addAll(robotPosesRejected);
     }
+
+    // Update debounced target flag
+    boolean rawHasTarget = false;
+    for (var cameraInputs : inputs) {
+      if (cameraInputs.tagIds.length > 0) { rawHasTarget = true; break; }
+    }
+    anyTargetDebounced = targetDebouncer.calculate(rawHasTarget);
 
     // Log summary data
     Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
