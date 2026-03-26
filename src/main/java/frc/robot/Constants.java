@@ -456,7 +456,7 @@ public final class Constants {
 
             // Homing: drive past the deployed hard stop until current spikes, then zero there
             public static final double HOME_TARGET_DEG = -30.0;
-            public static final double HOME_CURRENT_THRESHOLD_AMPS = 20.0;
+            public static final double HOME_CURRENT_THRESHOLD_AMPS = 50.0;
             public static final int    HOME_CONFIRM_CYCLES = 3;
             
             // NOTE: Cuts off at 10 key-value pairs
