@@ -178,7 +178,7 @@ public final class Constants {
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
         public static final double TURRET_OVERRIDE_LEFT_DEG = -90.0;
 
-        public static final double AGITATOR_HOLD_RPM = 2000.0;
+        public static final double AGITATOR_HOLD_RPM = 5000.0;
         public static final double FEED_HOLD_RPM = 5000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
