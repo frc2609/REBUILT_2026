@@ -86,7 +86,7 @@ public class CtreTalonDynamicMotionMagicVoltageIO extends CtreTalonFxIO implemen
 
     @Override
     public void setTargetPositionDegrees(double degrees) {
-        setTargetPositionDegrees(degrees, 0.0);
+        setTargetPositionDegrees(degrees, 0.0); // TODO: tune in ff based on gyro angular velocity
     }
 
     @Override
