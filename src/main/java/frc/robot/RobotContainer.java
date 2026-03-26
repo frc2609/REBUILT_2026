@@ -35,6 +35,7 @@ import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LedSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FuelPhysicsSim;
 import frc.robot.util.ProjectileSimulator;
@@ -97,6 +98,7 @@ public class RobotContainer {
     public final FeedSubsystem feedSubsystem;
     // public final ClimberSubsystem climberSubsystem;
     public final LedSubsystem ledSubsystem;
+    public final VisionSubsystem visionSubsystem;
     private boolean hasRun;
 
     private final AutoAimTurret autoAimCommand;
@@ -116,8 +118,34 @@ public class RobotContainer {
         intakeSubsystem = robotFactory.getIntakeSubsystem();
         driveSubsystem = robotFactory.getDriveSubsystem();
         feedSubsystem = robotFactory.getFeedSubsystem();
+        visionSubsystem = robotFactory.getVisionSubsystem();
         // climberSubsystem = robotFactory.getClimberSubsystem();
-        ledSubsystem = new LedSubsystem(Constants.LedConstants.Length,Constants.LedConstants.Port); 
+        int quarter = Constants.LedConstants.Length / 4;
+        ledSubsystem = new LedSubsystem(
+            Constants.LedConstants.Length,
+            Constants.LedConstants.Port,
+            
+            // Zone 0 — intake rollers running: solid yellow
+            LedSubsystem.PatternEntry.entry(
+                intakeSubsystem::isRollerRunning,
+                0, quarter,
+                LedSubsystem.LedPattern.solid(30, 255, 50)),
+            // Zone 1 — feed/indexer running: solid cyan
+            LedSubsystem.PatternEntry.entry(
+                feedSubsystem::isFeedRunning,
+                quarter, quarter,
+                LedSubsystem.LedPattern.solid(90, 255, 50)),
+            // Zone 2 — no april tags seen: solid red
+            LedSubsystem.PatternEntry.entry(
+                () -> !visionSubsystem.hasAnyTarget(),
+                quarter * 2, quarter,
+                LedSubsystem.LedPattern.solid(0, 255, 50)),
+            // Zone 3 — valid shot detected: blink white
+            LedSubsystem.PatternEntry.entry(
+                flywheelSubsystem::validShotDetected,
+                quarter * 3, quarter,
+                LedSubsystem.LedPattern.blink(0, 0, 100, 5))
+        );
         hasRun = false;
 
         // SOTM Setup
@@ -349,6 +377,6 @@ public class RobotContainer {
             ledSubsystem.signalEndDeploy();
             hasRun = true;
         }
-        ledSubsystem.pattern();
+        ledSubsystem.updateDisabled();
     }
 }
