@@ -121,16 +121,16 @@ public class LedSubsystem extends SubsystemBase {
         }
 
         for (int i = 0; i < ledLength; i++) {
-            ledBuffer.setHSV(i, 0, 0, 0);
+            ledBuffer.setHSV(i, 120, 200, 28);
         }
 
         int totalSteps = ledLength * 2;
         int t = animStep % totalSteps;
         int pixel = t < ledLength ? t : totalSteps - 1 - t;
-        for (int offset = -1; offset <= 1; offset++) {
+        for (int offset = 0; offset < 2; offset++) {
             int p = pixel + offset;
             if (p >= 0 && p < ledLength) {
-                ledBuffer.setHSV(p, 0, 255, 10);
+                ledBuffer.setHSV(p, 30, 255, 255);
             }
         }
 
