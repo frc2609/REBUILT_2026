@@ -35,7 +35,7 @@ public class CtreTalonFxIO {
     public int followerId = -1;
     public boolean hasFollower = false;
 
-    public LoggedNetworkNumber measuredLogged, setpointLogged, voltageLogged, statorLogged;
+    public LoggedNetworkNumber measuredLogged, setpointLogged, voltageLogged, statorLogged, errorLogged;
 
     public String NTPath;
     private ArrayList<LoggedNetworkNumber> tunables;
@@ -158,6 +158,7 @@ public class CtreTalonFxIO {
         setpointLogged = new LoggedNetworkNumber(NTPath+"/Setpoint");
         voltageLogged = new LoggedNetworkNumber(NTPath+"/PID Output (V)");
         statorLogged = new LoggedNetworkNumber(NTPath+"/Stator Current (A)");
+        errorLogged = new LoggedNetworkNumber(NTPath+"/Error (RPM)");
     }
 
     private static com.ctre.phoenix6.signals.NeutralModeValue toPhoenixNeutralMode(

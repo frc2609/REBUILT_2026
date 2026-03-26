@@ -60,6 +60,7 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
         measuredLogged.set(getVelocityRps()*60.0);
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
         statorLogged.set(getStatorCurrent());
+        errorLogged.set(motor.getClosedLoopError().getValueAsDouble()*60.0);
     }
 
     @Override
