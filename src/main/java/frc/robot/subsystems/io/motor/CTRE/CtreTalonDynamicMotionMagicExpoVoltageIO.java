@@ -30,6 +30,7 @@ public class CtreTalonDynamicMotionMagicExpoVoltageIO extends CtreTalonFxIO impl
 
     private final LoggedNetworkNumber absRotationsLogged;
     public final LoggedNetworkNumber rotationsLogged;
+    private final LoggedNetworkNumber positionErrorLogged;
 
     /**
      * @param cfg         Motor config map (must include MotionMagicExpo_kV, MotionMagicExpo_kA)
@@ -50,6 +51,7 @@ public class CtreTalonDynamicMotionMagicExpoVoltageIO extends CtreTalonFxIO impl
 
         absRotationsLogged = new LoggedNetworkNumber(NTPath + "/AbsRotations");
         rotationsLogged = new LoggedNetworkNumber(NTPath + "/Rotations");
+        positionErrorLogged = new LoggedNetworkNumber(NTPath + "/Error (deg)");
 
         this.gearRatio = gearRatio;
 
@@ -118,6 +120,7 @@ public class CtreTalonDynamicMotionMagicExpoVoltageIO extends CtreTalonFxIO impl
         rotationsLogged.set(motor.getPosition().getValueAsDouble());
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
         statorLogged.set(motor.getStatorCurrent().getValueAsDouble());
+        positionErrorLogged.set(Conversions.rotationsToDegrees(motor.getClosedLoopError().getValueAsDouble(), gearRatio));
     }
 
     @Override
@@ -127,6 +130,7 @@ public class CtreTalonDynamicMotionMagicExpoVoltageIO extends CtreTalonFxIO impl
         rotationsLogged.set(motor.getPosition().getValueAsDouble());
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
         statorLogged.set(motor.getStatorCurrent().getValueAsDouble());
+        positionErrorLogged.set(Conversions.rotationsToDegrees(motor.getClosedLoopError().getValueAsDouble(), gearRatio));
     }
 
     @Override

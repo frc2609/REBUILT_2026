@@ -55,6 +55,7 @@ public final class Constants {
 
     public enum PositionMotorType {
         CTRE_TALON_FX,
+        CTRE_TALON_FX_MM,
         CTRE_TALON_FX_FOC,
         CTRE_TALON_FX_EXPO,
         REV_SPARK_MAX,
@@ -108,7 +109,7 @@ public final class Constants {
     public static final PositionMotorType CLIMBER_POSITION_MOTOR_TYPE =
         PositionMotorType.CTRE_TALON_FX;
     public static final PositionMotorType TURRET_AIM_POSITION_MOTOR_TYPE =
-        PositionMotorType.CTRE_TALON_FX;
+        PositionMotorType.CTRE_TALON_FX_MM;
     public static final PositionMotorType TURRET_HOOD_POSITION_MOTOR_TYPE =
         PositionMotorType.CTRE_TALON_FX;
 
@@ -325,6 +326,9 @@ public final class Constants {
                 config.put("MotionMagicCruiseVelocity", MAX_VELOCITY);
                 config.put("MotionMagicAcceleration", MAX_ACCEL);
                 config.put("MotionMagicJerk", 0.0);  // 0 = unlimited = pure trapezoidal
+                // Expo profile shape params (only used by DynamicMotionMagicExpoVoltage)
+                config.put("MotionMagicExpo_kV", 0.124); // matches Slot0 kV (12V / 96.67 RPS)
+                config.put("MotionMagicExpo_kA", 0.01);  // start low, tune up if response is sluggish
 
                 config.put("forwardLimitEnabled", true);
                 config.put("forwardLimitRotations",

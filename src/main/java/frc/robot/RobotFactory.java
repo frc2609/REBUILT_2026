@@ -184,6 +184,11 @@ public class RobotFactory {
     private PositionMotorIO buildTurretAimIO() {
         switch (Constants.TURRET_AIM_POSITION_MOTOR_TYPE) {
             case CTRE_TALON_FX:
+                return new CtreTalonFxPositionIO(
+                    Constants.Turret.Aim.config,
+                    Constants.Turret.Aim.GEAR_RATIO,
+                    Constants.Turret.Aim.ENCODER_RATIO);
+            case CTRE_TALON_FX_MM:
                 if (currentMode == Mode.SIM) {
                     return new SimDynamicMotionMagicVoltageIO(
                         Constants.Turret.Aim.config,
