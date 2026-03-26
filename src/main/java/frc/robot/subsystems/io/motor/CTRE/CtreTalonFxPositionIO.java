@@ -26,6 +26,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
 
     private final LoggedNetworkNumber absRotationsLogged;
     public final LoggedNetworkNumber rotationsLogged;
+    private final LoggedNetworkNumber positionErrorLogged;
 
     public CtreTalonFxPositionIO(Map<String, Object> cfg, double gearRatio, double encoderRatio) {
         super(cfg);
@@ -37,6 +38,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
 
         absRotationsLogged = new LoggedNetworkNumber(NTPath+"/AbsRotations");
         rotationsLogged = new LoggedNetworkNumber(NTPath+"/Rotations");
+        positionErrorLogged = new LoggedNetworkNumber(NTPath+"/Error (deg)");
 
         this.gearRatio = gearRatio;
     }
@@ -104,6 +106,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         rotationsLogged.set(motor.getPosition().getValueAsDouble());
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
         statorLogged.set(motor.getStatorCurrent().getValueAsDouble());
+        positionErrorLogged.set(Conversions.rotationsToDegrees(motor.getClosedLoopError().getValueAsDouble(), gearRatio));
     }
 
     @Override
@@ -113,6 +116,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         rotationsLogged.set(motor.getPosition().getValueAsDouble());
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
         statorLogged.set(motor.getStatorCurrent().getValueAsDouble());
+        positionErrorLogged.set(Conversions.rotationsToDegrees(motor.getClosedLoopError().getValueAsDouble(), gearRatio));
     }
 
 
