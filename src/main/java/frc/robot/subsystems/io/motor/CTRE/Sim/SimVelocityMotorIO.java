@@ -92,7 +92,6 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
 
     @Override
     public void stop() {
-        set(0.0);
         setVelocityRps(0.0);
         motor.stopMotor();
     }

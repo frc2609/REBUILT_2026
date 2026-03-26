@@ -161,7 +161,7 @@ public final class Constants {
         public static final double UNJAM_FACTOR = 10.0; // kP multiplier when unjamming
 
         public static final double TURRET_READY_TOLERANCE = 4.0; // deg
-        public static final double FLYWHEEL_TOLERANCE_RPM = 50.0; // rpm
+        public static final double FLYWHEEL_TOLERANCE_RPM = 100.0; // rpm
 
         // Rotation values are OUTPUT degrees
         // RPM values are INPUT RPM, will be geared down

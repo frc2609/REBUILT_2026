@@ -43,10 +43,9 @@ public class AutoShoot extends Command {
 
         flywheel.useAutoSpeed();
 
-        Logger.recordOutput("turretReady", turretInPose.get());
-        Logger.recordOutput("flywheelReady", flywheel.isAtSpeed());
+        //Logger.recordOutput("turretReady", turretInPose.get());
 
-        if (flywheel.validShotDetected()) {
+        if (flywheel.validShotDetected() && flywheel.isAtSpeed()) {
             agitator.setAgitatorSpeed();
             agitator.setFeedSpeed();
 
