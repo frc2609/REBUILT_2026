@@ -121,7 +121,7 @@ public class AutoAimTurret extends Command {
         turretPose = new Pose2d(turretPose.getTranslation(), fieldTurretAim);
 
         turretInLimits = Math.abs(turretAngleDeg) <= (Constants.Turret.Aim.RANGE_DEG);
-        validShot = shot.isValid() && (shot.confidence() > 50.0);
+        validShot = shot.isValid();
 
         if (turretInLimits) {
             turret.setAimPositionFF(
