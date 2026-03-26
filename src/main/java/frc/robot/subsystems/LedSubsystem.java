@@ -9,17 +9,17 @@ public class LedSubsystem extends SubsystemBase {
     private final int ledLength;
     private final AddressableLED led;
     private final AddressableLEDBuffer ledBuffer;
-    public final Timer deployedWait = new Timer();
+    private final Timer deployedWait = new Timer();
     private boolean ledFree = false;
+    private int animStep = 0;
 
     public LedSubsystem(int ledLength, int ledPort) {
         led = new AddressableLED(ledPort);
         ledBuffer = new AddressableLEDBuffer(ledLength);
         this.ledLength = ledLength;
 
-        //sets a default pettern, to make it easier to detect full deploy
-        for (int i=0;i<ledLength;i++) {
-          ledBuffer.setHSV(i,0,255,10);
+        for (int i = 0; i < ledLength; i++) {
+            ledBuffer.setHSV(i, 0, 255, 10);
         }
 
         led.setLength(ledLength);
@@ -28,11 +28,14 @@ public class LedSubsystem extends SubsystemBase {
         deployedWait.start();
     }
 
-    public void SignalEndDeploy() {
-        for(int i = 0; i<ledLength;i++){
+    public boolean isDeployComplete() {
+        return deployedWait.get() > 5;
+    }
+
+    public void signalEndDeploy() {
+        for (int i = 0; i < ledLength; i++) {
             ledBuffer.setHSV(i, 60, 255, 10);
         }
-
         led.setData(ledBuffer);
         ledFree = true;
     }
@@ -41,15 +44,18 @@ public class LedSubsystem extends SubsystemBase {
         if (!ledFree) {
             return;
         }
-        for(int i=0;i<ledLength;i++) {
-            ledBuffer.setHSV(i, 0, 255, 10);
-            led.setData(ledBuffer);
+
+        int totalSteps = ledLength * 2;
+        int step = animStep % totalSteps;
+
+        for (int i = 0; i < ledLength; i++) {
             ledBuffer.setHSV(i, 0, 0, 0);
         }
-        for(int i =0; i>0;i-=1){
-            ledBuffer.setHSV(i, 0, 255, 10);
-            led.setData(ledBuffer);
-            ledBuffer.setHSV(i, 0, 0, 0);
-        }
+
+        int pixelIndex = step < ledLength ? step : totalSteps - 1 - step;
+        ledBuffer.setHSV(pixelIndex, 0, 255, 10);
+
+        led.setData(ledBuffer);
+        animStep++;
     }
 }
