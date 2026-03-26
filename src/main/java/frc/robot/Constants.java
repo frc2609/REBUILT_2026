@@ -455,9 +455,11 @@ public final class Constants {
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 
             // Homing: drive past the deployed hard stop until current spikes, then zero there
-            public static final double HOME_TARGET_DEG = -30.0;
-            public static final double HOME_CURRENT_THRESHOLD_AMPS = 50.0;
+            public static final double HOME_TARGET_DEG = -80.0;
+            public static final double HOME_CURRENT_THRESHOLD_AMPS = 10.0;
             public static final int    HOME_CONFIRM_CYCLES = 3;
+            public static final double HOME_STALL_GUARD_SECS = 0.2;
+            public static final double HOME_TIMEOUT_SECS = 5.0;
             
             // NOTE: Cuts off at 10 key-value pairs
             public static final Map<String, Object> config = new HashMap<>(Map.of(
@@ -477,7 +479,7 @@ public final class Constants {
                 config.put("forwardLimitRotations", 
                     Conversions.degreesToRotations(120.0, GEAR_RATIO)
                 );
-                config.put("reverseLimitRotations", -1.5);
+                config.put("reverseLimitRotations", Conversions.degreesToRotations(-95.0, GEAR_RATIO));
 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 
