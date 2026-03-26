@@ -96,8 +96,8 @@ public class RobotContainer {
     public final DriveSubsystem driveSubsystem;
     public final FeedSubsystem feedSubsystem;
     // public final ClimberSubsystem climberSubsystem;
-    public final LedSubsystem ledSubsystem; 
-    public boolean hasRun;
+    public final LedSubsystem ledSubsystem;
+    private boolean hasRun;
 
     private final AutoAimTurret autoAimCommand;
     private final ShotCalculator shotCalculator;
@@ -345,10 +345,10 @@ public class RobotContainer {
     }
 
     public void disabledPeriodic() {
-        if (!hasRun && ledSubsystem.deployedWait.get() > 5 ) {
-            ledSubsystem.SignalEndDeploy();
+        if (!hasRun && ledSubsystem.isDeployComplete()) {
+            ledSubsystem.signalEndDeploy();
             hasRun = true;
-        };
-        ledSubsystem.pattern();// not tested
+        }
+        ledSubsystem.pattern();
     }
 }

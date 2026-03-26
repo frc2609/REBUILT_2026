@@ -541,7 +541,7 @@ public final class Constants {
     }
 
     public static final class LedConstants{
-        public static final int Length = 10;
+        public static final int Length = 75;
         public static final int Port = 0;
     }
 }
