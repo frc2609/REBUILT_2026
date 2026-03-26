@@ -453,6 +453,11 @@ public final class Constants {
             public static final double GEAR_RATIO = 27.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
+
+            // Homing: drive past the deployed hard stop until current spikes, then zero there
+            public static final double HOME_TARGET_DEG = -30.0;
+            public static final double HOME_CURRENT_THRESHOLD_AMPS = 20.0;
+            public static final int    HOME_CONFIRM_CYCLES = 3;
             
             // NOTE: Cuts off at 10 key-value pairs
             public static final Map<String, Object> config = new HashMap<>(Map.of(

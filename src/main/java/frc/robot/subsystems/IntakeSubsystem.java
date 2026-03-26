@@ -56,6 +56,14 @@ public class IntakeSubsystem extends SubsystemBase {
         //((TalonFX) deployMotor).setPosition(9.28);
     }
 
+    public double getDeployCurrentAmps() {
+        return deployMotor.getStatorCurrentAmps();
+    }
+
+    public void zeroDeployPosition() {
+        deployMotor.resetToZero();
+    }
+
     public boolean deployIsAtPosition(double toleranceDegrees) {
         return deployMotor.isAtPosition(toleranceDegrees);
     }

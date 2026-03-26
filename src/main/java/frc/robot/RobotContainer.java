@@ -26,6 +26,7 @@ import frc.robot.commands.Autos.SprintDoubleAuto;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.HomeHood;
+import frc.robot.commands.HomeIntake;
 import frc.robot.commands.HoldIntakeDeployed;
 import frc.robot.commands.PushIntake;
 import frc.robot.commands.SetIntakeSpeedRPS;
@@ -184,7 +185,6 @@ public class RobotContainer {
 
             
         // climberSubsystem.resetPositionToAbsolute();
-        intakeSubsystem.zeroCurrentDeployPosition(); //TEMP
         //intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
 
@@ -366,6 +366,10 @@ public class RobotContainer {
     }
     public Command getHoodHomeCommand() {
         return new HomeHood(turretSubsystem);
+    }
+
+    public Command getIntakeHomeCommand() {
+        return new HomeIntake(intakeSubsystem);
     }
 
     public Command getAutonomousCommand() {
