@@ -52,7 +52,13 @@ public class AutoAimTurret extends Command {
     @Override
     public void execute() {
         Pose2d robotPose = swerve.getPose();
-        Pose2d turretPose = robotPose.plus(new Transform2d(-0.144, -0.165, robotPose.getRotation()));
+        
+        // inverted on purpose, used for physical display and distance calc
+        // does not match x and y used in SOTM docs
+        Pose2d turretPose = robotPose.plus(new Transform2d(
+            Constants.shotConfig.launcherOffsetY, 
+            Constants.shotConfig.launcherOffsetX, 
+            robotPose.getRotation()));
 
         Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
         if (Constants.currentMode == Mode.SIM) { alliance = Alliance.Blue; }
@@ -121,7 +127,7 @@ public class AutoAimTurret extends Command {
         turretPose = new Pose2d(turretPose.getTranslation(), fieldTurretAim);
 
         turretInLimits = Math.abs(turretAngleDeg) <= (Constants.Turret.Aim.RANGE_DEG);
-        validShot = shot.isValid();
+        validShot = shot.isValid() && shot.confidence() > Constants.Controls.SHOT_CONFIDENCE_MIN;
 
         if (turretInLimits) {
             turret.setAimPositionFF(
