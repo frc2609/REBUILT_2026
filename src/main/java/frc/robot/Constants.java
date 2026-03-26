@@ -55,6 +55,9 @@ public final class Constants {
 
     public enum PositionMotorType {
         CTRE_TALON_FX,
+        CTRE_TALON_FX_MM,
+        CTRE_TALON_FX_FOC,
+        CTRE_TALON_FX_EXPO,
         REV_SPARK_MAX,
         SIM
     }
@@ -106,7 +109,7 @@ public final class Constants {
     public static final PositionMotorType CLIMBER_POSITION_MOTOR_TYPE =
         PositionMotorType.CTRE_TALON_FX;
     public static final PositionMotorType TURRET_AIM_POSITION_MOTOR_TYPE =
-        PositionMotorType.CTRE_TALON_FX;
+        PositionMotorType.CTRE_TALON_FX_MM;
     public static final PositionMotorType TURRET_HOOD_POSITION_MOTOR_TYPE =
         PositionMotorType.CTRE_TALON_FX;
 
@@ -306,7 +309,12 @@ public final class Constants {
             public static final double ZERO_OFFSET = 0.515; // 0.242 unrestricted
             public static final double RANGE_DEG = 118.0; // 160
             public static final double HEADING_OFFSET_DEG = 170.0; // robot front to turret zero
-            public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
+            public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
+            // MotionMagic trapezoidal profile limits (rotor rotations/sec, /sec^2, /sec^3)
+            // Tuned via physics sim: 2.2x faster settling, 0.02° overshoot, lowest energy
+            public static final double MAX_VELOCITY = 100.0;   // rotor rot/s (~600 deg/s mechanism)
+            public static final double MAX_ACCEL = 400.0;      // rotor rot/s^2
+
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
                 "kP", 0.3,
@@ -314,9 +322,13 @@ public final class Constants {
                 "kS", 0.005
             ));
             static {
-                // config.put("MotionMagicCruiseVelocity", 100.0);
-                // config.put("MotionMagicAcceleration", 200.0);
-                // config.put("MotionMagicJerk", 0.0); //trapezoid
+                // Trapezoidal profile config (used by MotionMagic firmware)
+                config.put("MotionMagicCruiseVelocity", MAX_VELOCITY);
+                config.put("MotionMagicAcceleration", MAX_ACCEL);
+                config.put("MotionMagicJerk", 0.0);  // 0 = unlimited = pure trapezoidal
+                // Expo profile shape params (only used by DynamicMotionMagicExpoVoltage)
+                config.put("MotionMagicExpo_kV", 0.124); // matches Slot0 kV (12V / 96.67 RPS)
+                config.put("MotionMagicExpo_kA", 0.01);  // start low, tune up if response is sluggish
 
                 config.put("forwardLimitEnabled", true);
                 config.put("forwardLimitRotations",
@@ -332,6 +344,36 @@ public final class Constants {
                 config.put("statorCurrentLimit", 30.0);
                 config.put("statorCurrentLimitEnabled", true);
                 config.put("useClosedLoopFFSign", true);
+            }
+
+            // FOC (TorqueCurrentFOC) config — gains in Amps, not Volts
+            // Derived from voltage gains: kP_A = kP_V/R, kD_A = Kv*G/R, kS_A = kS_V/R
+            // Kraken X60: R = 0.0248 Ω, Kv = 0.124 V·s/rot
+            public static final Map<String, Object> configFOC = new HashMap<>(Map.of(
+                "motorId", 53,
+                "kP", 29.0,    // 0.72 V / 0.0248 Ω
+                "kD", 5.0,     // Kv * G / R = back-EMF equivalent damping
+                "kS", 2.4      // 0.06 V / 0.0248 Ω
+            ));
+            static {
+                configFOC.put("MotionMagicCruiseVelocity", MAX_VELOCITY);
+                configFOC.put("MotionMagicAcceleration", MAX_ACCEL);
+                configFOC.put("MotionMagicJerk", 0.0);
+
+                configFOC.put("forwardLimitEnabled", true);
+                configFOC.put("forwardLimitRotations",
+                    Conversions.degreesToRotations(RANGE_DEG, GEAR_RATIO));
+                configFOC.put("reverseLimitEnabled", true);
+                configFOC.put("reverseLimitRotations",
+                    Conversions.degreesToRotations(-RANGE_DEG, GEAR_RATIO));
+
+                configFOC.put("neutralMode", Constants.NeutralMode.BRAKE);
+                configFOC.put("inverted", false);
+                configFOC.put("supplyCurrentLimit", 30.0);
+                configFOC.put("supplyCurrentLimitEnabled", true);
+                configFOC.put("statorCurrentLimit", 30.0);
+                configFOC.put("statorCurrentLimitEnabled", true);
+                configFOC.put("useClosedLoopFFSign", true);
             }
         }
 

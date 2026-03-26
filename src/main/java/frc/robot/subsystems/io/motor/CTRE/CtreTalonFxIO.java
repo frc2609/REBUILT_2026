@@ -67,6 +67,8 @@ public class CtreTalonFxIO {
         setters.put("kV", value -> this.config.Slot0.kV = (double) value);
         setters.put("kS", value -> this.config.Slot0.kS = (double) value);
         setters.put("kG", value -> this.config.Slot0.kG = (double) value);
+        setters.put("MotionMagicExpo_kV", value -> this.config.MotionMagic.MotionMagicExpo_kV = (double) value);
+        setters.put("MotionMagicExpo_kA", value -> this.config.MotionMagic.MotionMagicExpo_kA = (double) value);
         setters.put(
             "useClosedLoopFFSign", 
             value -> this.config.Slot0.StaticFeedforwardSign = (((boolean) value) ? 
@@ -96,8 +98,14 @@ public class CtreTalonFxIO {
             "MotionMagicAcceleration", 
             value -> this.config.MotionMagic.MotionMagicAcceleration = (double) value);
         setters.put(
-            "MotionMagicJerk", 
+            "MotionMagicJerk",
             value -> this.config.MotionMagic.MotionMagicJerk = (double) value);
+        setters.put(
+            "MotionMagicExpo_kV",
+            value -> this.config.MotionMagic.MotionMagicExpo_kV = (double) value);
+        setters.put(
+            "MotionMagicExpo_kA",
+            value -> this.config.MotionMagic.MotionMagicExpo_kA = (double) value);
 
         setters.put(
             "supplyCurrentLimit", 

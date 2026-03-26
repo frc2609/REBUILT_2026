@@ -18,8 +18,14 @@ import frc.robot.subsystems.io.encoder.impl.SimAbsEncoderIO;
 import frc.robot.subsystems.io.encoder.impl.WpiDutyCycleEncoderIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
+import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicExpoVoltageIO;
+import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicTorqueCurrentFOCIO;
+import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicVoltageIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxVelocityIO;
+import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicExpoVoltageIO;
+import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicTorqueCurrentFOCIO;
+import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicVoltageIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimPositionMotorIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimVelocityMotorIO;
 import frc.robot.subsystems.vision.VisionIO;
@@ -175,23 +181,68 @@ public class RobotFactory {
     }
 
     private PositionMotorIO buildTurretAimIO() {
-        if (currentMode == Mode.SIM) {
-            return new SimPositionMotorIO(
-                Constants.Turret.Aim.config,
-                Constants.Turret.Aim.INERTIA,
-                Constants.Turret.Aim.GEAR_RATIO,
-                Constants.Turret.Aim.ENCODER_RATIO, 
-                Constants.Turret.Aim.SIM_MOTOR, 
-                Constants.SIM_DELTA);
-        }
         switch (Constants.TURRET_AIM_POSITION_MOTOR_TYPE) {
             case CTRE_TALON_FX:
                 return new CtreTalonFxPositionIO(
                     Constants.Turret.Aim.config,
                     Constants.Turret.Aim.GEAR_RATIO,
                     Constants.Turret.Aim.ENCODER_RATIO);
+            case CTRE_TALON_FX_MM:
+                if (currentMode == Mode.SIM) {
+                    return new SimDynamicMotionMagicVoltageIO(
+                        Constants.Turret.Aim.config,
+                        Constants.Turret.Aim.INERTIA,
+                        Constants.Turret.Aim.GEAR_RATIO,
+                        Constants.Turret.Aim.ENCODER_RATIO,
+                        Constants.Turret.Aim.SIM_MOTOR,
+                        Constants.SIM_DELTA,
+                        Constants.Turret.Aim.MAX_VELOCITY,
+                        Constants.Turret.Aim.MAX_ACCEL);
+                }
+                return new CtreTalonDynamicMotionMagicVoltageIO(
+                    Constants.Turret.Aim.config,
+                    Constants.Turret.Aim.GEAR_RATIO,
+                    Constants.Turret.Aim.ENCODER_RATIO,
+                    Constants.Turret.Aim.MAX_VELOCITY,
+                    Constants.Turret.Aim.MAX_ACCEL);
+            case CTRE_TALON_FX_FOC:
+                if (currentMode == Mode.SIM) {
+                    return new SimDynamicMotionMagicTorqueCurrentFOCIO(
+                        Constants.Turret.Aim.configFOC,
+                        Constants.Turret.Aim.INERTIA,
+                        Constants.Turret.Aim.GEAR_RATIO,
+                        Constants.Turret.Aim.ENCODER_RATIO,
+                        Constants.Turret.Aim.SIM_MOTOR,
+                        Constants.SIM_DELTA,
+                        Constants.Turret.Aim.MAX_VELOCITY,
+                        Constants.Turret.Aim.MAX_ACCEL);
+                }
+                return new CtreTalonDynamicMotionMagicTorqueCurrentFOCIO(
+                    Constants.Turret.Aim.configFOC,
+                    Constants.Turret.Aim.GEAR_RATIO,
+                    Constants.Turret.Aim.ENCODER_RATIO,
+                    Constants.Turret.Aim.MAX_VELOCITY,
+                    Constants.Turret.Aim.MAX_ACCEL);
+            case CTRE_TALON_FX_EXPO:
+                if (currentMode == Mode.SIM) {
+                    return new SimDynamicMotionMagicExpoVoltageIO(
+                        Constants.Turret.Aim.config,
+                        Constants.Turret.Aim.INERTIA,
+                        Constants.Turret.Aim.GEAR_RATIO,
+                        Constants.Turret.Aim.ENCODER_RATIO,
+                        Constants.Turret.Aim.SIM_MOTOR,
+                        Constants.SIM_DELTA,
+                        Constants.Turret.Aim.MAX_VELOCITY,
+                        Constants.Turret.Aim.MAX_ACCEL);
+                }
+                return new CtreTalonDynamicMotionMagicExpoVoltageIO(
+                    Constants.Turret.Aim.config,
+                    Constants.Turret.Aim.GEAR_RATIO,
+                    Constants.Turret.Aim.ENCODER_RATIO,
+                    Constants.Turret.Aim.MAX_VELOCITY,
+                    Constants.Turret.Aim.MAX_ACCEL);
             default:
-                throw new IllegalStateException("Unsupported shooter motor type");
+                throw new IllegalStateException("Unsupported turret aim motor type");
         }
     }
 
