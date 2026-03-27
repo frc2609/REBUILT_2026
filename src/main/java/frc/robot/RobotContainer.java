@@ -189,7 +189,8 @@ public class RobotContainer {
         turretSubsystem.setEncoderInvert(true);
         intakeSubsystem.setEncoderInvert(true);
 
-            
+        
+        intakeSubsystem.zeroCurrentDeployPosition();
         // climberSubsystem.resetPositionToAbsolute();
         //intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
@@ -337,6 +338,9 @@ public class RobotContainer {
 
     private void configureAutoChooser() {
         autoChooser.addDefaultOption("None", Commands.none());
+        autoChooser.addOption("Center Back", new SprintAuto(
+            "centerback", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
+        ));
         autoChooser.addOption("Left Sweep", new OneCycleAuto(
             "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
