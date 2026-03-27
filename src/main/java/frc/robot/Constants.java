@@ -126,7 +126,7 @@ public final class Constants {
         public static final double CENTER_Y = FIELD_WIDTH / 2.0;
 
         // Zone boundaries - red derived as true field mirror of blue
-        public static final double BLUE_ZONE_X = 4.3;
+        public static final double BLUE_ZONE_X = 4.5;
         public static final double BLUE_BLOCK_X = 5.5; // under trench, aim but don't shoot
         public static final double BLUE_CLOSE_ZONE_X = 7.25;
         public static final double RED_ZONE_X = FIELD_LENGTH - BLUE_ZONE_X;

@@ -86,7 +86,7 @@ public class AutoAimTurret extends Command {
             if (robotPose.getX() >= Constants.Field.RED_BLOCK_X) {
                 target = Constants.Field.RED_HUB;
                 targetForward = new Translation2d(-1,0);
-                if (robotPose.getX() > Constants.Field.RED_ZONE_X) {
+                if (robotPose.getX() < Constants.Field.RED_ZONE_X) {
                     disableShoot = true;
                 }
             } else if (robotPose.getX() >= Constants.Field.RED_CLOSE_ZONE_X) {
@@ -145,7 +145,7 @@ public class AutoAimTurret extends Command {
             //turret.setAimPosition(0.0);
         }
 
-        if (validShot && turretInLimits) {
+        if (validShot && turretInLimits && !disableShoot) {
             // Set hood and flywheel target based on shot 
             if (targetDist <= Constants.Controls.LOB_DISTANCE) {
                 turret.setHoodPosition(0.0);
@@ -191,6 +191,7 @@ public class AutoAimTurret extends Command {
         Logger.recordOutput("SOTM/Flags/HubActive", isHubActive());
         Logger.recordOutput("SOTM/Flags/TurretInRange", turretInLimits);
         Logger.recordOutput("SOTM/Flags/Confidence", shot.confidence());
+        Logger.recordOutput("SOTM/TrenchBlock", disableShoot);
     }
 
     public boolean shouldRumble() {
