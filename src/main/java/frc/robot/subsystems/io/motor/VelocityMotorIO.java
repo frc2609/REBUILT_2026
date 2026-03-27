@@ -16,7 +16,7 @@ public interface VelocityMotorIO {
     double getStatorCurrent();
     void setIsUnjamSlot(boolean unjam);
 
-    void set(double percent);
+    // void set(double percent);
 
     boolean isAtSpeed(double toleranceRps);
 

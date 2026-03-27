@@ -1,12 +1,9 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
-import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
 
 /** Intake Subsystem using velocity control (rotations per second). */
 public class IntakeSubsystem extends SubsystemBase {
@@ -27,6 +24,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void setRollerSpeed(double speedRPS) {
         driveMotor.setVelocityRps(speedRPS);
+    }
+
+    public boolean isRollerRunning() {
+        return driveMotor.getVelocityRps() > 0.1;
     }
 
     public boolean rollerIsAtSpeed(double tolerance) {
@@ -53,6 +54,14 @@ public class IntakeSubsystem extends SubsystemBase {
         //System.out.print
         deployMotor.resetToAbsolute(8.86/27.0);
         //((TalonFX) deployMotor).setPosition(9.28);
+    }
+
+    public double getDeployCurrentAmps() {
+        return deployMotor.getStatorCurrentAmps();
+    }
+
+    public void zeroDeployPosition() {
+        deployMotor.resetToZero();
     }
 
     public boolean deployIsAtPosition(double toleranceDegrees) {

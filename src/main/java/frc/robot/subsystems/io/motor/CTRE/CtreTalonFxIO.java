@@ -35,7 +35,7 @@ public class CtreTalonFxIO {
     public int followerId = -1;
     public boolean hasFollower = false;
 
-    public LoggedNetworkNumber measuredLogged, setpointLogged, voltageLogged, statorLogged;
+    public LoggedNetworkNumber measuredLogged, setpointLogged, voltageLogged, statorLogged, errorLogged;
 
     public String NTPath;
     private ArrayList<LoggedNetworkNumber> tunables;
@@ -67,6 +67,8 @@ public class CtreTalonFxIO {
         setters.put("kV", value -> this.config.Slot0.kV = (double) value);
         setters.put("kS", value -> this.config.Slot0.kS = (double) value);
         setters.put("kG", value -> this.config.Slot0.kG = (double) value);
+        setters.put("MotionMagicExpo_kV", value -> this.config.MotionMagic.MotionMagicExpo_kV = (double) value);
+        setters.put("MotionMagicExpo_kA", value -> this.config.MotionMagic.MotionMagicExpo_kA = (double) value);
         setters.put(
             "useClosedLoopFFSign", 
             value -> this.config.Slot0.StaticFeedforwardSign = (((boolean) value) ? 
@@ -96,8 +98,14 @@ public class CtreTalonFxIO {
             "MotionMagicAcceleration", 
             value -> this.config.MotionMagic.MotionMagicAcceleration = (double) value);
         setters.put(
-            "MotionMagicJerk", 
+            "MotionMagicJerk",
             value -> this.config.MotionMagic.MotionMagicJerk = (double) value);
+        setters.put(
+            "MotionMagicExpo_kV",
+            value -> this.config.MotionMagic.MotionMagicExpo_kV = (double) value);
+        setters.put(
+            "MotionMagicExpo_kA",
+            value -> this.config.MotionMagic.MotionMagicExpo_kA = (double) value);
 
         setters.put(
             "supplyCurrentLimit", 
@@ -158,6 +166,7 @@ public class CtreTalonFxIO {
         setpointLogged = new LoggedNetworkNumber(NTPath+"/Setpoint");
         voltageLogged = new LoggedNetworkNumber(NTPath+"/PID Output (V)");
         statorLogged = new LoggedNetworkNumber(NTPath+"/Stator Current (A)");
+        errorLogged = new LoggedNetworkNumber(NTPath+"/Error (RPM)");
     }
 
     private static com.ctre.phoenix6.signals.NeutralModeValue toPhoenixNeutralMode(

@@ -39,6 +39,10 @@ public class FeedSubsystem extends SubsystemBase {
         feedMotor.setVelocityRps(rotationsPerSecond);
     }
 
+    public boolean isFeedRunning() {
+        return feedMotor.getVelocityRps() > 0.1;
+    }
+
     public boolean agitatorIsAtSpeed(double toleranceDegrees) {
         return agitatorMotor.isAtSpeed(toleranceDegrees);
     }

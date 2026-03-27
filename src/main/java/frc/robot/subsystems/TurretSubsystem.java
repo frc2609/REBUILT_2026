@@ -37,6 +37,9 @@ public class TurretSubsystem extends SubsystemBase {
     public void setAimPositionFF(double degrees, double ff) {
         aimMotor.setTargetPositionDegrees(degrees, ff);
     }
+    public double getAimPosition(){
+        return aimMotor.getPositionDegrees();
+    }
 
     public void setEncoderInvert(boolean invert){
         this.aimEncoder.setInverted(invert);

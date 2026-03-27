@@ -12,9 +12,9 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.Constants.SimMotor;
-import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxVelocityIO;
+import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicTorqueCurrentFOCIO;
 
-public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
+public class SimDynamicMotionMagicTorqueCurrentFOCIO extends CtreTalonDynamicMotionMagicTorqueCurrentFOCIO {
     private DCMotorSim motorSim;
     private DCMotor gearbox;
     private TalonFXSimState talonFXSim;
@@ -24,11 +24,12 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
     private double kGearRatio;
     private double kSimDelta;
 
-    public SimVelocityMotorIO(
-        Map<String, Object> cfg, double inertia, double gearRatio,  
-        SimMotor simMotor, double simDelta
+    public SimDynamicMotionMagicTorqueCurrentFOCIO(
+        Map<String, Object> cfg, double inertia, double gearRatio, double encoderRatio,
+        SimMotor simMotor, double simDelta,
+        double maxVelocity, double maxAccel
     ) {
-        super(cfg); // create the motor from CTRE implementation
+        super(cfg, gearRatio, encoderRatio, maxVelocity, maxAccel);
 
         kGearRatio = gearRatio;
         kSimDelta = simDelta;
@@ -44,15 +45,15 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
                 controllerType = MotorType.KrakenX44;
                 break;
             default:
-                throw new Error("Unknown Sim Motor Type id="+motorId);
+                throw new Error("Unknown Sim Motor Type id=" + motorId);
         }
-        
+
         motorSim = new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(gearbox, inertia, gearRatio), 
+            LinearSystemId.createDCMotorSystem(gearbox, inertia, gearRatio),
             gearbox
         );
 
-        talonFXSim = super.motor.getSimState();
+        talonFXSim = motor.getSimState();
         talonFXSim.Orientation = ChassisReference.CounterClockwise_Positive;
         talonFXSim.setMotorType(controllerType);
 
@@ -60,39 +61,50 @@ public class SimVelocityMotorIO extends CtreTalonFxVelocityIO {
         simNotifier.startPeriodic(kSimDelta);
     }
 
-    // https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/simulation/simulation-intro.html
+    public SimDynamicMotionMagicTorqueCurrentFOCIO(
+        Map<String, Object> cfg, double inertia, double gearRatio,
+        SimMotor simMotor, double simDelta,
+        double maxVelocity, double maxAccel
+    ) {
+        this(cfg, inertia, gearRatio, 1.0, simMotor, simDelta, maxVelocity, maxAccel);
+    }
 
     public void updateSim() {
         talonFXSim.setSupplyVoltage(RobotController.getBatteryVoltage());
         motorVoltage = talonFXSim.getMotorVoltage();
 
-        // use the motor voltage to calculate new position and velocity
-        // using WPILib's DCMotorSim class for physics simulation
         motorSim.setInputVoltage(motorVoltage);
         motorSim.update(kSimDelta);
 
-        // apply the new rotor position and velocity to the TalonFX;
-        // note that this is rotor position/velocity (before gear ratio), but
-        // DCMotorSim returns mechanism position/velocity (after gear ratio)
         talonFXSim.setRawRotorPosition(motorSim.getAngularPosition().times(kGearRatio));
         talonFXSim.setRotorVelocity(motorSim.getAngularVelocity().times(kGearRatio));
     }
 
-    // @Override
-    public double getVelocityRps() {
-        return motorSim.getAngularVelocityRPM() / 60.0;
-    }
-
     @Override
     public void logMotorPID() {
-        measuredLogged.set(motorSim.getAngularVelocityRPM());
+        measuredLogged.set(getPositionDegrees());
+        rotationsLogged.set(motorSim.getAngularPositionRotations());
         voltageLogged.set(talonFXSim.getMotorVoltage());
         statorLogged.set(talonFXSim.getTorqueCurrent());
     }
 
     @Override
+    public void logMotorPID(double rotations) {
+        logMotorPID();
+    }
+
+    @Override
+    public double getStatorCurrentAmps() {
+        return talonFXSim.getTorqueCurrent();
+    }
+
+    @Override
+    public void setCoastMode(boolean coast) {
+        // no-op in sim
+    }
+
+    @Override
     public void stop() {
-        setVelocityRps(0.0);
-        motor.stopMotor();
+        // no-op in sim
     }
 }
