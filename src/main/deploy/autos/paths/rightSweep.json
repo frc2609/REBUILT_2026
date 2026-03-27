@@ -56,7 +56,7 @@
     }
   ],
   "constraints": {
-    "end_translation_tolerance_meters": 0.1,
+    "end_translation_tolerance_meters": 0.25,
     "end_rotation_tolerance_deg": 4.0
   }
 }

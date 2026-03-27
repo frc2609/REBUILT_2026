@@ -318,7 +318,7 @@ public final class Constants {
 
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
-                "kP", 0.3,
+                "kP", 0.8,
                 "kD", 0.02,
                 "kS", 0.005
             ));
