@@ -9,9 +9,9 @@
         "containers": [
           {
             "title": "RPMTrim",
-            "x": 960.0,
-            "y": 320.0,
-            "width": 192.0,
+            "x": 832.0,
+            "y": 128.0,
+            "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -25,32 +25,18 @@
             "title": "RPM",
             "x": 832.0,
             "y": 0.0,
-            "width": 128.0,
-            "height": 320.0,
+            "width": 256.0,
+            "height": 128.0,
             "type": "Number Bar",
             "properties": {
-              "topic": "/AdvantageKit/RealOutputs/OnTheFly Setpoint",
+              "topic": "/AdvantageKit/RealOutputs/SOTM/FlywheelSetpoint",
               "period": 0.033,
               "data_type": "double",
               "min_value": 0.0,
-              "max_value": 5000.0,
+              "max_value": 6000.0,
               "divisions": 2,
               "inverted": false,
-              "orientation": "vertical"
-            }
-          },
-          {
-            "title": "TargetDistance",
-            "x": 960.0,
-            "y": 0.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/TargetDistance",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
+              "orientation": "horizontal"
             }
           },
           {
@@ -76,10 +62,10 @@
           },
           {
             "title": "MatchTime",
-            "x": 512.0,
-            "y": 320.0,
-            "width": 320.0,
-            "height": 128.0,
+            "x": 832.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 192.0,
             "type": "Match Time",
             "properties": {
               "topic": "/AdvantageKit/DriverStation/MatchTime",
@@ -88,82 +74,6 @@
               "time_display_mode": "Minutes and Seconds",
               "red_start_time": 15,
               "yellow_start_time": 30
-            }
-          },
-          {
-            "title": "turretAimkV",
-            "x": 1152.0,
-            "y": 320.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "turretAimkV",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "Turret Heading Offset",
-            "x": 832.0,
-            "y": 320.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "headingOffset",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
-            "title": "Hood",
-            "x": 1152.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/Tuning/Turret/Hood/Measured",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "ValidShot",
-            "x": 960.0,
-            "y": 128.0,
-            "width": 192.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/ValidShot",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "HubActive",
-            "x": 1152.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/HubActive",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
             }
           },
           {
@@ -178,51 +88,143 @@
               "period": 0.06,
               "rotation_turns": 0
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "Calibration",
-      "grid_layout": {
-        "layouts": [],
-        "containers": [
+          },
           {
-            "title": "RPMTrim",
-            "x": 832.0,
-            "y": 320.0,
+            "title": "Setpoint",
+            "x": 960.0,
+            "y": 128.0,
             "width": 128.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
-              "topic": "/AdvantageKit/RealOutputs/RPMTrim",
+              "topic": "/Tuning/Flywheel/Setpoint",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "ValidShot",
+            "x": 1088.0,
+            "y": 0.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/SOTM/Flags/ValidShot",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "TurretInRange",
+            "x": 1088.0,
+            "y": 128.0,
+            "width": 192.0,
+            "height": 64.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/SOTM/Flags/TurretInRange",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "FlywheelReady",
+            "x": 1088.0,
+            "y": 192.0,
+            "width": 192.0,
+            "height": 64.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/SOTM/Flags/FlywheelReady",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Confidence",
+            "x": 1088.0,
+            "y": 320.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/SOTM/Flags/Confidence",
               "period": 0.06,
               "data_type": "double",
               "show_submit_button": false
             }
           },
           {
-            "title": "RPM",
-            "x": 832.0,
-            "y": 0.0,
-            "width": 128.0,
-            "height": 320.0,
-            "type": "Number Bar",
+            "title": "HubActive",
+            "x": 1088.0,
+            "y": 256.0,
+            "width": 192.0,
+            "height": 64.0,
+            "type": "Boolean Box",
             "properties": {
-              "topic": "/AdvantageKit/RealOutputs/OnTheFly Setpoint",
-              "period": 0.033,
-              "data_type": "double",
-              "min_value": 0.0,
-              "max_value": 5000.0,
-              "divisions": 2,
-              "inverted": false,
-              "orientation": "vertical"
+              "topic": "/AdvantageKit/RealOutputs/SOTM/Flags/HubActive",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
             }
           },
           {
+            "title": "Aim Offset",
+            "x": 512.0,
+            "y": 320.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/SOTM/HeadingOffset",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "Aim kV",
+            "x": 704.0,
+            "y": 320.0,
+            "width": 128.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/Tuning/SOTM/turretAimkV",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Prematch",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
             "title": "TargetDistance",
-            "x": 960.0,
-            "y": 0.0,
+            "x": 640.0,
+            "y": 320.0,
             "width": 192.0,
             "height": 128.0,
             "type": "Text Display",
@@ -234,24 +236,10 @@
             }
           },
           {
-            "title": "Turret Heading Offset",
-            "x": 640.0,
-            "y": 0.0,
-            "width": 192.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "headingOffset",
-              "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": true
-            }
-          },
-          {
             "title": "Hood",
-            "x": 1152.0,
-            "y": 0.0,
-            "width": 128.0,
+            "x": 1088.0,
+            "y": 320.0,
+            "width": 192.0,
             "height": 128.0,
             "type": "Text Display",
             "properties": {
@@ -262,44 +250,10 @@
             }
           },
           {
-            "title": "ValidShot",
-            "x": 960.0,
-            "y": 128.0,
-            "width": 192.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/ValidShot",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
-            "title": "HubActive",
-            "x": 1152.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 192.0,
-            "type": "Boolean Box",
-            "properties": {
-              "topic": "/AdvantageKit/RealOutputs/HubActive",
-              "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
-            }
-          },
-          {
             "title": "limelight-front",
             "x": 0.0,
             "y": 0.0,
-            "width": 384.0,
+            "width": 320.0,
             "height": 320.0,
             "type": "Camera Stream",
             "properties": {
@@ -307,119 +261,90 @@
               "period": 0.06,
               "rotation_turns": 0
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "Autonomous",
-      "grid_layout": {
-        "layouts": [],
-        "containers": [
+          },
           {
-            "title": "TargetDistance",
-            "x": 1024.0,
+            "title": "Deploy",
+            "x": 1088.0,
             "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
+            "width": 192.0,
+            "height": 192.0,
+            "type": "Large Text Display",
             "properties": {
-              "topic": "/AdvantageKit/RealOutputs/TargetDistance",
+              "topic": "/Tuning/Intake/Deploy/Measured",
               "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
+              "data_type": "double"
             }
           },
           {
-            "title": "Turret Angle",
-            "x": 512.0,
+            "title": "Deploy Rotations",
+            "x": 1088.0,
+            "y": 192.0,
+            "width": 192.0,
+            "height": 128.0,
+            "type": "Large Text Display",
+            "properties": {
+              "topic": "/Tuning/Intake/Deploy/Rotations",
+              "period": 0.06,
+              "data_type": "double"
+            }
+          },
+          {
+            "title": "Turret",
+            "x": 960.0,
             "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Radial Gauge",
+            "width": 128.0,
+            "height": 192.0,
+            "type": "Large Text Display",
             "properties": {
               "topic": "/Tuning/Turret/Azimuth/Measured",
               "period": 0.06,
-              "data_type": "double",
-              "start_angle": -180.0,
-              "end_angle": 180.0,
-              "min_value": -180.0,
-              "max_value": 180.0,
-              "number_of_labels": 8,
-              "wrap_value": false,
-              "show_pointer": true,
-              "show_ticks": true
+              "data_type": "double"
             }
           },
           {
-            "title": "MatchTime",
-            "x": 512.0,
-            "y": 256.0,
-            "width": 256.0,
-            "height": 192.0,
-            "type": "Match Time",
-            "properties": {
-              "topic": "/AdvantageKit/DriverStation/MatchTime",
-              "period": 0.06,
-              "data_type": "double",
-              "time_display_mode": "Minutes and Seconds",
-              "red_start_time": 15,
-              "yellow_start_time": 30
-            }
-          },
-          {
-            "title": "Hood",
-            "x": 1152.0,
+            "title": "limelight-left",
+            "x": 640.0,
             "y": 0.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Text Display",
+            "width": 320.0,
+            "height": 320.0,
+            "type": "Camera Stream",
             "properties": {
-              "topic": "/Tuning/Turret/Hood/Measured",
+              "topic": "/CameraPublisher/limelight-left",
               "period": 0.06,
-              "data_type": "double",
-              "show_submit_button": false
+              "rotation_turns": 0
             }
           },
           {
-            "title": "ValidShot",
-            "x": 1024.0,
-            "y": 128.0,
+            "title": "Turret Abs",
+            "x": 960.0,
+            "y": 192.0,
             "width": 128.0,
             "height": 128.0,
-            "type": "Boolean Box",
+            "type": "Large Text Display",
             "properties": {
-              "topic": "/AdvantageKit/RealOutputs/ValidShot",
+              "topic": "/Tuning/Turret/Azimuth/AbsRotations",
               "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "data_type": "double"
             }
           },
           {
-            "title": "HubActive",
-            "x": 1152.0,
-            "y": 128.0,
-            "width": 128.0,
-            "height": 128.0,
-            "type": "Boolean Box",
+            "title": "limelight-right",
+            "x": 320.0,
+            "y": 0.0,
+            "width": 320.0,
+            "height": 320.0,
+            "type": "Camera Stream",
             "properties": {
-              "topic": "/AdvantageKit/RealOutputs/HubActive",
+              "topic": "/CameraPublisher/limelight-right",
               "period": 0.06,
-              "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
-              "true_icon": "None",
-              "false_icon": "None"
+              "rotation_turns": 0
             }
           },
           {
             "title": "Auto Routine",
-            "x": 1088.0,
-            "y": 256.0,
-            "width": 192.0,
+            "x": 0.0,
+            "y": 320.0,
+            "width": 320.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -429,16 +354,35 @@
             }
           },
           {
-            "title": "limelight-front",
-            "x": 0.0,
-            "y": 0.0,
-            "width": 512.0,
-            "height": 448.0,
-            "type": "Camera Stream",
+            "title": "Aim Offset",
+            "x": 832.0,
+            "y": 320.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
             "properties": {
-              "topic": "/CameraPublisher/limelight-front",
+              "topic": "/Tuning/SOTM/HeadingOffset",
               "period": 0.06,
-              "rotation_turns": 0
+              "data_type": "double",
+              "show_submit_button": true
+            }
+          },
+          {
+            "title": "RPM",
+            "x": 320.0,
+            "y": 320.0,
+            "width": 320.0,
+            "height": 128.0,
+            "type": "Number Bar",
+            "properties": {
+              "topic": "/AdvantageKit/RealOutputs/SOTM/FlywheelSetpoint",
+              "period": 0.033,
+              "data_type": "double",
+              "min_value": 0.0,
+              "max_value": 6000.0,
+              "divisions": 2,
+              "inverted": false,
+              "orientation": "horizontal"
             }
           }
         ]
