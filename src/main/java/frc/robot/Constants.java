@@ -64,6 +64,7 @@ public final class Constants {
 
     public enum VelocityMotorType {
         CTRE_TALON_FX,
+        CTRE_TALON_FX_FOC,
         REV_SPARK_MAX,
         SIM
     }
@@ -97,7 +98,7 @@ public final class Constants {
         {"kP", "kI", "kD", "kA", "kV", "kS", "kG"};
 
     public static final VelocityMotorType FLYWHEEL_VELOCITY_MOTOR_TYPE =
-        VelocityMotorType.CTRE_TALON_FX;
+        VelocityMotorType.CTRE_TALON_FX_FOC;
     public static final VelocityMotorType FEED_VELOCITY_MOTOR_TYPE =
         VelocityMotorType.CTRE_TALON_FX;
     public static final VelocityMotorType INTAKE_ROLLER_VELOCITY_MOTOR_TYPE =
@@ -293,10 +294,11 @@ public final class Constants {
             "followerId", 51,
             "followerAligned", false,
             "kP", 0.04,
-            "kV", 0.0117,
+            "kV", 0.0002, //0.0117
             "inverted", false,
             "statorCurrentLimit", 90.0,
-            "statorCurrentLimitEnabled", true
+            "statorCurrentLimitEnabled", true,
+            "neutralMode", NeutralMode.COAST
         ));
     }
 

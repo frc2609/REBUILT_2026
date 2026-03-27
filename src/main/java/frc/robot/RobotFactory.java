@@ -22,7 +22,9 @@ import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicExpoVoltage
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicTorqueCurrentFOCIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicVoltageIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
+import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxTorqueCurrentFOCIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxVelocityIO;
+import frc.robot.subsystems.io.motor.CTRE.Sim.SimCtreTalonFxTorqueCurrentFOCIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicExpoVoltageIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicTorqueCurrentFOCIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicVoltageIO;
@@ -156,19 +158,32 @@ public class RobotFactory {
     }
 
     private VelocityMotorIO buildFlywheelIO() {
-        if (currentMode == Mode.SIM) {
-            return new SimVelocityMotorIO(
-                Constants.Flywheel.config,
-                Constants.Flywheel.INERTIA,
-                Constants.Flywheel.GEAR_RATIO,
-                Constants.Flywheel.SIM_MOTOR, 
-                Constants.SIM_DELTA
-            );
-        }
 
         switch (Constants.FLYWHEEL_VELOCITY_MOTOR_TYPE) {
             case CTRE_TALON_FX:
-                return new CtreTalonFxVelocityIO(Constants.Flywheel.config);
+                if (currentMode == Mode.SIM) {
+                    return new SimVelocityMotorIO(
+                        Constants.Flywheel.config,
+                        Constants.Flywheel.INERTIA,
+                        Constants.Flywheel.GEAR_RATIO,
+                        Constants.Flywheel.SIM_MOTOR, 
+                        Constants.SIM_DELTA
+                    );
+                } else {
+                    return new CtreTalonFxVelocityIO(Constants.Flywheel.config);
+                }
+            case CTRE_TALON_FX_FOC:
+                if (currentMode == Mode.SIM) {
+                    return new SimCtreTalonFxTorqueCurrentFOCIO(
+                        Constants.Flywheel.config,
+                        Constants.Flywheel.INERTIA,
+                        Constants.Flywheel.GEAR_RATIO,
+                        Constants.Flywheel.SIM_MOTOR, 
+                        Constants.SIM_DELTA
+                    );
+                } else {
+                    return new CtreTalonFxTorqueCurrentFOCIO(Constants.Flywheel.config);
+                }
             default:
                 throw new IllegalStateException("Unsupported shooter motor type");
         }

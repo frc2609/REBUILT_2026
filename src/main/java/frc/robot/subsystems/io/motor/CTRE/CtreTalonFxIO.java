@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import javax.xml.stream.events.StartDocument;
-
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -28,7 +26,7 @@ public class CtreTalonFxIO {
     private boolean isRioCANBUS = false;
     public final TalonFX motor;
     public int motorId;
-    private TalonFXConfiguration config;
+    public TalonFXConfiguration config;
 
     public TalonFX followerMotor = null;
     private MotorAlignmentValue followerAligned;
