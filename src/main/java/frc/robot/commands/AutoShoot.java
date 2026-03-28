@@ -60,7 +60,7 @@ public class AutoShoot extends Command {
         flywheel.useAutoSpeed();
 
         if (flywheel.validShotDetected() && flywheel.isAtSpeed(
-            isPassing.get() ? (500.0/60.0) :
+            isPassing.get() ? (900.0/60.0) :
             (Constants.Controls.FLYWHEEL_TOLERANCE_RPM/60.0)
         )) {
             agitator.setAgitatorSpeed();
