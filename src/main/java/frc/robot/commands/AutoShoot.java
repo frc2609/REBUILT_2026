@@ -18,8 +18,25 @@ public class AutoShoot extends Command {
     private final double feedRPS;
     private final double agitatorRPS;
     private final FuelPhysicsSim ballSim;
-    private final Supplier<Boolean> turretInPose;
+    private final Supplier<Boolean> turretInPose, isPassing;
     private int i = 0;
+
+    public AutoShoot(
+        FlywheelSubsystem flywheel, FeedSubsystem agitator, 
+        double feedRPS, double agitatorRPS, FuelPhysicsSim ballSim,
+        Supplier<Boolean> turretInPose, Supplier<Boolean> isPassing
+    ) {
+        this.flywheel = flywheel;
+        this.agitator = agitator;
+        this.ballSim = ballSim;
+        this.turretInPose = turretInPose;
+        this.isPassing = isPassing;
+        
+        this.feedRPS = feedRPS;
+        this.agitatorRPS = agitatorRPS;
+
+        addRequirements(flywheel, agitator);
+    }
 
     public AutoShoot(
         FlywheelSubsystem flywheel, FeedSubsystem agitator, 
@@ -30,6 +47,7 @@ public class AutoShoot extends Command {
         this.agitator = agitator;
         this.ballSim = ballSim;
         this.turretInPose = turretInPose;
+        this.isPassing = () -> {return false;};
         
         this.feedRPS = feedRPS;
         this.agitatorRPS = agitatorRPS;
@@ -41,7 +59,10 @@ public class AutoShoot extends Command {
     public void execute() {
         flywheel.useAutoSpeed();
 
-        if (flywheel.validShotDetected() && flywheel.isAtSpeed()) {
+        if (flywheel.validShotDetected() && flywheel.isAtSpeed(
+            isPassing.get() ? (500.0/60.0) :
+            (Constants.Controls.FLYWHEEL_TOLERANCE_RPM/60.0)
+        )) {
             agitator.setAgitatorSpeed();
             agitator.setFeedSpeed();
 

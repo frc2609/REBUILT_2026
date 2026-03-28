@@ -33,6 +33,7 @@ public class AutoAimTurret extends Command {
     private boolean disableShoot = false;
     private boolean turretInLimits = false;
     private boolean validShot = false;
+    private boolean passing = false;
 
     public AutoAimTurret(
         DriveSubsystem swerve, TurretSubsystem turret,
@@ -70,31 +71,39 @@ public class AutoAimTurret extends Command {
 
         if (alliance == Alliance.Blue) {
             if (robotPose.getX() <= Constants.Field.BLUE_BLOCK_X) {
+                passing = false;
                 target = Constants.Field.BLUE_HUB;
                 targetForward = new Translation2d(1,0);
                 if (robotPose.getX() > Constants.Field.BLUE_ZONE_X) {
                     disableShoot = true;
                 }
-            } else if (robotPose.getX() <= Constants.Field.BLUE_CLOSE_ZONE_X) {
-                target = isLeft ? Constants.Field.BLUE_CLOSE_PASS_LEFT : Constants.Field.BLUE_CLOSE_PASS_RIGHT;
-                targetForward = new Translation2d(-1,0);
             } else {
-                target = isLeft ? Constants.Field.BLUE_PASS_LEFT : Constants.Field.BLUE_PASS_RIGHT;
-                targetForward = new Translation2d(-1,0);
+                passing = true;
+                if (robotPose.getX() <= Constants.Field.BLUE_CLOSE_ZONE_X) {
+                    target = isLeft ? Constants.Field.BLUE_CLOSE_PASS_LEFT : Constants.Field.BLUE_CLOSE_PASS_RIGHT;
+                    targetForward = new Translation2d(-1,0);
+                } else {
+                    target = isLeft ? Constants.Field.BLUE_PASS_LEFT : Constants.Field.BLUE_PASS_RIGHT;
+                    targetForward = new Translation2d(-1,0);
+                }
             }
         } else {
             if (robotPose.getX() >= Constants.Field.RED_BLOCK_X) {
+                passing = false;
                 target = Constants.Field.RED_HUB;
                 targetForward = new Translation2d(-1,0);
                 if (robotPose.getX() < Constants.Field.RED_ZONE_X) {
                     disableShoot = true;
                 }
-            } else if (robotPose.getX() >= Constants.Field.RED_CLOSE_ZONE_X) {
-                target = isLeft ? Constants.Field.RED_CLOSE_PASS_LEFT : Constants.Field.RED_CLOSE_PASS_RIGHT;
-                targetForward = new Translation2d(1,0);
             } else {
-                target = isLeft ? Constants.Field.RED_PASS_LEFT : Constants.Field.RED_PASS_RIGHT;
-                targetForward = new Translation2d(1,0);
+                passing = true;
+                if (robotPose.getX() >= Constants.Field.RED_CLOSE_ZONE_X) {
+                    target = isLeft ? Constants.Field.RED_CLOSE_PASS_LEFT : Constants.Field.RED_CLOSE_PASS_RIGHT;
+                    targetForward = new Translation2d(1,0);
+                } else {
+                    target = isLeft ? Constants.Field.RED_PASS_LEFT : Constants.Field.RED_PASS_RIGHT;
+                    targetForward = new Translation2d(1,0);
+                }
             }
         }
 
@@ -191,11 +200,16 @@ public class AutoAimTurret extends Command {
         Logger.recordOutput("SOTM/Flags/HubActive", isHubActive());
         Logger.recordOutput("SOTM/Flags/TurretInRange", turretInLimits);
         Logger.recordOutput("SOTM/Flags/Confidence", shot.confidence());
-        Logger.recordOutput("SOTM/TrenchBlock", disableShoot);
+        Logger.recordOutput("SOTM/Flags/TrenchBlock", disableShoot);
+        Logger.recordOutput("SOTM/Flags/Passing", passing);
     }
 
     public boolean shouldRumble() {
         return validShot && turretInLimits && !disableShoot;
+    }
+
+    public boolean isPassing() {
+        return passing;
     }
 
     @Override

@@ -202,7 +202,8 @@ public class RobotContainer {
             Constants.Controls.FEED_HOLD_RPM / 60.0, 
             Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
             ballSim,
-            turretSubsystem::aimIsAtPosition
+            turretSubsystem::aimIsAtPosition,
+            autoAimCommand::isPassing
         );
 
         FollowPath.registerEventTrigger("autoShoot", autoShootCommand);
@@ -384,9 +385,9 @@ public class RobotContainer {
         return new HomeHood(turretSubsystem);
     }
 
-    public Command getIntakeHomeCommand() {
-        return new HomeIntake(intakeSubsystem);
-    }
+    // public Command getIntakeHomeCommand() {
+    //     return new HomeIntake(intakeSubsystem);
+    // }
 
     public Command getAutonomousCommand() {
         return autoChooser.get();
