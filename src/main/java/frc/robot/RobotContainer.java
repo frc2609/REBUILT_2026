@@ -21,6 +21,7 @@ import frc.robot.commands.AutoPushIntake;
 import frc.robot.lib.BLine.FollowPath;
 import frc.robot.commands.Autos.DifferentAuto;
 import frc.robot.commands.Autos.OneCycleAuto;
+import frc.robot.commands.Autos.SnowBlowAuto;
 import frc.robot.commands.Autos.SprintAuto;
 import frc.robot.commands.Autos.SprintDoubleAuto;
 import frc.robot.commands.DriveCommands;
@@ -185,6 +186,7 @@ public class RobotContainer {
 
             
         // climberSubsystem.resetPositionToAbsolute();
+        intakeSubsystem.zeroCurrentDeployPosition(); //TEMP
         //intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
 
@@ -244,6 +246,9 @@ public class RobotContainer {
         ));
         autoChooser.addOption("Right Diff", new DifferentAuto(
             "rightSweep", "rightClose", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
+        ));
+        autoChooser.addOption("Left Snow Blow", new SnowBlowAuto(
+            "left_snowblow", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
         Logger.registerDashboardInput(autoChooser);
         SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());

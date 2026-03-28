@@ -136,7 +136,7 @@ public class Robot extends LoggedRobot {
         }
         robotContainer.turretSubsystem.setAimCoastMode(false);
         CommandScheduler.getInstance().schedule(robotContainer.getHoodHomeCommand());
-        CommandScheduler.getInstance().schedule(robotContainer.getIntakeHomeCommand());
+        // CommandScheduler.getInstance().schedule(robotContainer.getIntakeHomeCommand());
     }
 
     /** This function is called periodically during operator control. */
