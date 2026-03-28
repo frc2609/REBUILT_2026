@@ -341,6 +341,9 @@ public class RobotContainer {
         autoChooser.addOption("Left Sweep", new OneCycleAuto(
             "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
+        autoChooser.addOption("Alpha Sweep", new OneCycleAuto(
+            "alpha", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
+        ));
         autoChooser.addOption("Right Sweep", new OneCycleAuto(
             "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
