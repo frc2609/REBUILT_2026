@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.Turret;
 import frc.robot.commands.AutoAimTurret;
 import frc.robot.commands.AutoPushIntake;
 import frc.robot.lib.BLine.FollowPath;
@@ -97,8 +98,8 @@ public class RobotContainer {
     public final DriveSubsystem driveSubsystem;
     public final FeedSubsystem feedSubsystem;
     public final ClimberSubsystem climberSubsystem;
-    public final LedSubsystem ledSubsystem;
-    boolean hasRun;
+    public final LedSubsystem ledSubsystem; boolean hasRun;
+    
 
     private final AutoAimTurret autoAimCommand;
     private final ShotCalculator shotCalculator;
@@ -119,7 +120,7 @@ public class RobotContainer {
         feedSubsystem = robotFactory.getFeedSubsystem();
         climberSubsystem = robotFactory.getClimberSubsystem();
         ledSubsystem = new LedSubsystem(Constants.LedConstants.Length, Constants.LedConstants.Port,
-                Constants.LedConstants.travelTime);
+                Constants.LedConstants.travelTime,Constants.LedConstants.ledGroup);
         hasRun = false;
 
         // SOTM Setup

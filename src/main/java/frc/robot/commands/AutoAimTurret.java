@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -31,7 +32,7 @@ public class AutoAimTurret extends Command {
 
     private boolean disableShoot = false;
     private boolean turretInLimits = false;
-    private boolean validShot = false;
+    public boolean validShot = false;
 
     public AutoAimTurret(
         DriveSubsystem swerve, TurretSubsystem turret,
@@ -165,18 +166,10 @@ public class AutoAimTurret extends Command {
         Logger.recordOutput("TargetDistance", targetDist);
         Logger.recordOutput("ValidShot", validShot);
         Logger.recordOutput("HubActive", isHubActive());
+        
     }
 
-    public boolean shouldRumble() {
-        return validShot && turretInLimits && !disableShoot;
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
-
-    public boolean isHubActive() {
+    public static boolean isHubActive() {
         Optional<Alliance> alliance = DriverStation.getAlliance();
         // If we have no alliance, we cannot be enabled, therefore no hub.
         if (alliance.isEmpty()) {
@@ -234,5 +227,17 @@ public class AutoAimTurret extends Command {
             return true;
         }
     }
+    
+
+    public boolean shouldRumble() {
+        return validShot && turretInLimits && !disableShoot;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    
 }
 

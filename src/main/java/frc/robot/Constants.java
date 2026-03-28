@@ -497,8 +497,9 @@ public final class Constants {
     }
 
     public static final class LedConstants{
-        public static final int Length = 10;
+        public static final int Length = 100;
         public static final int Port = 0;
         public static final double travelTime = 1.25;//time to go from one end to the other in seconds
+        public static final int ledGroup = 3;
     }
 }
