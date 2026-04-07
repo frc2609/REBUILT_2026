@@ -205,17 +205,8 @@ public class AutoAimTurret extends Command {
         Logger.recordOutput("SOTM/Flags/Passing", passing);
     }
 
-    public boolean shouldRumble() {
-        return validShot && turretInLimits && !disableShoot;
-    }
-
     public boolean isPassing() {
         return passing;
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
     }
 
     public static boolean isHubActive() {

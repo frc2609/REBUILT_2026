@@ -105,10 +105,8 @@ public class RobotContainer {
     public final FeedSubsystem feedSubsystem;
     // public final ClimberSubsystem climberSubsystem;
     public final LedSubsystem ledSubsystem;
-    public final VisionSubsystem visionSubsystem;
+    //public final VisionSubsystem visionSubsystem;
     private boolean hasRun;
-    public final ClimberSubsystem climberSubsystem;
-    public final LedSubsystem ledSubsystem; boolean hasRun;
     
 
     private final AutoAimTurret autoAimCommand;
@@ -129,7 +127,7 @@ public class RobotContainer {
         intakeSubsystem = robotFactory.getIntakeSubsystem();
         driveSubsystem = robotFactory.getDriveSubsystem();
         feedSubsystem = robotFactory.getFeedSubsystem();
-        climberSubsystem = robotFactory.getClimberSubsystem();
+        // climberSubsystem = robotFactory.getClimberSubsystem();
         ledSubsystem = new LedSubsystem(Constants.LedConstants.Length, Constants.LedConstants.Port,
                 Constants.LedConstants.travelTime,Constants.LedConstants.ledGroup);
         hasRun = false;
