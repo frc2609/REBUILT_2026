@@ -1,8 +1,7 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
-
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.DynamicMotionMagicExpoVoltage;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.subsystems.io.motor.PositionMotorIO;
@@ -12,9 +11,14 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import frc.robot.util.Conversions;
 
-public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMotorIO {
-    //private MotionMagicDutyCycle control = new MotionMagicDutyCycle(0).withSlot(0);
-    private PositionDutyCycle control = new PositionDutyCycle(0).withSlot(0);
+/**
+ * Position motor IO using DynamicMotionMagicExpoVoltage control.
+ * Uses an exponential motion profile shaped by MotionMagicExpo_kV and kA,
+ * with per-request dynamic velocity and acceleration limits.
+ * Output is in Voltage (not DutyCycle).
+ */
+public class CtreTalonDynamicMotionMagicExpoVoltageIO extends CtreTalonFxIO implements PositionMotorIO {
+    private DynamicMotionMagicExpoVoltage control;
     private final double gearRatio;
 
     public double targetDegrees = 0.0;
@@ -28,7 +32,16 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
     public final LoggedNetworkNumber rotationsLogged;
     private final LoggedNetworkNumber positionErrorLogged;
 
-    public CtreTalonFxPositionIO(Map<String, Object> cfg, double gearRatio, double encoderRatio) {
+    /**
+     * @param cfg         Motor config map (must include MotionMagicExpo_kV, MotionMagicExpo_kA)
+     * @param gearRatio   Gear ratio for degree/rotation conversion
+     * @param encoderRatio Encoder ratio (unused, kept for interface consistency)
+     * @param maxVelocity Max cruise velocity in rotor rotations/sec
+     * @param maxAccel    Max acceleration in rotor rotations/sec^2
+     */
+    public CtreTalonDynamicMotionMagicExpoVoltageIO(
+            Map<String, Object> cfg, double gearRatio, double encoderRatio,
+            double maxVelocity, double maxAccel) {
         super(cfg);
 
         forwardLimitEnabled = (boolean) cfg.get("forwardLimitEnabled");
@@ -36,16 +49,21 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         forwardLimitRotations = (double) cfg.get("forwardLimitRotations");
         reverseLimitRotations = (double) cfg.get("reverseLimitRotations");
 
-        absRotationsLogged = new LoggedNetworkNumber(NTPath+"/AbsRotations");
-        rotationsLogged = new LoggedNetworkNumber(NTPath+"/Rotations");
-        positionErrorLogged = new LoggedNetworkNumber(NTPath+"/Error (deg)");
+        absRotationsLogged = new LoggedNetworkNumber(NTPath + "/AbsRotations");
+        rotationsLogged = new LoggedNetworkNumber(NTPath + "/Rotations");
+        positionErrorLogged = new LoggedNetworkNumber(NTPath + "/Error (deg)");
 
         this.gearRatio = gearRatio;
+
+        control = new DynamicMotionMagicExpoVoltage(0, maxVelocity, maxAccel)
+            .withSlot(0);
     }
 
-    public CtreTalonFxPositionIO(Map<String, Object> cfg, double gearRatio) {
-        this(cfg, gearRatio, 1.0);
-    } 
+    public CtreTalonDynamicMotionMagicExpoVoltageIO(
+            Map<String, Object> cfg, double gearRatio,
+            double maxVelocity, double maxAccel) {
+        this(cfg, gearRatio, 1.0, maxVelocity, maxAccel);
+    }
 
     @Override
     public void setTargetPositionDegrees(double degrees, double ff) {
@@ -58,10 +76,7 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
             targetRotations = Math.max(targetRotations, reverseLimitRotations);
         }
 
-        // Keep a vendor-agnostic setpoint for consistent "at position" semantics across
-        // implementations.
         targetDegrees = Conversions.rotationsToDegrees(targetRotations, gearRatio);
-        //System.out.println("POSITION COMMAND: "+degrees+" -> "+targetRotations);
 
         control = control.withPosition(targetRotations).withFeedForward(ff);
         motor.setControl(control);
@@ -74,22 +89,21 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
 
     @Override
     public double getPositionDegrees() {
-        return Conversions.rotationsToDegrees(motor.getPosition().getValueAsDouble(),gearRatio);
+        return Conversions.rotationsToDegrees(motor.getPosition().getValueAsDouble(), gearRatio);
     }
 
     @Override
     public boolean isAtPosition(double toleranceDegrees) {
-        // Compare measured position to the last commanded setpoint in degrees 
-        // (matches SparkMax + sim behavior)
         return Math.abs(targetDegrees - getPositionDegrees()) <= toleranceDegrees;
     }
 
     @Override
     public void resetToAbsolute(double absRotations) {
         double motorRotations = absRotations * gearRatio;
-        System.out.println(NTPath+": ENCODER RESET, absReading="+absRotations+", gear:"+gearRatio+" rotations:"+motorRotations);
+        System.out.println(NTPath + ": ENCODER RESET, absReading=" + absRotations
+            + ", gear:" + gearRatio + " rotations:" + motorRotations);
         motor.setPosition(motorRotations);
-        targetDegrees = getPositionDegrees(); // 0?
+        targetDegrees = getPositionDegrees();
         if (hasFollower) {
             followerMotor.setPosition(motorRotations);
         }
@@ -119,7 +133,6 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
         positionErrorLogged.set(Conversions.rotationsToDegrees(motor.getClosedLoopError().getValueAsDouble(), gearRatio));
     }
 
-
     @Override
     public double getStatorCurrentAmps() {
         return motor.getStatorCurrent().getValueAsDouble();
@@ -136,9 +149,6 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
     @Override
     public void stop() {
         motor.stopMotor();
-        // if (hasFollower) {
-        //     followerMotor.stopMotor();
-        // }
         targetDegrees = getPositionDegrees();
     }
 }

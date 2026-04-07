@@ -34,7 +34,7 @@ public class OneCycleAuto extends SequentialCommandGroup {
                 Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
                 ballSim,
                 turret::aimIsAtPosition
-            ).withTimeout(1.5),
+            ).withTimeout(3.0),
 
             // Follow path while running intake to collect a ball
             Commands.deadline(

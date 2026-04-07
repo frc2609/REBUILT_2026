@@ -35,6 +35,7 @@ public class TunerConstants {
         .withKP(175).withKI(0).withKD(1)
         .withKS(0.1).withKV(1.79).withKA(0)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+    
     // When using closed-loop control, the drive motor uses the control
     // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
     private static final Slot0Configs driveGains = new Slot0Configs()
@@ -83,7 +84,7 @@ public class TunerConstants {
     // Theoretical free speed (m/s) at 12 V applied output;
     // This needs to be tuned to your individual robot
     public static final LinearVelocity kLinearSpeedAt12Volts = MetersPerSecond.of(20.0);
-    public static final LinearVelocity kAngularSpeedAt12Volts = MetersPerSecond.of(8);
+    public static final LinearVelocity kAngularSpeedAt12Volts = MetersPerSecond.of(10.0);
 
     // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
     // This may need to be tuned to your individual robot
@@ -149,7 +150,7 @@ public class TunerConstants {
     private static final int kFrontRightDriveMotorId = 2;
     private static final int kFrontRightSteerMotorId = 3;
     private static final int kFrontRightEncoderId = 4;
-    private static final Angle kFrontRightEncoderOffset = Rotations.of(0.08251953125);
+    private static final Angle kFrontRightEncoderOffset = Rotations.of(-0.098388671875);
     private static final boolean kFrontRightSteerMotorInverted = true;
     private static final boolean kFrontRightEncoderInverted = false;
 

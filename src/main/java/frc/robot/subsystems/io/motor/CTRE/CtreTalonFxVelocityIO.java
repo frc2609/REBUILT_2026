@@ -20,14 +20,15 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
 
     @Override
     public void setVelocityRps(double velocity) {
+        this.setpointRps = velocity;
         control = control.withVelocity(velocity).withSlot(this.currentSlot);
         motor.setControl(control);
     }
 
-    @Override
-    public void set(double percent) {
-        motor.set(percent);
-    }
+    // @Override
+    // public void set(double percent) {
+    //     motor.set(percent);
+    // }
 
     @Override
     public double getVelocityRps() {
@@ -60,11 +61,12 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
         measuredLogged.set(getVelocityRps()*60.0);
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
         statorLogged.set(getStatorCurrent());
+        errorLogged.set(motor.getClosedLoopError().getValueAsDouble()*60.0);
     }
 
     @Override
     public void stop() {
-        setpointRps = 0.0;
+        //setpointRps = 0.0;
         motor.stopMotor();
     }
 }

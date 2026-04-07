@@ -4,7 +4,6 @@ import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
@@ -19,8 +18,14 @@ import frc.robot.subsystems.io.encoder.impl.SimAbsEncoderIO;
 import frc.robot.subsystems.io.encoder.impl.WpiDutyCycleEncoderIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
+import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicExpoVoltageIO;
+import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicTorqueCurrentFOCIO;
+import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicVoltageIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxVelocityIO;
+import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicExpoVoltageIO;
+import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicTorqueCurrentFOCIO;
+import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicVoltageIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimPositionMotorIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimVelocityMotorIO;
 import frc.robot.subsystems.vision.VisionIO;
@@ -35,7 +40,7 @@ public class RobotFactory {
     private final DriveSubsystem driveSubsystem;
     private final VisionSubsystem visionSubsystem;
     private final FeedSubsystem feedSubsystem;
-    private final ClimberSubsystem climberSubsystem;
+    //private final ClimberSubsystem climberSubsystem;
 
     private final Mode currentMode;
 
@@ -57,9 +62,9 @@ public class RobotFactory {
         intakeSubsystem = new IntakeSubsystem(
             buildIntakeEncoderIO(), buildIntakeDeployIO(), buildIntakeRollerIO()
         );
-        climberSubsystem = new ClimberSubsystem(
-            buildClimberEncoderIO(), buildClimberMotorIO()
-        );
+        // climberSubsystem = new ClimberSubsystem(
+        //     buildClimberEncoderIO(), buildClimberMotorIO()
+        // );
         feedSubsystem = new FeedSubsystem(
             buildAgitatorIO(), buildFeedIO()
         );
@@ -67,38 +72,38 @@ public class RobotFactory {
 
     // CLIMBER
 
-    public ClimberSubsystem getClimberSubsystem() {
-        return this.climberSubsystem;
-    }
+    // public ClimberSubsystem getClimberSubsystem() {
+    //     return this.climberSubsystem;
+    // }
 
-    private AbsEncoderIO buildClimberEncoderIO() {
-        if (currentMode == Mode.SIM) {
-            return new SimAbsEncoderIO(0);
-        }
+    // private AbsEncoderIO buildClimberEncoderIO() {
+    //     if (currentMode == Mode.SIM) {
+    //         return new SimAbsEncoderIO(0);
+    //     }
 
-        return new WpiDutyCycleEncoderIO(Constants.Climber.EncoderChannel);
-    }
+    //     return new WpiDutyCycleEncoderIO(Constants.Climber.EncoderChannel);
+    // }
 
-    private PositionMotorIO buildClimberMotorIO() {
-        if (currentMode == Mode.SIM) {
-            return new SimPositionMotorIO(
-                Constants.Climber.config,
-                Constants.Climber.INERTIA,
-                Constants.Climber.GEAR_RATIO,
-                Constants.Climber.ENCODER_RATIO, 
-                Constants.Climber.SIM_MOTOR, 
-                Constants.SIM_DELTA);
-        }
-        switch (Constants.CLIMBER_POSITION_MOTOR_TYPE) {
-            case CTRE_TALON_FX:
-                return new CtreTalonFxPositionIO(
-                    Constants.Climber.config,
-                    Constants.Climber.GEAR_RATIO,
-                    Constants.Climber.ENCODER_RATIO);
-            default:
-                throw new IllegalStateException("Unsupported intake deploy motor type");
-        }
-    }
+    // private PositionMotorIO buildClimberMotorIO() {
+    //     if (currentMode == Mode.SIM) {
+    //         return new SimPositionMotorIO(
+    //             Constants.Climber.config,
+    //             Constants.Climber.INERTIA,
+    //             Constants.Climber.GEAR_RATIO,
+    //             Constants.Climber.ENCODER_RATIO, 
+    //             Constants.Climber.SIM_MOTOR, 
+    //             Constants.SIM_DELTA);
+    //     }
+    //     switch (Constants.CLIMBER_POSITION_MOTOR_TYPE) {
+    //         case CTRE_TALON_FX:
+    //             return new CtreTalonFxPositionIO(
+    //                 Constants.Climber.config,
+    //                 Constants.Climber.GEAR_RATIO,
+    //                 Constants.Climber.ENCODER_RATIO);
+    //         default:
+    //             throw new IllegalStateException("Unsupported intake deploy motor type");
+    //     }
+    // }
 
     // FEED / AGITATOR
 
@@ -176,23 +181,68 @@ public class RobotFactory {
     }
 
     private PositionMotorIO buildTurretAimIO() {
-        if (currentMode == Mode.SIM) {
-            return new SimPositionMotorIO(
-                Constants.Turret.Aim.config,
-                Constants.Turret.Aim.INERTIA,
-                Constants.Turret.Aim.GEAR_RATIO,
-                Constants.Turret.Aim.ENCODER_RATIO, 
-                Constants.Turret.Aim.SIM_MOTOR, 
-                Constants.SIM_DELTA);
-        }
         switch (Constants.TURRET_AIM_POSITION_MOTOR_TYPE) {
             case CTRE_TALON_FX:
                 return new CtreTalonFxPositionIO(
                     Constants.Turret.Aim.config,
                     Constants.Turret.Aim.GEAR_RATIO,
                     Constants.Turret.Aim.ENCODER_RATIO);
+            case CTRE_TALON_FX_MM:
+                if (currentMode == Mode.SIM) {
+                    return new SimDynamicMotionMagicVoltageIO(
+                        Constants.Turret.Aim.config,
+                        Constants.Turret.Aim.INERTIA,
+                        Constants.Turret.Aim.GEAR_RATIO,
+                        Constants.Turret.Aim.ENCODER_RATIO,
+                        Constants.Turret.Aim.SIM_MOTOR,
+                        Constants.SIM_DELTA,
+                        Constants.Turret.Aim.MAX_VELOCITY,
+                        Constants.Turret.Aim.MAX_ACCEL);
+                }
+                return new CtreTalonDynamicMotionMagicVoltageIO(
+                    Constants.Turret.Aim.config,
+                    Constants.Turret.Aim.GEAR_RATIO,
+                    Constants.Turret.Aim.ENCODER_RATIO,
+                    Constants.Turret.Aim.MAX_VELOCITY,
+                    Constants.Turret.Aim.MAX_ACCEL);
+            case CTRE_TALON_FX_FOC:
+                if (currentMode == Mode.SIM) {
+                    return new SimDynamicMotionMagicTorqueCurrentFOCIO(
+                        Constants.Turret.Aim.configFOC,
+                        Constants.Turret.Aim.INERTIA,
+                        Constants.Turret.Aim.GEAR_RATIO,
+                        Constants.Turret.Aim.ENCODER_RATIO,
+                        Constants.Turret.Aim.SIM_MOTOR,
+                        Constants.SIM_DELTA,
+                        Constants.Turret.Aim.MAX_VELOCITY,
+                        Constants.Turret.Aim.MAX_ACCEL);
+                }
+                return new CtreTalonDynamicMotionMagicTorqueCurrentFOCIO(
+                    Constants.Turret.Aim.configFOC,
+                    Constants.Turret.Aim.GEAR_RATIO,
+                    Constants.Turret.Aim.ENCODER_RATIO,
+                    Constants.Turret.Aim.MAX_VELOCITY,
+                    Constants.Turret.Aim.MAX_ACCEL);
+            case CTRE_TALON_FX_EXPO:
+                if (currentMode == Mode.SIM) {
+                    return new SimDynamicMotionMagicExpoVoltageIO(
+                        Constants.Turret.Aim.config,
+                        Constants.Turret.Aim.INERTIA,
+                        Constants.Turret.Aim.GEAR_RATIO,
+                        Constants.Turret.Aim.ENCODER_RATIO,
+                        Constants.Turret.Aim.SIM_MOTOR,
+                        Constants.SIM_DELTA,
+                        Constants.Turret.Aim.MAX_VELOCITY,
+                        Constants.Turret.Aim.MAX_ACCEL);
+                }
+                return new CtreTalonDynamicMotionMagicExpoVoltageIO(
+                    Constants.Turret.Aim.config,
+                    Constants.Turret.Aim.GEAR_RATIO,
+                    Constants.Turret.Aim.ENCODER_RATIO,
+                    Constants.Turret.Aim.MAX_VELOCITY,
+                    Constants.Turret.Aim.MAX_ACCEL);
             default:
-                throw new IllegalStateException("Unsupported shooter motor type");
+                throw new IllegalStateException("Unsupported turret aim motor type");
         }
     }
 
@@ -345,8 +395,8 @@ public class RobotFactory {
             // Limelight needs gyro rotation for MegaTag2 
             return new VisionIO[] {
                 new VisionIOLimelight(Constants.Vision.Left.name, driveSubsystem::getRotation),
-                new VisionIOLimelight(Constants.Vision.Right.name, driveSubsystem::getRotation)
-                //new VisionIOLimelight(Constants.Vision.Front.name, driveSubsystem::getRotation)
+                new VisionIOLimelight(Constants.Vision.Right.name, driveSubsystem::getRotation),
+                new VisionIOLimelight(Constants.Vision.Front.name, driveSubsystem::getRotation)
             };
         default:
             throw new IllegalStateException("Unsupported mode");

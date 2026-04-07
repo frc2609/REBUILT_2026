@@ -25,7 +25,6 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
     public void setAutoSpeed(double rps) {
         this.autoSpeedRPS = rps;
-        Logger.recordOutput("OnTheFly Setpoint", this.autoSpeedRPS*60.0);
     }
     public void useAutoSpeed(){
         setSpeed(this.autoSpeedRPS);
@@ -45,16 +44,19 @@ public class FlywheelSubsystem extends SubsystemBase {
         flywheelMotor.setVelocityRps(rotationsPerSecond);
     }
     
-    public void bangBang(double speedRPS, double kF){
-        if (flywheelMotor.getVelocityRps() < speedRPS) {
-            flywheelMotor.set(1.0);
-        } else {
-            flywheelMotor.set(kF);
-        }
-    }
+    // public void bangBang(double speedRPS, double kF){
+    //     if (flywheelMotor.getVelocityRps() < speedRPS) {
+    //         flywheelMotor.set(1.0);
+    //     } else {
+    //         flywheelMotor.set(kF);
+    //     }
+    // }
 
-    public boolean isAtSpeed() {
-        return flywheelMotor.isAtSpeed(Constants.Controls.FLYWHEEL_TOLERANCE_RPM);
+    public boolean isAtSpeed(double toleranceRPS) {
+        boolean isAtSpeed = Math.abs(this.autoSpeedRPS-flywheelMotor.getVelocityRps()) < 
+            toleranceRPS;
+        Logger.recordOutput("SOTM/Flags/FlywheelReady", isAtSpeed);
+        return isAtSpeed;
     }
 
     public void stop() {
@@ -66,5 +68,6 @@ public class FlywheelSubsystem extends SubsystemBase {
     {
         flywheelMotor.logMotorPID();
         flywheelMotor.updateFromTunables();
+        Logger.recordOutput("SOTM/FlywheelSetpoint", this.autoSpeedRPS*60.0);
     }
 }

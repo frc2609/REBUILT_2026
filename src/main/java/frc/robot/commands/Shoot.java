@@ -28,7 +28,12 @@ public class Shoot extends Command {
 
     @Override
     public void execute() {
-        flywheel.setSpeed();
+        if (flywheel.validShotDetected()){
+            flywheel.useAutoSpeed();
+        } else {
+            flywheel.setSpeed();
+        }
+        
         agitator.setAgitatorSpeed();
         agitator.setFeedSpeed();
 

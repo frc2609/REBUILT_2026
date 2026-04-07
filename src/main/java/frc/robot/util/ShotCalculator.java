@@ -73,7 +73,7 @@ public class ShotCalculator {
   public record LaunchParameters(
       double rpm,
       double timeOfFlightSec,
-      Rotation2d launcherAngle,
+      Rotation2d driveAngle,
       double driveAngularVelocityRadPerSec,
       boolean isValid,
       double confidence,
@@ -97,6 +97,7 @@ public class ShotCalculator {
       Translation2d hubCenter,
       Translation2d hubForward,
       double visionConfidence,
+      double launcherHeading,
       double pitchDeg,
       double rollDeg) {
 
@@ -107,8 +108,9 @@ public class ShotCalculator {
         ChassisSpeeds robotVelocity,
         Translation2d hubCenter,
         Translation2d hubForward,
-        double visionConfidence) {
-      this(robotPose, fieldVelocity, robotVelocity, hubCenter, hubForward, visionConfidence, 0.0, 0.0);
+        double visionConfidence,
+        double launcherHeading) {
+      this(robotPose, fieldVelocity, robotVelocity, hubCenter, hubForward, visionConfidence, launcherHeading, 0.0, 0.0);
     }
   }
 
@@ -116,17 +118,17 @@ public class ShotCalculator {
   public static class Config {
     // Launcher geometry (measure from CAD)
     public double launcherOffsetX = 0.20; // meters forward of robot center
-    public double launcherOffsetY = 0.10;  // meters left of robot center
+    public double launcherOffsetY = 0.0;  // meters left of robot center
 
     // How close/far you can score from (meters)
     public double minScoringDistance = 0.5;
-    public double maxScoringDistance = 15.0;
+    public double maxScoringDistance = 5.0;
 
     // Newton solver tuning
     public int maxIterations = 25;
     public double convergenceTolerance = 0.001; // seconds
     public double tofMin = 0.05;
-    public double tofMax = 10.0;
+    public double tofMax = 5.0;
 
     // Below this speed (m/s), don't bother with SOTM, just aim straight
     public double minSOTMSpeed = 0.1;
@@ -138,10 +140,10 @@ public class ShotCalculator {
     public double phaseDelayMs = 30.0;  // vision pipeline lag
     public double mechLatencyMs = 20.0; // how long the mechanism takes to respond
 
-    // The ball's inherited robot velocity decays in flight because of drag.
-    // Real displacement = (1 - e^(-c*tof)) / c instead of just v*tof.
-    // Set to 0 to disable drag compensation.
-    public double sotmDragCoeff = 0.47;
+    // Linear drag damping constant (1/s) for SOTM horizontal velocity decay.
+    // displacement = v0 * (1 - e^(-c*t)) / c
+    // c = 0.5*rho*Cd*A*v_ref / m = 0.24 for our ball at ~10 m/s. Set to 0 to disable.
+    public double sotmDragCoeff = 0.24;
 
     // Confidence scoring weights (5-component weighted geometric mean)
     public double wConvergence = 1.0;
@@ -156,13 +158,18 @@ public class ShotCalculator {
     public double headingSpeedScalar = 1.0;
 
     // Heading tolerance scales with distance from hub.
-    // Closer = tighter because small angle errors matter more up close.
+    // Farther = tighter because the same angle error produces a larger miss at long range.
     // scaledMaxError *= referenceDistance / distance, clamped [0.5, 2.0].
     public double headingReferenceDistance = 2.5; // meters
 
     // Suppress firing when pitch or roll exceeds this threshold.
     // Bumps and ramps tilt the robot, which throws off aim. Set to 90 to disable.
     public double maxTiltDeg = 5.0;
+
+    // Rotation between the launcher face and robot front. 0 = forward-facing,
+    // Math.PI = rear-facing. The solver rotates the drive heading so the
+    // correct face points at the hub.
+    public double shooterAngleOffsetRad = 0.0;
   }
 
   private final Config config;
@@ -172,11 +179,12 @@ public class ShotCalculator {
   private final InterpolatingDoubleTreeMap correctionRpmMap = new InterpolatingDoubleTreeMap();
   private final InterpolatingDoubleTreeMap correctionTofMap = new InterpolatingDoubleTreeMap();
 
+  // If set via loadShotLUT(), base RPM/TOF/angle come from here instead of the
+  // separate maps. Corrections and copilot offset still layer on top.
+  private ShotLUT shotLUT = null;
+
   // Copilot RPM trim (flat offset applied during match)
   private double rpmOffset = 0;
-
-  // Copilot aim angle trim in degrees (flat offset applied during match)
-  private double aimAngleOffset = 0;
 
   // Solver state (reused across cycles to avoid allocation)
   private double previousTOF = -1;
@@ -204,13 +212,13 @@ public class ShotCalculator {
 
   // LUT lookup: base value + any corrections + copilot RPM offset
   double effectiveRPM(double distance) {
-    double base = rpmMap.get(distance);
+    double base = shotLUT != null ? shotLUT.getRPM(distance) : rpmMap.get(distance);
     Double correction = correctionRpmMap.get(distance);
     return base + (correction != null ? correction : 0.0) + rpmOffset;
   }
 
   double effectiveTOF(double distance) {
-    double base = tofMap.get(distance);
+    double base = shotLUT != null ? shotLUT.getTOF(distance) : tofMap.get(distance);
     Double correction = correctionTofMap.get(distance);
     return base + (correction != null ? correction : 0.0);
   }
@@ -273,6 +281,8 @@ public class ShotCalculator {
     double robotX = compensatedPose.getX();
     double robotY = compensatedPose.getY();
     double heading = compensatedPose.getRotation().getRadians();
+
+    Logger.recordOutput("compensatedPose", compensatedPose);
 
     Translation2d hubCenter = inputs.hubCenter();
     double hubX = hubCenter.getX();
@@ -358,8 +368,12 @@ public class ShotCalculator {
       for (int i = 0; i < maxIter; i++) {
         double prevTOF = tof;
 
+        // Compute drag exponent once per iteration for both drift and derivative
+        double c = config.sotmDragCoeff;
+        double dragExp = c < 1e-6 ? 1.0 : Math.exp(-c * tof);
+        double driftTOF = c < 1e-6 ? tof : (1.0 - dragExp) / c;
+
         // Projected displacement at time t, with drag-compensated velocity offset
-        double driftTOF = dragCompensatedTOF(tof);
         double prx = rx - vx * driftTOF;
         double pry = ry - vy * driftTOF;
         projDist = Math.hypot(prx, pry);
@@ -373,8 +387,8 @@ public class ShotCalculator {
 
         double lookupTOF = effectiveTOF(projDist);
 
-        // Derivative for Newton step
-        double dPrime = -(prx * vx + pry * vy) / projDist;
+        // Derivative for Newton step (chain rule: d/dt of dragCompensatedTOF = e^(-ct))
+        double dPrime = -dragExp * (prx * vx + pry * vy) / projDist;
         double gPrime = tofMapDerivative(projDist);
         double f = lookupTOF - tof;
         double fPrime = gPrime * dPrime - 1.0;
@@ -425,27 +439,25 @@ public class ShotCalculator {
       compTargetX = hubX - vx * headingDriftTOF;
       compTargetY = hubY - vy * headingDriftTOF;
     }
-    double aimX = compTargetX - robotX;
-    double aimY = compTargetY - robotY;
+    double aimX = compTargetX - launcherX;
+    double aimY = compTargetY - launcherY;
     Rotation2d driveAngle = new Rotation2d(aimX, aimY);
+    // if (config.shooterAngleOffsetRad != 0.0) {
+    //   driveAngle = driveAngle.plus(new Rotation2d(config.shooterAngleOffsetRad));
+    // }
 
     // Heading error for confidence calculation
-    double headingErrorRad = MathUtil.angleModulus(driveAngle.getRadians() - heading);
-
-    // ADDED
-    Rotation2d launcherAngle = new Rotation2d(
-        compTargetX-launcherX, 
-        compTargetY-launcherY
-    );
+    double headingErrorRad = MathUtil.angleModulus(driveAngle.getRadians() - inputs.launcherHeading());
+    Logger.recordOutput("SOTM/HeadingError", headingErrorRad);
 
     // Angular velocity feedforward: rate of change of aim angle
-    // TODO: Adjust for launched pos
     double driveAngularVelocity = 0;
     if (!velocityFiltered && distance > 0.1) {
       // tangential velocity / distance gives angular rate
-      double tangentialVel = (-ry * vx + rx * vy) / distance;
+      double tangentialVel = (ry * vx - rx * vy) / distance;
       driveAngularVelocity = tangentialVel / distance;
     }
+    Logger.recordOutput("SOTM/FeedForward", driveAngularVelocity);
 
     // Solver convergence quality
     double solverQuality;
@@ -471,7 +483,7 @@ public class ShotCalculator {
     return new LaunchParameters(
         effectiveRPMValue,
         effectiveTOF,
-        launcherAngle,
+        driveAngle,
         driveAngularVelocity,
         true,
         confidence,
@@ -554,11 +566,10 @@ public class ShotCalculator {
     correctionRpmMap.clear();
     correctionTofMap.clear();
   }
-  
+
   /** Bump the RPM offset by delta. Clamped to +/- 200. Bind this to copilot D-pad. */
   public void adjustOffset(double delta) {
     rpmOffset = MathUtil.clamp(rpmOffset + delta, -200, 200);
-    Logger.recordOutput("RPMTrim", rpmOffset);
   }
 
   /** Reset the RPM offset to zero. Call this on mode transitions so trim doesn't carry over. */
@@ -570,21 +581,6 @@ public class ShotCalculator {
     return rpmOffset;
   }
 
-  /** Bump the aim angle offset by delta degrees. Clamped to +/- 30. Bind this to copilot D-pad left/right. */
-  public void adjustAimOffset(double delta) {
-    aimAngleOffset = aimAngleOffset + delta;
-    Logger.recordOutput("AimAngleTrim", aimAngleOffset);
-  }
-
-  /** Reset the aim angle offset to zero. Call this on mode transitions so trim doesn't carry over. */
-  public void resetAimOffset() {
-    aimAngleOffset = 0;
-  }
-
-  public double getAimOffset() {
-    return aimAngleOffset;
-  }
-
   /** Raw time-of-flight from the LUT at this distance (no velocity compensation). */
   public double getTimeOfFlight(double distanceM) {
     return effectiveTOF(distanceM);
@@ -592,6 +588,7 @@ public class ShotCalculator {
 
   /** Base RPM at this distance, before any corrections or offset. */
   public double getBaseRPM(double distance) {
+    if (shotLUT != null) return shotLUT.getRPM(distance);
     return rpmMap.get(distance);
   }
 
@@ -602,6 +599,26 @@ public class ShotCalculator {
     prevRobotVx = 0;
     prevRobotVy = 0;
     prevRobotOmega = 0;
+  }
+
+  /**
+   * Load a ShotLUT instead of calling loadLUTEntry() one at a time. RPM, hood angle,
+   * and TOF all interpolate together so they can't drift apart. Corrections from
+   * addRpmCorrection() and copilot offset still layer on top.
+   *
+   * <p>Takes priority over any entries added through loadLUTEntry().
+   */
+  public void loadShotLUT(ShotLUT lut) {
+    this.shotLUT = lut;
+  }
+
+  /**
+   * Hood angle at this distance from the ShotLUT. Returns 0 if you loaded data through
+   * loadLUTEntry() instead, since the basic path doesn't carry angle info.
+   */
+  public double getHoodAngle(double distance) {
+    if (shotLUT != null) return shotLUT.getAngle(distance);
+    return 0;
   }
 
   InterpolatingDoubleTreeMap getRpmMap() {

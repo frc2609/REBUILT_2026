@@ -55,6 +55,9 @@ public final class Constants {
 
     public enum PositionMotorType {
         CTRE_TALON_FX,
+        CTRE_TALON_FX_MM,
+        CTRE_TALON_FX_FOC,
+        CTRE_TALON_FX_EXPO,
         REV_SPARK_MAX,
         SIM
     }
@@ -106,7 +109,7 @@ public final class Constants {
     public static final PositionMotorType CLIMBER_POSITION_MOTOR_TYPE =
         PositionMotorType.CTRE_TALON_FX;
     public static final PositionMotorType TURRET_AIM_POSITION_MOTOR_TYPE =
-        PositionMotorType.CTRE_TALON_FX;
+        PositionMotorType.CTRE_TALON_FX_MM;
     public static final PositionMotorType TURRET_HOOD_POSITION_MOTOR_TYPE =
         PositionMotorType.CTRE_TALON_FX;
 
@@ -123,7 +126,7 @@ public final class Constants {
         public static final double CENTER_Y = FIELD_WIDTH / 2.0;
 
         // Zone boundaries - red derived as true field mirror of blue
-        public static final double BLUE_ZONE_X = 4.3;
+        public static final double BLUE_ZONE_X = 4.5;
         public static final double BLUE_BLOCK_X = 5.5; // under trench, aim but don't shoot
         public static final double BLUE_CLOSE_ZONE_X = 7.25;
         public static final double RED_ZONE_X = FIELD_LENGTH - BLUE_ZONE_X;
@@ -154,11 +157,12 @@ public final class Constants {
     public static final class Controls {
         public static final int DRIVER_CONTROLLER_PORT = 0;
         public static final int OPERATOR_CONTROLLER_PORT = 1;
-        public static final double SHOOTING_SPEED_PERCENT = 0.3;
+        public static final double SHOOTING_SPEED_PERCENT = 0.1;
         public static final double UNJAM_FACTOR = 10.0; // kP multiplier when unjamming
+        public static final double SHOT_CONFIDENCE_MIN = 50.0; // out of 100
 
-        public static final double TURRET_READY_TOLERANCE = 15.0; // deg
-        public static final double FLYWHEEL_TOLERANCE_RPM = 150.0; // rpm
+        public static final double TURRET_READY_TOLERANCE = 4.0; // deg
+        public static final double FLYWHEEL_TOLERANCE_RPM = 100.0; // rpm
 
         // Rotation values are OUTPUT degrees
         // RPM values are INPUT RPM, will be geared down
@@ -167,7 +171,7 @@ public final class Constants {
         public static final double INTAKE_DEPLOYED_DEG = 0.0;
         public static final double INTAKE_RETRACT_DEG  = 110.0; // for push
         
-        public static final double INTAKE_RUN_RPM = 3000.0;
+        public static final double INTAKE_RUN_RPM = 4000.0;
         public static final double INTAKE_IDLE_RPM = 0.0;
 
         public static final double CLIMBER_DEPLOYED_DEG = 360.0;
@@ -178,8 +182,8 @@ public final class Constants {
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
         public static final double TURRET_OVERRIDE_LEFT_DEG = -90.0;
 
-        public static final double AGITATOR_HOLD_RPM = 4500.0;
-        public static final double FEED_HOLD_RPM = 4000.0; // max speed
+        public static final double AGITATOR_HOLD_RPM = 5000.0;
+        public static final double FEED_HOLD_RPM = 5000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
         public static final double LOB_DISTANCE = 2.0;
@@ -209,19 +213,20 @@ public final class Constants {
             0.47,    // drag coeff (smooth sphere)
             0.0,     // Magnus coeff
             1.225,   // air density
-            0.482,    // exit height (m), floor to where the ball leaves the shooter
+            0.376,    // exit height (m), floor to where the ball leaves the shooter
             0.0762,  // flywheel diameter, 0.0762
-            1.83,    // target height (m), from game manual
-            0.9,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
-            71.0,    // launch angle from horizontal, 65.0
+            1.95,    // target height (m), 1.83 from game manual
+            0.85,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
+            68.0,    // launch angle from horizontal
             0.001,   // sim timestep
             1500, 6000, 25, 10.0  // RPM search range, iterations, max sim time
         );
 
-    public static ShotCalculator.Config shotConfig = new ShotCalculator.Config();
+    public static final ShotCalculator.Config shotConfig = new ShotCalculator.Config();
     static {
-        shotConfig.launcherOffsetX = 0.0;  // how far forward the launcher is from robot center (m)
-        shotConfig.launcherOffsetY = 0.0;   // how far left, 0 if centered
+        shotConfig.launcherOffsetX = -0.189;  // how far forward the launcher is from robot center (m)
+        shotConfig.launcherOffsetY = -0.144;   // how far left, 0 if centered
+        //shotConfig.shooterAngleOffsetRad = Math.PI; // use LoggedNetworkNumber SOTM/HeadingOffset instead
         shotConfig.phaseDelayMs = 30.0;     // your vision pipeline latency
         shotConfig.mechLatencyMs = 20.0;    // how long the mechanism takes to respond
         shotConfig.maxTiltDeg = 5.0;        // suppress firing when chassis tilts past this (bumps/ramps)
@@ -229,6 +234,7 @@ public final class Constants {
         shotConfig.headingReferenceDistance = 2.5; // heading tolerance scales with distance from hub
         shotConfig.maxScoringDistance = 20.0;
         shotConfig.tofMax = 10.0;
+        shotConfig.maxSOTMSpeed = 10.0;
     }
     
     // Subsystems
@@ -303,18 +309,27 @@ public final class Constants {
             public static final double ENCODER_RATIO = 1.0;
             public static final double ZERO_OFFSET = 0.515; // 0.242 unrestricted
             public static final double RANGE_DEG = 118.0; // 160
-            public static final double HEADING_OFFSET_DEG = 170.0; // robot front to turret zero
-            public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X44;
+            public static final double HEADING_OFFSET_DEG = 180.0; // robot front to turret zero
+            public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
+            // MotionMagic trapezoidal profile limits (rotor rotations/sec, /sec^2, /sec^3)
+            // Tuned via physics sim: 2.2x faster settling, 0.02° overshoot, lowest energy
+            public static final double MAX_VELOCITY = 100.0;   // rotor rot/s (~600 deg/s mechanism)
+            public static final double MAX_ACCEL = 400.0;      // rotor rot/s^2
+
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
-                "kP", 0.06,
-                "kD", 0.0,
+                "kP", 0.8,
+                "kD", 0.02,
                 "kS", 0.005
             ));
             static {
-                // config.put("MotionMagicCruiseVelocity", 100.0);
-                // config.put("MotionMagicAcceleration", 200.0);
-                // config.put("MotionMagicJerk", 0.0); //trapezoid
+                // Trapezoidal profile config (used by MotionMagic firmware)
+                config.put("MotionMagicCruiseVelocity", MAX_VELOCITY);
+                config.put("MotionMagicAcceleration", MAX_ACCEL);
+                config.put("MotionMagicJerk", 0.0);  // 0 = unlimited = pure trapezoidal
+                // Expo profile shape params (only used by DynamicMotionMagicExpoVoltage)
+                config.put("MotionMagicExpo_kV", 0.124); // matches Slot0 kV (12V / 96.67 RPS)
+                config.put("MotionMagicExpo_kA", 0.01);  // start low, tune up if response is sluggish
 
                 config.put("forwardLimitEnabled", true);
                 config.put("forwardLimitRotations",
@@ -330,6 +345,36 @@ public final class Constants {
                 config.put("statorCurrentLimit", 30.0);
                 config.put("statorCurrentLimitEnabled", true);
                 config.put("useClosedLoopFFSign", true);
+            }
+
+            // FOC (TorqueCurrentFOC) config — gains in Amps, not Volts
+            // Derived from voltage gains: kP_A = kP_V/R, kD_A = Kv*G/R, kS_A = kS_V/R
+            // Kraken X60: R = 0.0248 Ω, Kv = 0.124 V·s/rot
+            public static final Map<String, Object> configFOC = new HashMap<>(Map.of(
+                "motorId", 53,
+                "kP", 29.0,    // 0.72 V / 0.0248 Ω
+                "kD", 5.0,     // Kv * G / R = back-EMF equivalent damping
+                "kS", 2.4      // 0.06 V / 0.0248 Ω
+            ));
+            static {
+                configFOC.put("MotionMagicCruiseVelocity", MAX_VELOCITY);
+                configFOC.put("MotionMagicAcceleration", MAX_ACCEL);
+                configFOC.put("MotionMagicJerk", 0.0);
+
+                configFOC.put("forwardLimitEnabled", true);
+                configFOC.put("forwardLimitRotations",
+                    Conversions.degreesToRotations(RANGE_DEG, GEAR_RATIO));
+                configFOC.put("reverseLimitEnabled", true);
+                configFOC.put("reverseLimitRotations",
+                    Conversions.degreesToRotations(-RANGE_DEG, GEAR_RATIO));
+
+                configFOC.put("neutralMode", Constants.NeutralMode.BRAKE);
+                configFOC.put("inverted", false);
+                configFOC.put("supplyCurrentLimit", 30.0);
+                configFOC.put("supplyCurrentLimitEnabled", true);
+                configFOC.put("statorCurrentLimit", 30.0);
+                configFOC.put("statorCurrentLimitEnabled", true);
+                configFOC.put("useClosedLoopFFSign", true);
             }
         }
 
@@ -409,6 +454,11 @@ public final class Constants {
             public static final double GEAR_RATIO = 27.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
+
+            // Homing: drive past the deployed hard stop until current spikes, then zero there
+            public static final double HOME_TARGET_DEG = -30.0;
+            public static final double HOME_CURRENT_THRESHOLD_AMPS = 50.0;
+            public static final int    HOME_CONFIRM_CYCLES = 3;
             
             // NOTE: Cuts off at 10 key-value pairs
             public static final Map<String, Object> config = new HashMap<>(Map.of(

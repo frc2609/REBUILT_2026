@@ -16,10 +16,10 @@ import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FuelPhysicsSim;
 
-public class DifferentAuto extends SequentialCommandGroup {
+public class BumpAuto extends SequentialCommandGroup {
 
-    public DifferentAuto(
-        String pathName,
+    public BumpAuto(
+        String toBump,
         String path2Name,
         DriveSubsystem drive,
         FlywheelSubsystem flywheel,
@@ -31,7 +31,7 @@ public class DifferentAuto extends SequentialCommandGroup {
         addCommands(
             // Follow path while running intake to collect a ball
             Commands.deadline(
-                drive.followPath(new Path(pathName)),
+                drive.followPath(new Path(toBump)),
                 Commands.sequence(
                     new SetIntakeSpeedRPS(intake, Constants.Controls.INTAKE_RUN_RPM / 60.0),
                     new HoldIntakeDeployed(intake, Constants.Controls.INTAKE_DEPLOYED_DEG)
@@ -47,6 +47,7 @@ public class DifferentAuto extends SequentialCommandGroup {
                     ballSim,
                     turret::aimIsAtPosition
                 ),
+                
                 new AutoPushIntake(intake, 0, 110.0)
             ).withTimeout(3.0),
 

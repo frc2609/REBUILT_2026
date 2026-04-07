@@ -18,8 +18,25 @@ public class AutoShoot extends Command {
     private final double feedRPS;
     private final double agitatorRPS;
     private final FuelPhysicsSim ballSim;
-    private final Supplier<Boolean> turretInPose;
+    private final Supplier<Boolean> turretInPose, isPassing;
     private int i = 0;
+
+    public AutoShoot(
+        FlywheelSubsystem flywheel, FeedSubsystem agitator, 
+        double feedRPS, double agitatorRPS, FuelPhysicsSim ballSim,
+        Supplier<Boolean> turretInPose, Supplier<Boolean> isPassing
+    ) {
+        this.flywheel = flywheel;
+        this.agitator = agitator;
+        this.ballSim = ballSim;
+        this.turretInPose = turretInPose;
+        this.isPassing = isPassing;
+        
+        this.feedRPS = feedRPS;
+        this.agitatorRPS = agitatorRPS;
+
+        addRequirements(flywheel, agitator);
+    }
 
     public AutoShoot(
         FlywheelSubsystem flywheel, FeedSubsystem agitator, 
@@ -30,6 +47,7 @@ public class AutoShoot extends Command {
         this.agitator = agitator;
         this.ballSim = ballSim;
         this.turretInPose = turretInPose;
+        this.isPassing = () -> {return false;};
         
         this.feedRPS = feedRPS;
         this.agitatorRPS = agitatorRPS;
@@ -39,18 +57,14 @@ public class AutoShoot extends Command {
 
     @Override
     public void execute() {
-        //System.out.println("SHOOTING>"+flywheel.validShotDetected())
-
         flywheel.useAutoSpeed();
 
-        Logger.recordOutput("turretReady", turretInPose.get());
-        Logger.recordOutput("flywheelReady", flywheel.isAtSpeed());
-
-        if (flywheel.validShotDetected()) {//&& turretInPose.get() && flywheel.isAtSpeed()) {
-            agitator.setAgitatorSpeed(agitatorRPS);
-            agitator.setFeedSpeed(feedRPS);
-
-            // if (flywheel.isAtSpeed(1.0)) // coast or brake feed to not shoot
+        if (flywheel.validShotDetected() && flywheel.isAtSpeed(
+            isPassing.get() ? (900.0/60.0) :
+            (Constants.Controls.FLYWHEEL_TOLERANCE_RPM/60.0)
+        )) {
+            agitator.setAgitatorSpeed();
+            agitator.setFeedSpeed();
 
             if (Constants.currentMode == Constants.Mode.SIM) {
                 if (i%4 == 0) {
