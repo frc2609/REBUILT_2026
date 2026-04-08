@@ -86,6 +86,8 @@ public class RobotContainer {
     private final Trigger resetRpmTrigger = operatorController.back();
     private final Trigger resetAimTrigger = operatorController.start();
 
+    private final Trigger validShotTrigger; 
+
     @SuppressWarnings("unused")
     private final Trigger zeroEncodersTrigger = driverController.b();
 
@@ -131,7 +133,7 @@ public class RobotContainer {
         ledSubsystem = new LedSubsystem(Constants.LedConstants.Length, Constants.LedConstants.Port,
                 Constants.LedConstants.travelTime,Constants.LedConstants.ledGroup);
         hasRun = false;
-
+        validShotTrigger = new Trigger(flywheelSubsystem::validShotDetected);
         // SOTM Setup
 
         ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
