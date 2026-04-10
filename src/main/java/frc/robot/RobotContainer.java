@@ -81,6 +81,7 @@ public class RobotContainer {
     private final Trigger aimRightTrigger = operatorController.povRight();
     private final Trigger resetRpmTrigger = operatorController.back();
     private final Trigger resetAimTrigger = operatorController.start();
+    private final Trigger unjamTrigger = operatorController.a();
 
     @SuppressWarnings("unused")
     private final Trigger zeroEncodersTrigger = driverController.b();
@@ -203,7 +204,8 @@ public class RobotContainer {
             Constants.Controls.FEED_HOLD_RPM / 60.0, 
             Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
             ballSim,
-            turretSubsystem::aimIsAtPosition
+            turretSubsystem::aimIsAtPosition,
+            autoAimCommand::higherFlywheelTolerance
         );
 
         FollowPath.registerEventTrigger("autoShoot", autoShootCommand);
@@ -272,6 +274,12 @@ public class RobotContainer {
         }));
         resetAimTrigger.onTrue(Commands.runOnce(() -> 
             turretHeadingOffsetLogged.set(Constants.Turret.Aim.HEADING_OFFSET_DEG)
+        ));
+
+        unjamTrigger.onTrue(Commands.sequence(
+            Commands.runOnce(() -> feedSubsystem.spindexerSetUnjam(true), feedSubsystem),
+            Commands.waitSeconds(1.0),
+            Commands.runOnce(() -> feedSubsystem.spindexerSetUnjam(false), feedSubsystem)
         ));
 
         // Turret manual override (driver POV up/left/right) — holds turret at a fixed robot-relative angle

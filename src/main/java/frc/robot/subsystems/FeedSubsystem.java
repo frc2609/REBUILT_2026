@@ -51,6 +51,11 @@ public class FeedSubsystem extends SubsystemBase {
         return feedMotor.isAtSpeed(toleranceDegrees);
     }
 
+    public void spindexerSetUnjam(boolean unjamming) {
+        agitatorMotor.setIsUnjamSlot(unjamming);
+        Logger.recordOutput("Feed Unjamming", unjamming);
+    }
+
     public void stop() {
         agitatorMotor.stop();
         feedMotor.stop();
@@ -64,21 +69,21 @@ public class FeedSubsystem extends SubsystemBase {
         agitatorMotor.updateFromTunables();
         feedMotor.updateFromTunables();
 
-        if (unjamming) {
-            if (unjamTimer.get() > Constants.Agitator.UNJAM_TIME) {
-                unjamTimer.reset();
-                unjamming = false;
-                agitatorMotor.setIsUnjamSlot(false);
-                Logger.recordOutput("Feed Unjamming", false);
-            }
-        } else if (
-            agitatorMotor.getStatorCurrent() > Constants.Agitator.JAM_CURRENT &&
-            unjamTimer.get() > Constants.Agitator.UNJAM_TIME // debounce
-        ){
-            unjamTimer.reset();
-            unjamming = true;
-            agitatorMotor.setIsUnjamSlot(true);
-            Logger.recordOutput("Feed Unjamming", true);
-        }
+        // if (unjamming) {
+        //     if (unjamTimer.get() > Constants.Agitator.UNJAM_TIME) {
+        //         unjamTimer.reset();
+        //         unjamming = false;
+        //         agitatorMotor.setIsUnjamSlot(false);
+        //         Logger.recordOutput("Feed Unjamming", false);
+        //     }
+        // } else if (
+        //     agitatorMotor.getStatorCurrent() > Constants.Agitator.JAM_CURRENT &&
+        //     unjamTimer.get() > Constants.Agitator.UNJAM_TIME // debounce
+        // ){
+        //     unjamTimer.reset();
+        //     unjamming = true;
+        //     agitatorMotor.setIsUnjamSlot(true);
+        //     Logger.recordOutput("Feed Unjamming", true);
+        // }
     }
 }
