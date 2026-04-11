@@ -193,6 +193,7 @@ public class RobotContainer {
         intakeSubsystem.zeroCurrentDeployPosition();
         // climberSubsystem.resetPositionToAbsolute();
         //intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
+        intakeSubsystem.zeroCurrentDeployPosition();
         turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
 
         feedSubsystem.setSetpoints(Constants.Controls.AGITATOR_HOLD_RPM,Constants.Controls.FEED_HOLD_RPM);
@@ -203,7 +204,8 @@ public class RobotContainer {
             Constants.Controls.FEED_HOLD_RPM / 60.0, 
             Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
             ballSim,
-            turretSubsystem::aimIsAtPosition
+            turretSubsystem::aimIsAtPosition,
+            autoAimCommand::isPassing
         );
 
         FollowPath.registerEventTrigger("autoShoot", autoShootCommand);
@@ -321,15 +323,24 @@ public class RobotContainer {
                 () -> -driverController.getLeftY(),
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
-                1.0));
-        autoShootTrigger.whileTrue(
-            DriveCommands.joystickDrive(
-                driveSubsystem,
-                () -> -driverController.getLeftY(),
-                () -> -driverController.getLeftX(),
-                () -> -driverController.getRightX(),
-                Constants.Controls.SHOOTING_SPEED_PERCENT)
-        .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+                () -> {
+                    double speed = 1.0;
+                    if (autoShootTrigger.getAsBoolean()) {
+                        speed = 0.3;
+                        if (!autoAimCommand.isPassing()){
+                            speed = 0.15;
+                        }
+                    }
+                    return speed;
+                }));
+        // autoShootTrigger.whileTrue(
+        //     DriveCommands.joystickDrive(
+        //         driveSubsystem,
+        //         () -> -driverController.getLeftY(),
+        //         () -> -driverController.getLeftX(),
+        //         () -> -driverController.getRightX(),
+        //         autoAimCommand::isPassing)
+        //.withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
         xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
         resetGyroTrigger.onTrue(
@@ -344,6 +355,9 @@ public class RobotContainer {
         autoChooser.addOption("Left Sweep", new OneCycleAuto(
             "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
+        // autoChooser.addOption("Alpha Sweep", new OneCycleAuto(
+        //     "alpha", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
+        // ));
         autoChooser.addOption("Right Sweep", new OneCycleAuto(
             "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
@@ -388,9 +402,9 @@ public class RobotContainer {
         return new HomeHood(turretSubsystem);
     }
 
-    public Command getIntakeHomeCommand() {
-        return new HomeIntake(intakeSubsystem);
-    }
+    // public Command getIntakeHomeCommand() {
+    //     return new HomeIntake(intakeSubsystem);
+    // }
 
     public Command getAutonomousCommand() {
         return autoChooser.get();

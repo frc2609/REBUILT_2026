@@ -52,9 +52,11 @@ public class FlywheelSubsystem extends SubsystemBase {
     //     }
     // }
 
-    public boolean isAtSpeed() {
-        return Math.abs(this.autoSpeedRPS-flywheelMotor.getVelocityRps()) < 
-            (Constants.Controls.FLYWHEEL_TOLERANCE_RPM/60.0);
+    public boolean isAtSpeed(double toleranceRPS) {
+        boolean isAtSpeed = Math.abs(this.autoSpeedRPS-flywheelMotor.getVelocityRps()) < 
+            toleranceRPS;
+        Logger.recordOutput("SOTM/Flags/FlywheelReady", isAtSpeed);
+        return isAtSpeed;
     }
 
     public void stop() {
@@ -66,7 +68,6 @@ public class FlywheelSubsystem extends SubsystemBase {
     {
         flywheelMotor.logMotorPID();
         flywheelMotor.updateFromTunables();
-        Logger.recordOutput("SOTM/Flags/FlywheelReady", isAtSpeed());
         Logger.recordOutput("SOTM/FlywheelSetpoint", this.autoSpeedRPS*60.0);
     }
 }
