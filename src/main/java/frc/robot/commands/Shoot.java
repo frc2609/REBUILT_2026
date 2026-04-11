@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.SystemState;
 import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.util.FuelPhysicsSim;
@@ -28,7 +29,7 @@ public class Shoot extends Command {
 
     @Override
     public void execute() {
-        if (flywheel.validShotDetected()){
+        if (SystemState.validShotDetected){
             flywheel.useAutoSpeed();
         } else {
             flywheel.setSpeed();

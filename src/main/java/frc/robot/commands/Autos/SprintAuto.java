@@ -39,13 +39,7 @@ public class SprintAuto extends SequentialCommandGroup {
 
             // Shoot collected ball
             new ParallelCommandGroup(
-                new AutoShoot(
-                    flywheel, feed,
-                    Constants.Controls.FEED_HOLD_RPM / 60.0,
-                    Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-                    ballSim,
-                    turret::aimIsAtPosition
-                ),
+                new AutoShoot(flywheel, feed, ballSim),
                 new AutoPushIntake(intake, 0, 110.0)
             ).withTimeout(4.0)
         );

@@ -162,6 +162,7 @@ public final class Constants {
         public static final double SHOT_CONFIDENCE_MIN = 50.0; // out of 100
 
         public static final double TURRET_READY_TOLERANCE = 4.0; // deg
+        public static final double FLYWHEEL_PASS_TOLERANCE_RPM = 900.0; // rpm
         public static final double FLYWHEEL_TOLERANCE_RPM = 100.0; // rpm
 
         // Rotation values are OUTPUT degrees

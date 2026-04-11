@@ -146,7 +146,7 @@ public class RobotContainer {
                 LedSubsystem.LedPattern.solid(0, 255, 50)),
             // Zone 3 — valid shot detected: blink white
             LedSubsystem.PatternEntry.entry(
-                flywheelSubsystem::validShotDetected,
+                () -> SystemState.validShotDetected,
                 quarter * 3, quarter,
                 LedSubsystem.LedPattern.blink(0, 0, 100, 5))
         );
@@ -197,15 +197,7 @@ public class RobotContainer {
 
         feedSubsystem.setSetpoints(Constants.Controls.AGITATOR_HOLD_RPM,Constants.Controls.FEED_HOLD_RPM);
         flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOB_RPM);
-        autoShootCommand = new AutoShoot(
-            flywheelSubsystem, 
-            feedSubsystem, 
-            Constants.Controls.FEED_HOLD_RPM / 60.0, 
-            Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-            ballSim,
-            turretSubsystem::aimIsAtPosition,
-            autoAimCommand::isPassing
-        );
+        autoShootCommand = new AutoShoot(flywheelSubsystem, feedSubsystem, ballSim);
 
         FollowPath.registerEventTrigger("autoShoot", autoShootCommand);
             
@@ -326,12 +318,14 @@ public class RobotContainer {
                     double speed = 1.0;
                     if (autoShootTrigger.getAsBoolean()) {
                         speed = 0.3;
-                        if (!autoAimCommand.isPassing()){
+                        if (SystemState.isPassing){
                             speed = 0.15;
                         }
                     }
                     return speed;
-                }));
+                }
+            )
+        );
         // autoShootTrigger.whileTrue(
         //     DriveCommands.joystickDrive(
         //         driveSubsystem,

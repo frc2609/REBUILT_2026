@@ -4,7 +4,6 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
 
 /** Shooter Subsystem using velocity control (rotations per second). */
@@ -20,9 +19,6 @@ public class FlywheelSubsystem extends SubsystemBase {
         this.flywheelMotor = flywheelMotor;
     }
 
-    public boolean validShotDetected() {
-        return this.autoSpeedRPS != 0.0;
-    }
     public void setAutoSpeed(double rps) {
         this.autoSpeedRPS = rps;
     }

@@ -28,13 +28,8 @@ public class OneCycleAuto extends SequentialCommandGroup {
     ) {
         addCommands(
             // Shoot preloaded ball
-            new AutoShoot(
-                flywheel, feed,
-                Constants.Controls.FEED_HOLD_RPM / 60.0,
-                Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-                ballSim,
-                turret::aimIsAtPosition
-            ).withTimeout(3.0),
+            new AutoShoot(flywheel, feed, ballSim)
+            .withTimeout(3.0),
 
             // Follow path while running intake to collect a ball
             Commands.deadline(
@@ -46,13 +41,8 @@ public class OneCycleAuto extends SequentialCommandGroup {
             ),
 
             // Shoot collected ball
-            new AutoShoot(
-                flywheel, feed,
-                Constants.Controls.FEED_HOLD_RPM / 60.0,
-                Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-                ballSim,
-                turret::aimIsAtPosition
-            ).withTimeout(3.0)
+            new AutoShoot(flywheel, feed, ballSim)
+                .withTimeout(3.0)
         );
     }
 }

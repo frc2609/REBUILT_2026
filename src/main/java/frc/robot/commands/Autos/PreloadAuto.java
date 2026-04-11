@@ -29,13 +29,8 @@ public class PreloadAuto extends SequentialCommandGroup {
             Commands.waitSeconds(3.0),
 
             // Shoot preloaded ball
-            new AutoShoot(
-                flywheel, feed,
-                Constants.Controls.FEED_HOLD_RPM / 60.0,
-                Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
-                ballSim,
-                turret::aimIsAtPosition
-            ).withTimeout(4.0)
+            new AutoShoot(flywheel, feed, ballSim)
+                .withTimeout(4.0)
         );
     }
 }
