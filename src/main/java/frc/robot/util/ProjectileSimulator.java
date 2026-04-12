@@ -328,7 +328,7 @@ public class ProjectileSimulator {
       double minAngleDeg, double maxAngleDeg, double angleStepDeg) {
     ShotLUT lut = new ShotLUT();
 
-    for (double distance = 0.50; distance <= 5.00 + 0.001; distance += 0.05) {
+    for (double distance = 2.0; distance <= 20.00 + 0.001; distance += 0.5) {
       distance = Math.round(distance * 100.0) / 100.0;
 
       double bestRPM = Double.MAX_VALUE;

@@ -41,6 +41,8 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FuelPhysicsSim;
 import frc.robot.util.ProjectileSimulator;
 import frc.robot.util.ShotCalculator;
+import frc.robot.util.ShotLUT;
+import frc.robot.util.ProjectileSimulator.SimParameters;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -153,8 +155,16 @@ public class RobotContainer {
         // SOTM Setup
         
         ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
-        ProjectileSimulator.GeneratedLUT lut = sim.generateLUT(2.0, 20.0, 0.5);
+        ProjectileSimulator passingSim = new ProjectileSimulator(Constants.passingSimParameters);
+
+        ShotLUT lut = sim.generateVariableAngleShotLUT(61.0, 85.0, 6.0);
+        ShotLUT passingLut = passingSim.generateVariableAngleShotLUT(61.0, 85.0, 6.0);
+        
         this.shotCalculator = new ShotCalculator(Constants.shotConfig);
+        this.shotCalculator.loadShotLUT(lut);
+
+        // transition between shooting and passing eventually.
+        //this.shotCalculator.loadShotLUT(passingLut);
 
         // // Option 1: basic path (RPM + TOF only, fixed angle)
         // ShotCalculator shotCalc = new ShotCalculator(config);
@@ -170,13 +180,13 @@ public class RobotContainer {
         // lut.put(3.0, 3500, 38.0, 0.78);
         // shotCalc.loadShotLUT(lut);
 
-        for (var entry : lut.entries()) {
-            if (entry.reachable()) {
-                System.out.printf("%.2fm -> %.0f RPM, %.3fs TOF%n",
-                    entry.distanceM(), entry.rpm(), entry.tof());
-                shotCalculator.loadLUTEntry(entry.distanceM(), entry.rpm(), entry.tof());
-            }
-        }
+        // for (var entry : lut.entries()) {
+        //     if (entry.reachable()) {
+        //         System.out.printf("%.2fm -> %.0f RPM, %.3fs TOF%n",
+        //             entry.distanceM(), entry.rpm(), entry.tof());
+        //         shotCalculator.loadLUTEntry(entry.distanceM(), entry.rpm(), entry.tof());
+        //     }
+        // }
 
         turretHeadingOffsetLogged = new LoggedNetworkNumber("/Tuning/SOTM/HeadingOffset", 180.0);
         autoAimCommand = new AutoAimTurret(

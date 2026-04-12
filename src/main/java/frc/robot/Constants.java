@@ -177,8 +177,8 @@ public final class Constants {
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
         public static final double TURRET_OVERRIDE_LEFT_DEG = -90.0;
 
-        public static final double AGITATOR_HOLD_RPM = 5000.0;
-        public static final double FEED_HOLD_RPM = 5000.0; // max speed
+        public static final double AGITATOR_HOLD_RPM = 6000.0;
+        public static final double FEED_HOLD_RPM = 6000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
         public static final double LOB_DISTANCE = 2.0;
@@ -211,6 +211,22 @@ public final class Constants {
             0.376,    // exit height (m), floor to where the ball leaves the shooter
             0.0762,  // flywheel diameter, 0.0762
             1.95,    // target height (m), 1.83 from game manual
+            0.85,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
+            68.0,    // launch angle from horizontal
+            0.001,   // sim timestep
+            1500, 6000, 25, 10.0  // RPM search range, iterations, max sim time
+        );
+
+    public static ProjectileSimulator.SimParameters passingSimParameters = 
+        new ProjectileSimulator.SimParameters(
+            0.215,   // ball mass kg
+            0.1501,  // ball diameter m
+            0.47,    // drag coeff (smooth sphere)
+            0.0,     // Magnus coeff
+            1.225,   // air density
+            0.376,    // exit height (m), floor to where the ball leaves the shooter
+            0.0762,  // flywheel diameter, 0.0762
+            0.0,    // target height (m), 1.83 from game manual
             0.85,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
             68.0,    // launch angle from horizontal
             0.001,   // sim timestep
@@ -301,7 +317,7 @@ public final class Constants {
                     Conversions.degreesToRotations(-RANGE_DEG, GEAR_RATIO));
                 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
-                config.put("inverted", false);
+                config.put("inverted", true);
                 config.put("supplyCurrentLimit", 30.0);
                 config.put("supplyCurrentLimitEnabled", true);
                 config.put("statorCurrentLimit", 30.0);

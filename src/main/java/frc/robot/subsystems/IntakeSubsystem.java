@@ -27,7 +27,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void setRollerPercent(double direction) {
         System.out.println("~~~~~~ROLLER POWER~~~~~~"+rollerMotor.getSetpoint());
-        rollerMotor.setPercent(direction * 1.0);
+        rollerMotor.setPercent(direction * 0.8);
     }
 
     public double getDeploySetpoint() {
