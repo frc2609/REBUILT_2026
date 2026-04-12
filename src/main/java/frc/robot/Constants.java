@@ -273,12 +273,13 @@ public final class Constants {
             "motorId", 50,
             "followerId", 51,
             "followerAligned", false,
-            "kP", 0.04,
-            "kV", 0.0002, //0.0117
+            "kP", 6767.0,
             "inverted", true,
             "statorCurrentLimit", 90.0,
             "statorCurrentLimitEnabled", true,
-            "neutralMode", NeutralMode.COAST
+            "neutralMode", NeutralMode.COAST,
+            "peakForwardTorqueCurrent", 120.0,
+            "peakReverseTorqueCurrent", 2.0
         ));
     }
 

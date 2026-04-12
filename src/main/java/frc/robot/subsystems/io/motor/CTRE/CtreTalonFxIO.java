@@ -117,7 +117,13 @@ public class CtreTalonFxIO {
         setters.put(
             "statorCurrentLimitEnabled", 
             value -> config.CurrentLimits.StatorCurrentLimitEnable = (boolean) value);
-        
+        setters.put(
+            "peakForwardTorqueCurrent", 
+            value -> config.TorqueCurrent.PeakForwardTorqueCurrent = (double) value);
+        setters.put(
+            "peakReverseTorqueCurrent", 
+            value -> config.TorqueCurrent.PeakReverseTorqueCurrent = (double) value);
+
         setters.put(
             "isRioCANBUS", 
             value -> this.isRioCANBUS = (boolean) value);

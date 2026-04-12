@@ -1,6 +1,7 @@
 package frc.robot.subsystems.io.motor.CTRE;
 
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+
 import edu.wpi.first.math.controller.BangBangController;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
 
@@ -8,8 +9,9 @@ import java.util.Map;
 
 public class CtreTalonFxTorqueCurrentFOCIO extends CtreTalonFxIO implements VelocityMotorIO {
 
-    public BangBangController bangBangController = new BangBangController();
-    public TorqueCurrentFOC control = new TorqueCurrentFOC(0);
+    //public BangBangController bangBangController = new BangBangController();
+    public VelocityTorqueCurrentFOC control = new VelocityTorqueCurrentFOC(0.0);
+    double setpointRPS = 0.0;
 
     public CtreTalonFxTorqueCurrentFOCIO(Map<String, Object> cfg) {
         super(cfg);
@@ -27,31 +29,32 @@ public class CtreTalonFxTorqueCurrentFOCIO extends CtreTalonFxIO implements Velo
 
     @Override
     public void setVelocityRps(double setpoint) {
-        bangBangController.setSetpoint(setpoint);
-        control = control.withOutput(
-            80.0*bangBangController.calculate(getVelocityRps())
-            + config.Slot0.kV * setpoint
-        );
+        //bangBangController.setSetpoint(setpoint);
+        control = control.withVelocity(setpoint);
+        // control = control.withOutput(
+        //     80.0*bangBangController.calculate(getVelocityRps())
+        //     + config.Slot0.kV * setpoint
+        // );
         motor.setControl(control);
     }
 
     @Override
     public void logMotorPID() {
         measuredLogged.set(getVelocityRps()*60.0);
-        setpointLogged.set(bangBangController.getSetpoint()*60.0);
+        setpointLogged.set(getSetpointRPM());
         voltageLogged.set(motor.getMotorVoltage().getValueAsDouble());
         statorLogged.set(getStatorCurrent());
     }
 
     @Override
     public double getSetpointRPM() {
-        return bangBangController.getSetpoint();
+        double input = setpointLogged.get();
+        return input;
     }
 
     @Override
     public boolean isAtSpeed(double toleranceRps) {
-        //bangBangController.setTolerance(toleranceRps);
-        return bangBangController.atSetpoint();
+        return Math.abs(setpointRPS - getVelocityRps()) <= toleranceRps;
     }
 
     @Override

@@ -86,7 +86,7 @@ public class SimCtreTalonFxTorqueCurrentFOCIO extends CtreTalonFxTorqueCurrentFO
     @Override
     public void logMotorPID() {
         measuredLogged.set(motorSim.getAngularVelocityRPM());
-        setpointLogged.set(bangBangController.getSetpoint()*60.0);
+        setpointLogged.set(getSetpointRPM());
         voltageLogged.set(talonFXSim.getMotorVoltage());
         statorLogged.set(talonFXSim.getTorqueCurrent());
     }
