@@ -102,12 +102,16 @@ public class CtreTalonDynamicMotionMagicVoltageIO extends CtreTalonFxIO implemen
     @Override
     public void resetToAbsolute(double absRotations) {
         double motorRotations = absRotations * gearRatio;
-        System.out.println(NTPath + ": ENCODER RESET, absReading=" + absRotations
-            + ", gear:" + gearRatio + " rotations:" + motorRotations);
-        motor.setPosition(motorRotations);
-        targetDegrees = getPositionDegrees();
+        System.out.println(NTPath+": ENCODER RESET, absReading="+absRotations+", gear:"+gearRatio+" rotations:"+motorRotations);
+        this.resetToRotations(motorRotations);
+    }
+
+    @Override
+    public void resetToRotations(double rotations) {
+        motor.setPosition(rotations);
+        targetDegrees = getPositionDegrees(); // 0?
         if (hasFollower) {
-            followerMotor.setPosition(motorRotations);
+            followerMotor.setPosition(rotations);
         }
     }
 

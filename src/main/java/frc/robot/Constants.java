@@ -239,38 +239,6 @@ public final class Constants {
     
     // Subsystems
 
-    public static final class Climber {
-        public static final int EncoderChannel = 1;
-        public static final double INERTIA = 0.01;
-        public static final double GEAR_RATIO = 45.0;
-        public static final double ENCODER_RATIO = 1.0;
-        public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
-
-        // NOTE: Cuts off at 10 key-value pairs
-        public static final Map<String, Object> config = new HashMap<>(
-            Map.of(
-                "motorId", 40,
-                "kP", 0.0,
-                "kI", 0.0,
-                "kD", 0.0,
-                "kV", 0.0,
-                "kS", 0.0,
-                "forwardLimitEnabled", false,
-                "forwardLimitRotations", 100.0,
-                "reverseLimitEnabled", false,
-                "reverseLimitRotations", 100.0
-        ));
-        static {
-            config.put("inverted", false);
-            config.put("supplyCurrentLimit", 60.0);
-            config.put("supplyCurrentLimitEnabled", true);
-            config.put("statorCurrentLimit", 80.0);
-            config.put("statorCurrentLimitEnabled", true);
-            // config.put("MotionMagicCruiseVelocity", 2.0);
-            // config.put("MotionMagicAcceleration", 1.0);
-        }
-    }
-
     public static final class Feed {
         public static final double INERTIA = 0.01;
         public static final double GEAR_RATIO = 25.0/12.0;
@@ -305,10 +273,9 @@ public final class Constants {
 
         public static final class Aim {
             public static final double INERTIA = 0.01;
-            public static final double GEAR_RATIO = 60.0;
+            public static final double GEAR_RATIO = 2.909;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.515; // 0.242 unrestricted
-            public static final double RANGE_DEG = 118.0; // 160
+            public static final double RANGE_DEG = 180.0; // 160
             public static final double HEADING_OFFSET_DEG = 180.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
             // MotionMagic trapezoidal profile limits (rotor rotations/sec, /sec^2, /sec^3)
@@ -402,7 +369,7 @@ public final class Constants {
                 config.put("forwardLimitRotations", 0.92);
                 config.put("reverseLimitRotations", 0.0);
                 
-                config.put("inverted", true);
+                config.put("inverted", false);
                 config.put("supplyCurrentLimit", 40.0);
                 config.put("supplyCurrentLimitEnabled", true);
                 config.put("statorCurrentLimit", 40.0);
@@ -414,7 +381,7 @@ public final class Constants {
 
     public static final class Agitator {
         public static final double INERTIA = 0.001;
-        public static final double GEAR_RATIO = 80.0/9.0;
+        public static final double GEAR_RATIO = 80.0/3.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
         public static final double JAM_CURRENT = 100.0; // stator limit before unjam
         public static final double UNJAM_TIME  = 3.0; // seconds
@@ -439,6 +406,8 @@ public final class Constants {
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 31,
+                "followerId", 32,
+                "followerAligned", false,
                 "isRioCANBUS",true,
                 "inverted", true,
                 "kP", 0.032,
@@ -451,7 +420,7 @@ public final class Constants {
         public static final class Deploy {
             public static final double INERTIA = 0.001;
             public static final double ZERO_OFFSET = 0;
-            public static final double GEAR_RATIO = 27.0;
+            public static final double GEAR_RATIO = 12.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 

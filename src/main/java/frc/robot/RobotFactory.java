@@ -54,13 +54,13 @@ public class RobotFactory {
             driveSubsystem::addVisionMeasurement, buildVisionIO()
         );
         turretSubsystem = new TurretSubsystem(
-            buildTurretAimIO(), buildTurretHoodIO(), buildTurretEncoderIO()
+            buildTurretAimIO(), buildTurretHoodIO() //buildTurretEncoderIO()
         );
         flywheelSubsystem = new FlywheelSubsystem(
             buildFlywheelIO()
         );
         intakeSubsystem = new IntakeSubsystem(
-            buildIntakeEncoderIO(), buildIntakeDeployIO(), buildIntakeRollerIO()
+            buildIntakeDeployIO(), buildIntakeRollerIO()
         );
         // climberSubsystem = new ClimberSubsystem(
         //     buildClimberEncoderIO(), buildClimberMotorIO()
@@ -279,13 +279,13 @@ public class RobotFactory {
         return this.intakeSubsystem;
     }
 
-    private AbsEncoderIO buildIntakeEncoderIO() {
-        if (currentMode == Mode.SIM) {
-        return new SimAbsEncoderIO(0);
-        }
+    // private AbsEncoderIO buildIntakeEncoderIO() {
+    //     if (currentMode == Mode.SIM) {
+    //     return new SimAbsEncoderIO(0);
+    //     }
 
-        return new WpiDutyCycleEncoderIO(Constants.Intake.EncoderChannel);
-    }
+    //     return new WpiDutyCycleEncoderIO(Constants.Intake.EncoderChannel);
+    // }
 
     private PositionMotorIO buildIntakeDeployIO() {
         if (currentMode == Mode.SIM) {

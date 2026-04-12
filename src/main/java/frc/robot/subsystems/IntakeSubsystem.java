@@ -9,13 +9,11 @@ import frc.robot.subsystems.io.motor.VelocityMotorIO;
 public class IntakeSubsystem extends SubsystemBase {
     private final PositionMotorIO deployMotor;
     private final VelocityMotorIO driveMotor;
-    private final AbsEncoderIO deployEncoder;
 
     public IntakeSubsystem(
-        AbsEncoderIO deployEncoder, PositionMotorIO deployMotor, VelocityMotorIO driveMotor) {
+        PositionMotorIO deployMotor, VelocityMotorIO driveMotor) {
         this.deployMotor = deployMotor;
         this.driveMotor = driveMotor;
-        this.deployEncoder = deployEncoder;
     }
 
     public void setDeploySetpoint(double deg) {
@@ -41,22 +39,18 @@ public class IntakeSubsystem extends SubsystemBase {
         deployMotor.setTargetPositionDegrees(degrees);
     }
 
-    public void resetDeployPositionToAbsolute(double offsetRotations) {
-        double motorRotations = deployEncoder.getRotations()-offsetRotations;
-        if (motorRotations <= -0.1) { motorRotations += 1.0; }
+    // public void resetDeployPositionToAbsolute(double offsetRotations) {
+    //     double motorRotations = deployEncoder.getRotations()-offsetRotations;
+    //     if (motorRotations <= -0.1) { motorRotations += 1.0; }
 
-        System.out.println("DEPLOY ZEROED, rotor offset: "+motorRotations);
-        deployMotor.resetToAbsolute(motorRotations);
+    //     System.out.println("DEPLOY ZEROED, rotor offset: "+motorRotations);
+    //     deployMotor.resetToAbsolute(motorRotations);
+    // }
+
+    public void zeroDeployToRotations(double offsetRotations) {
+        deployMotor.resetToRotations(offsetRotations);
     }
 
-    public void zeroCurrentDeployPosition() {
-        // TEMPORARY
-        //System.out.print
-        deployMotor.resetToAbsolute(8.97/27.0);
-        //((TalonFX) deployMotor).setPosition(9.28);
-    }
-
-    
     public double getDeployCurrentAmps() {
         return deployMotor.getStatorCurrentAmps();
     }
@@ -79,13 +73,8 @@ public class IntakeSubsystem extends SubsystemBase {
     @Override
     public void periodic()
     {
-        deployMotor.logMotorPID(deployEncoder.getRotations());
         driveMotor.logMotorPID();
         deployMotor.updateFromTunables();
         driveMotor.updateFromTunables();
-    }
-
-    public void setEncoderInvert(boolean inverted) {
-        this.deployEncoder.setInverted(inverted);
     }
 }
