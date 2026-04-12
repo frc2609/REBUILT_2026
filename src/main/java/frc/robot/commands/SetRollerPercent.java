@@ -6,17 +6,17 @@ import frc.robot.subsystems.IntakeSubsystem;
 /** Holds the shooter at a requested speed (RPS) while scheduled. */
 public class SetRollerPercent extends Command {
     private final IntakeSubsystem intake;
-    private final double direction;
+    private final double percent;
 
-    public SetRollerPercent(IntakeSubsystem intake, double direction) {
+    public SetRollerPercent(IntakeSubsystem intake, double percent) {
         this.intake = intake;
-        this.direction = direction;
+        this.percent = percent;
         addRequirements(intake);
     }
     
     @Override
     public void execute() {
-        intake.setRollerPercent(direction);
+        intake.setRollerPercent(percent);
     }
 
     @Override

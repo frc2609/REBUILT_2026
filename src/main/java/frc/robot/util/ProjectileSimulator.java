@@ -275,7 +275,7 @@ public class ProjectileSimulator {
 
   /** Generate the full lookup table: 0.50m to 5.00m in 5cm steps (91 entries). Takes ~200ms. */
   public GeneratedLUT generateLUT() {
-    return generateLUT(0.50, 5.00, 0.05);
+    return generateLUT(2.0, 20.0, 0.5);
   }
 
   public GeneratedLUT generateLUT(double minDistM, double maxDistM, double stepM) {

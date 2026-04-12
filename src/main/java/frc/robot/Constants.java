@@ -162,14 +162,15 @@ public final class Constants {
         public static final double SHOT_CONFIDENCE_MIN = 50.0; // out of 100
 
         public static final double TURRET_READY_TOLERANCE = 4.0; // deg
-        public static final double FLYWHEEL_TOLERANCE_RPM = 100.0; // rpm
+        public static final double FLYWHEEL_TOLERANCE_RPM = 670.0; // rpm
 
         // Rotation values are OUTPUT degrees
         // RPM values are INPUT RPM, will be geared down
 
 
         public static final double INTAKE_DEPLOYED_DEG = 695.0;
-        public static final double INTAKE_RUN_PERCENT = 1.0;
+        public static final double INTAKE_RUN_PERCENT = 0.7;
+        public static final double INTAKE_SPIT_PERCENT = 0.1;
 
         public static final double TURRET_HOOD_DEG = 15.0;
 
@@ -210,7 +211,7 @@ public final class Constants {
             1.225,   // air density
             0.376,    // exit height (m), floor to where the ball leaves the shooter
             0.0762,  // flywheel diameter, 0.0762
-            1.95,    // target height (m), 1.83 from game manual
+            1.91,    // target height (m), 1.83 from game manual
             0.85,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
             68.0,    // launch angle from horizontal
             0.001,   // sim timestep
@@ -235,8 +236,8 @@ public final class Constants {
 
     public static final ShotCalculator.Config shotConfig = new ShotCalculator.Config();
     static {
-        shotConfig.launcherOffsetX = -0.189;  // how far forward the launcher is from robot center (m)
-        shotConfig.launcherOffsetY = -0.144;   // how far left, 0 if centered
+        shotConfig.launcherOffsetX = -0.119;  // how far forward the launcher is from robot center (m)
+        shotConfig.launcherOffsetY = -0.152;   // how far left, 0 if centered
         //shotConfig.shooterAngleOffsetRad = Math.PI; // use LoggedNetworkNumber SOTM/HeadingOffset instead
         shotConfig.phaseDelayMs = 30.0;     // your vision pipeline latency
         shotConfig.mechLatencyMs = 20.0;    // how long the mechanism takes to respond
@@ -527,7 +528,9 @@ public final class Constants {
     }
 
     public static final class LedConstants{
-        public static final int Length = 75;
+        public static final int Length = 100;
         public static final int Port = 0;
+        public static final double travelTime = 1.25;//time to go from one end to the other in seconds
+        public static final int ledGroup = 3;
     }
 }

@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoAimTurret;
 import frc.robot.commands.AutoPushIntake;
-import frc.robot.lib.BLine.FollowPath;
 import frc.robot.commands.Autos.DifferentAuto;
 import frc.robot.commands.Autos.OneCycleAuto;
 import frc.robot.commands.Autos.SprintAuto;
@@ -26,7 +25,6 @@ import frc.robot.commands.Autos.SprintDoubleAuto;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.HomeHood;
-import frc.robot.commands.HomeIntake;
 import frc.robot.commands.HoldIntakeDeployed;
 import frc.robot.commands.PushIntake;
 import frc.robot.commands.SetRollerPercent;
@@ -36,29 +34,29 @@ import frc.robot.subsystems.FlywheelSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LedSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
-import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.FuelPhysicsSim;
 import frc.robot.util.ProjectileSimulator;
 import frc.robot.util.ShotCalculator;
 import frc.robot.util.ShotLUT;
-import frc.robot.util.ProjectileSimulator.SimParameters;
-
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
 
-    private final CommandXboxController driverController =
-        new CommandXboxController(Constants.Controls.DRIVER_CONTROLLER_PORT);
-    private final CommandXboxController operatorController =
-        new CommandXboxController(Constants.Controls.OPERATOR_CONTROLLER_PORT);
+    private final CommandXboxController driverController = new CommandXboxController(
+            Constants.Controls.DRIVER_CONTROLLER_PORT);
+    private final CommandXboxController operatorController = new CommandXboxController(
+            Constants.Controls.OPERATOR_CONTROLLER_PORT);
 
     private final Trigger xTrigger = driverController.x();
     private final Trigger resetGyroTrigger = driverController.back();
@@ -85,7 +83,6 @@ public class RobotContainer {
     private final Trigger resetRpmTrigger = operatorController.back();
     private final Trigger resetAimTrigger = operatorController.start();
 
-
     //private final Trigger zeroEncodersTrigger = driverController.b();
 
     // Tuning controls
@@ -104,8 +101,9 @@ public class RobotContainer {
     public final FeedSubsystem feedSubsystem;
     // public final ClimberSubsystem climberSubsystem;
     public final LedSubsystem ledSubsystem;
-    public final VisionSubsystem visionSubsystem;
-    private boolean hasRun;
+    //public final VisionSubsystem visionSubsystem;
+    private boolean ledsHaveRun;
+    
 
     private final AutoAimTurret autoAimCommand;
     private final LoggedNetworkNumber turretHeadingOffsetLogged;
@@ -122,43 +120,21 @@ public class RobotContainer {
         intakeSubsystem = robotFactory.getIntakeSubsystem();
         driveSubsystem = robotFactory.getDriveSubsystem();
         feedSubsystem = robotFactory.getFeedSubsystem();
-        visionSubsystem = robotFactory.getVisionSubsystem();
-        // climberSubsystem = robotFactory.getClimberSubsystem();
-        int quarter = Constants.LedConstants.Length / 4;
         ledSubsystem = new LedSubsystem(
-            Constants.LedConstants.Length,
+            Constants.LedConstants.Length, 
             Constants.LedConstants.Port,
-            
-            // Zone 0 — intake rollers running: solid yellow
-            LedSubsystem.PatternEntry.entry(
-                intakeSubsystem::isRollerRunning,
-                0, quarter,
-                LedSubsystem.LedPattern.solid(30, 255, 50)),
-            // Zone 1 — feed/indexer running: solid cyan
-            LedSubsystem.PatternEntry.entry(
-                feedSubsystem::isFeedRunning,
-                quarter, quarter,
-                LedSubsystem.LedPattern.solid(90, 255, 50)),
-            // Zone 2 — no april tags seen: solid red
-            LedSubsystem.PatternEntry.entry(
-                () -> !visionSubsystem.hasAnyTarget(),
-                quarter * 2, quarter,
-                LedSubsystem.LedPattern.solid(0, 255, 50)),
-            // Zone 3 — valid shot detected: blink white
-            LedSubsystem.PatternEntry.entry(
-                flywheelSubsystem::validShotDetected,
-                quarter * 3, quarter,
-                LedSubsystem.LedPattern.blink(0, 0, 100, 5))
+            Constants.LedConstants.travelTime,
+            Constants.LedConstants.ledGroup
         );
-        hasRun = false;
+        ledsHaveRun = false;
 
         // SOTM Setup
-        
-        ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
-        ProjectileSimulator passingSim = new ProjectileSimulator(Constants.passingSimParameters);
 
-        ShotLUT lut = sim.generateVariableAngleShotLUT(61.0, 85.0, 6.0);
-        ShotLUT passingLut = passingSim.generateVariableAngleShotLUT(61.0, 85.0, 6.0);
+        ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
+        //ProjectileSimulator passingSim = new ProjectileSimulator(Constants.passingSimParameters);
+
+        ShotLUT lut = sim.generateShotLUT();
+        //ShotLUT passingLut = passingSim.generateVariableAngleShotLUT(61.0, 85.0, 6.0);
         
         this.shotCalculator = new ShotCalculator(Constants.shotConfig);
         this.shotCalculator.loadShotLUT(lut);
@@ -223,23 +199,22 @@ public class RobotContainer {
             autoAimCommand::isPassing
         ));
         manualShootTrigger.whileTrue(new Shoot(
-            flywheelSubsystem, 
-            feedSubsystem, 
-            ballSim
-        ));
+                flywheelSubsystem,
+                feedSubsystem,
+                ballSim));
 
         intakeSubsystem.setSetpoints(
             Constants.Controls.INTAKE_RUN_PERCENT,
             Constants.Controls.INTAKE_DEPLOYED_DEG
         );
         startIntakeTrigger.onTrue(new SetRollerPercent(
-            intakeSubsystem, 1.0
+            intakeSubsystem, Constants.Controls.INTAKE_RUN_PERCENT
         ));
         stopIntakeTrigger.onTrue(new SetRollerPercent(
             intakeSubsystem, 0.0
         ));
         outtakeTrigger.onTrue(new SetRollerPercent(
-            intakeSubsystem, -1.0
+            intakeSubsystem, Constants.Controls.INTAKE_SPIT_PERCENT
         ));
         intakeSubsystem.setDefaultCommand(new HoldIntakeDeployed(
             intakeSubsystem
@@ -271,30 +246,34 @@ public class RobotContainer {
             turretHeadingOffsetLogged.set(Constants.Turret.Aim.HEADING_OFFSET_DEG)
         ));
 
-        // Turret manual override (driver POV up/left/right) — holds turret at a fixed robot-relative angle
+        // Turret manual override (driver POV up/left/right) — holds turret at a fixed
+        // robot-relative angle
         turretOverrideFrontTrigger.onTrue(
-            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_FRONT_DEG), turretSubsystem));
+                Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_FRONT_DEG),
+                        turretSubsystem));
         turretOverrideRightTrigger.onTrue(
-            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_RIGHT_DEG), turretSubsystem));
+                Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_RIGHT_DEG),
+                        turretSubsystem));
         turretOverrideLeftTrigger.onTrue(
-            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_LEFT_DEG), turretSubsystem));
+                Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_LEFT_DEG),
+                        turretSubsystem));
 
         // Driver POV down — cancel override and restore auto-aim default command
         turretAutoAimTrigger.onTrue(Commands.runOnce(() -> {
             Command current = turretSubsystem.getCurrentCommand();
-            if (current != null && current != autoAimCommand) current.cancel();
+            if (current != null && current != autoAimCommand)
+                current.cancel();
         }));
 
         new Trigger(autoAimCommand::shouldRumble).whileTrue(Commands.startEnd(
-            () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5),
-            () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0)
-        ));
+                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5),
+                () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0)));
 
         // Zero encoders to current positions (B button)
         // zeroEncodersTrigger.onTrue(Commands.runOnce(() -> {
-        //     climberSubsystem.zeroCurrentPosition();
-        //     //intakeSubsystem.zeroCurrentDeployPosition();
-        //     turretSubsystem.zeroCurrentAimPosition();
+        // climberSubsystem.zeroCurrentPosition();
+        // //intakeSubsystem.zeroCurrentDeployPosition();
+        // turretSubsystem.zeroCurrentAimPosition();
         // }).ignoringDisable(true));
         // operatorController.b().onTrue(Commands.runOnce(() -> {
         //     turretSubsystem.resetAimPositionToAbsolute(Constants.Turret.Aim.ZERO_OFFSET);
@@ -324,6 +303,10 @@ public class RobotContainer {
         xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
         resetGyroTrigger.onTrue(
             Commands.runOnce(driveSubsystem::zeroHeading, driveSubsystem).ignoringDisable(true));
+    
+        // makeValid.whileTrue(Commands.run(() -> ledSubsystem.ShotValid(true)));
+        // makeValid.whileFalse(Commands.run(() -> ledSubsystem.ShotValid(false)));
+        // makeActive.whileTrue(Commands.run(() -> ledSubsystem.HubActive()));
     } 
 
     private void configureAutoChooser() {
@@ -372,8 +355,9 @@ public class RobotContainer {
         //ballSim.placeFieldBalls();
 
         ballSim.configureRobot(0.5, 0.5, 0.01,
-            () -> driveSubsystem.getPose(), () -> driveSubsystem.getChassisSpeeds());
+                () -> driveSubsystem.getPose(), () -> driveSubsystem.getChassisSpeeds());
     }
+
     public void updateSim() {
         ballSim.tick();
     }
@@ -390,10 +374,12 @@ public class RobotContainer {
     }
 
     public void disabledPeriodic() {
-        if (!hasRun && ledSubsystem.isDeployComplete()) {
-            ledSubsystem.signalEndDeploy();
-            hasRun = true;
+        if (!ledsHaveRun && ledSubsystem.deployedWait.get() > 5) {
+            ledSubsystem.SignalEndDeploy();
+            ledsHaveRun = true;
         }
-        ledSubsystem.updateDisabled();
+        ;
+
+        ledSubsystem.pattern();
     }
 }

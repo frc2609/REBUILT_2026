@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -157,12 +158,13 @@ public class AutoAimTurret extends Command {
         if (validShot && turretInLimits && !disableShoot) {
             // Set hood and flywheel target based on shot 
             if (targetDist <= Constants.Controls.LOB_DISTANCE) {
-                turret.setHoodPosition(85.0-shotCalc.getHoodAngle(shot.solvedDistanceM()));
+                turret.setHoodPosition(4.0);
                 flywheel.setAutoSpeed(Constants.Controls.FLYWHEEL_LOB_RPM/60.0);
             } else {
-                turret.setHoodPosition(85.0-shotCalc.getHoodAngle(shot.solvedDistanceM()));
+                turret.setHoodPosition(Constants.Controls.TURRET_HOOD_DEG);
                 flywheel.setAutoSpeed(shot.rpm()/60.0);
             }
+            //Logger.recordOutput("SOTM/HoodAngle", 85.0-shotCalc.getHoodAngle(shot.solvedDistanceM()));
         } else {
             flywheel.setAutoSpeed(0.0);
         }
@@ -204,20 +206,11 @@ public class AutoAimTurret extends Command {
         Logger.recordOutput("SOTM/Flags/Passing", passing);
     }
 
-    public boolean shouldRumble() {
-        return validShot && turretInLimits && !disableShoot;
-    }
-
     public boolean isPassing() {
         return passing;
     }
 
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
-
-    public boolean isHubActive() {
+    public static boolean isHubActive() {
         Optional<Alliance> alliance = DriverStation.getAlliance();
         // If we have no alliance, we cannot be enabled, therefore no hub.
         if (alliance.isEmpty()) {
@@ -275,5 +268,17 @@ public class AutoAimTurret extends Command {
             return true;
         }
     }
+    
+
+    public boolean shouldRumble() {
+        return validShot && turretInLimits && !disableShoot;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    
 }
 
