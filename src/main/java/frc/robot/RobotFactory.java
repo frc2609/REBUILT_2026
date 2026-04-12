@@ -16,11 +16,13 @@ import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 import frc.robot.subsystems.io.encoder.impl.CANCoderIO;
 import frc.robot.subsystems.io.encoder.impl.SimAbsEncoderIO;
 import frc.robot.subsystems.io.encoder.impl.WpiDutyCycleEncoderIO;
+import frc.robot.subsystems.io.motor.PercentMotorIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicExpoVoltageIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicTorqueCurrentFOCIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonDynamicMotionMagicVoltageIO;
+import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPercentIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxPositionIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxTorqueCurrentFOCIO;
 import frc.robot.subsystems.io.motor.CTRE.CtreTalonFxVelocityIO;
@@ -28,6 +30,7 @@ import frc.robot.subsystems.io.motor.CTRE.Sim.SimCtreTalonFxTorqueCurrentFOCIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicExpoVoltageIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicTorqueCurrentFOCIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicVoltageIO;
+import frc.robot.subsystems.io.motor.CTRE.Sim.SimPercentMotorIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimPositionMotorIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimVelocityMotorIO;
 import frc.robot.subsystems.vision.VisionIO;
@@ -56,13 +59,13 @@ public class RobotFactory {
             driveSubsystem::addVisionMeasurement, buildVisionIO()
         );
         turretSubsystem = new TurretSubsystem(
-            buildTurretAimIO(), buildTurretHoodIO(), buildTurretEncoderIO()
+            buildTurretAimIO(), buildTurretHoodIO() //buildTurretEncoderIO()
         );
         flywheelSubsystem = new FlywheelSubsystem(
             buildFlywheelIO()
         );
         intakeSubsystem = new IntakeSubsystem(
-            buildIntakeEncoderIO(), buildIntakeDeployIO(), buildIntakeRollerIO()
+            buildIntakeDeployIO(), buildIntakeRollerIO()
         );
         // climberSubsystem = new ClimberSubsystem(
         //     buildClimberEncoderIO(), buildClimberMotorIO()
@@ -280,13 +283,13 @@ public class RobotFactory {
         }
     }
 
-    private AbsEncoderIO buildTurretEncoderIO() {
-        if (currentMode == Mode.SIM) {
-            return new SimAbsEncoderIO(0);
-        }
+    // private AbsEncoderIO buildTurretEncoderIO() {
+    //     if (currentMode == Mode.SIM) {
+    //         return new SimAbsEncoderIO(0);
+    //     }
 
-        return new CANCoderIO(Constants.Turret.EncoderChannel);
-    }
+    //     return new CANCoderIO(Constants.Turret.EncoderChannel);
+    // }
 
     // INTAKE
 
@@ -294,13 +297,13 @@ public class RobotFactory {
         return this.intakeSubsystem;
     }
 
-    private AbsEncoderIO buildIntakeEncoderIO() {
-        if (currentMode == Mode.SIM) {
-        return new SimAbsEncoderIO(0);
-        }
+    // private AbsEncoderIO buildIntakeEncoderIO() {
+    //     if (currentMode == Mode.SIM) {
+    //     return new SimAbsEncoderIO(0);
+    //     }
 
-        return new WpiDutyCycleEncoderIO(Constants.Intake.EncoderChannel);
-    }
+    //     return new WpiDutyCycleEncoderIO(Constants.Intake.EncoderChannel);
+    // }
 
     private PositionMotorIO buildIntakeDeployIO() {
         if (currentMode == Mode.SIM) {
@@ -323,9 +326,9 @@ public class RobotFactory {
         }
     }
 
-    private VelocityMotorIO buildIntakeRollerIO() {
+    private PercentMotorIO buildIntakeRollerIO() {
         if (currentMode == Mode.SIM) {
-            return new SimVelocityMotorIO(
+            return new SimPercentMotorIO(
                 Constants.Intake.Roller.config,
                 Constants.Intake.Roller.INERTIA,
                 Constants.Intake.Roller.GEAR_RATIO,
@@ -333,9 +336,9 @@ public class RobotFactory {
                 Constants.SIM_DELTA
             );
         }
-        switch (Constants.INTAKE_ROLLER_VELOCITY_MOTOR_TYPE) {
+        switch (Constants.INTAKE_ROLLER_PERCENT_MOTOR_TYPE) {
         case CTRE_TALON_FX:
-            return new CtreTalonFxVelocityIO(Constants.Intake.Roller.config);
+            return new CtreTalonFxPercentIO(Constants.Intake.Roller.config);
         default:
             throw new IllegalStateException("Unsupported intake roller motor type");
         }

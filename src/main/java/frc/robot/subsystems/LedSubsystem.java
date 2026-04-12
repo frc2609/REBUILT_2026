@@ -1,78 +1,42 @@
 package frc.robot.subsystems;
 
+import java.security.PublicKey;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LedSubsystem extends SubsystemBase {
 
-    @FunctionalInterface
-    public interface LedPattern {
-        void apply(AddressableLEDBuffer buf, int start, int length, int step);
-
-        static LedPattern solid(int h, int s, int v) {
-            return (buf, start, len, step) -> {
-                for (int i = start; i < start + len; i++) {
-                    buf.setHSV(i, h, s, v);
-                }
-            };
-        }
-
-        static LedPattern blink(int h, int s, int v, int periodSteps) {
-            return (buf, start, len, step) -> {
-                boolean on = (step / periodSteps) % 2 == 0;
-                int value = on ? v : 0;
-                int sat   = on ? s : 0;
-                for (int i = start; i < start + len; i++) {
-                    buf.setHSV(i, h, sat, value);
-                }
-            };
-        }
-
-        static LedPattern bounce(int h, int s, int v) {
-            return (buf, start, len, step) -> {
-                int totalSteps = len * 2;
-                int t = step % totalSteps;
-                int pixel = t < len ? t : totalSteps - 1 - t;
-                buf.setHSV(start + pixel, h, s, v);
-            };
-        }
-
-        static LedPattern off() {
-            return (buf, start, len, step) -> {
-                for (int i = start; i < start + len; i++) {
-                    buf.setHSV(i, 0, 0, 0);
-                }
-            };
-        }
-    }
-
-    public record PatternEntry(BooleanSupplier trigger, int start, int length, LedPattern pattern) {
-        public static PatternEntry entry(BooleanSupplier trigger, int start, int length, LedPattern pattern) {
-            return new PatternEntry(trigger, start, length, pattern);
-        }
-    }
-
     private final int ledLength;
     private final AddressableLED led;
     private final AddressableLEDBuffer ledBuffer;
-    private final Timer deployedWait = new Timer();
-    private final PatternEntry[] entries;
-    private boolean ledFree = false;
-    private int animStep = 0;
+    private int ledGroup;
+    private final int groupedLength;
 
-    public LedSubsystem(int ledLength, int ledPort, PatternEntry... entries) {
+    // disabled pattern
+    private final double travelTime;
+
+    // tell the programer the robot is working
+    public final Timer deployedWait = new Timer();
+    private boolean ledFree = false;
+
+    public LedSubsystem(int ledLength, int ledPort, double travelTime, int ledGroup) {
         led = new AddressableLED(ledPort);
         ledBuffer = new AddressableLEDBuffer(ledLength);
         this.ledLength = ledLength;
-        this.entries = entries;
+        this.travelTime = travelTime;
+        this.ledGroup = ledGroup;
+        groupedLength = (int) (ledLength / ledGroup);
 
-        for (int i = 0; i < ledLength; i++) {
-            ledBuffer.setHSV(i, 0, 255, 10);
+        // sets a default pettern, to make it easier to detect full deploy
+        for (int i = 0; i < groupedLength; i++) {
+            generateLeds(i, 0, 255, 10);
         }
 
         led.setLength(ledLength);
@@ -81,60 +45,120 @@ public class LedSubsystem extends SubsystemBase {
         deployedWait.start();
     }
 
-    public boolean isDeployComplete() {
-        return deployedWait.get() > 5;
-    }
-
-    public void signalEndDeploy() {
-        for (int i = 0; i < ledLength; i++) {
-            ledBuffer.setHSV(i, 60, 255, 10);
+    public void SignalEndDeploy() {
+        for (int i = 0; i < groupedLength; i++) {
+            generateLeds(i, 60, 255, 10);
         }
         led.setData(ledBuffer);
         ledFree = true;
     }
 
-    /** Called automatically by the WPILib scheduler during enabled mode. */
-    @Override
-    public void periodic() {
-        if (DriverStation.isDisabled() || !ledFree) {
-            return;
-        }
-
-        for (int i = 0; i < ledLength; i++) {
-            ledBuffer.setHSV(i, 0, 0, 0);
-        }
-
-        for (PatternEntry entry : entries) {
-            if (entry.trigger().getAsBoolean()) {
-                entry.pattern().apply(ledBuffer, entry.start(), entry.length(), animStep);
-            }
-        }
-
-        led.setData(ledBuffer);
-        animStep++;
-    }
-
-    /** Called from RobotContainer.disabledPeriodic() to show the idle bounce animation. */
-    public void updateDisabled() {
+    public void pattern() {
         if (!ledFree) {
             return;
         }
+        int timerPixel = (int) (((groupedLength / travelTime) * deployedWait.get()));
+        if ((int) (timerPixel / groupedLength) % 2 == 0) {
+            generateLeds(timerPixel % groupedLength, 30, 255, 10);
+            led.setData(ledBuffer);
+            generateLeds(timerPixel % groupedLength, 100, 255, 1);
+        } else {
+            generateLeds(groupedLength - (timerPixel % groupedLength) - 1, 30, 255, 10);
+            led.setData(ledBuffer);
+            generateLeds(groupedLength - (timerPixel % groupedLength) - 1, 100, 255, 1);
 
-        for (int i = 0; i < ledLength; i++) {
-            ledBuffer.setHSV(i, 120, 200, 28);
+        }
+    }
+
+    private void generateLeds(int index, int hue, int saturation, int value) {
+        for (int idx = 0; idx < ledGroup; idx++) {
+            ledBuffer.setHSV((index * ledGroup) + idx, hue, saturation, value);
+        }
+    }
+
+    public void ShotValid(boolean isValidShot) {
+        for (int i = 0; i<groupedLength;i++) {
+            if (i%2==0){
+                if (isValidShot) {
+                    generateLeds(i, 60, 255, 10);
+                } else{
+                    generateLeds(i, 100, 255, 10);
+                }
+            }
+        }
+        led.setData(ledBuffer);
+    }
+
+
+    public void HubActive() {
+        for (int i = 0; i<groupedLength;i++) {
+            if (i%2==1){
+                if (isHubActive()) {
+                    generateLeds(i, 60, 255, 10);
+                } else{
+                    generateLeds(i, 30, 255, 10);
+                }
+            }
+        }
+        led.setData(ledBuffer);
+    }
+
+    public static boolean isHubActive() {
+        Optional<Alliance> alliance = DriverStation.getAlliance();
+        // If we have no alliance, we cannot be enabled, therefore no hub.
+        if (alliance.isEmpty()) {
+            return false;
+        }
+        // Hub is always enabled in autonomous.
+        if (DriverStation.isAutonomousEnabled()) {
+            return true;
+        }
+        // At this point, if we're not teleop enabled, there is no hub.
+        if (!DriverStation.isTeleopEnabled()) {
+            return false;
         }
 
-        int totalSteps = ledLength * 2;
-        int t = animStep % totalSteps;
-        int pixel = t < ledLength ? t : totalSteps - 1 - t;
-        for (int offset = 0; offset < 2; offset++) {
-            int p = pixel + offset;
-            if (p >= 0 && p < ledLength) {
-                ledBuffer.setHSV(p, 30, 255, 255);
+        // We're teleop enabled, compute.
+        double matchTime = DriverStation.getMatchTime();
+        String gameData = DriverStation.getGameSpecificMessage();
+        // If we have no game data, we cannot compute, assume hub is active, as its likely early in teleop.
+        if (gameData.isEmpty()) {
+            return true;
+        }
+        boolean redInactiveFirst = false;
+        switch (gameData.charAt(0)) {
+            case 'R' -> redInactiveFirst = true;
+            case 'B' -> redInactiveFirst = false;
+            default -> {
+            // If we have invalid game data, assume hub is active.
+            return true;
             }
         }
 
-        led.setData(ledBuffer);
-        animStep++;
+        // Shift was is active for blue if red won auto, or red if blue won auto.
+        boolean shift1Active = switch (alliance.get()) {
+            case Red -> !redInactiveFirst;
+            case Blue -> redInactiveFirst;
+        };
+
+        if (matchTime > 130) {
+            // Transition shift, hub is active.
+            return true;
+        } else if (matchTime > 105) {
+            // Shift 1
+            return shift1Active;
+        } else if (matchTime > 80) {
+            // Shift 2
+            return !shift1Active;
+        } else if (matchTime > 55) {
+            // Shift 3
+            return shift1Active;
+        } else if (matchTime > 30) {
+            // Shift 4
+            return !shift1Active;
+        } else {
+            // End game, hub always active.
+            return true;
+        }
     }
 }

@@ -1,39 +1,38 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
-import frc.robot.subsystems.io.motor.VelocityMotorIO;
+import frc.robot.subsystems.io.motor.PercentMotorIO;
 
 /** Intake Subsystem using velocity control (rotations per second). */
 public class IntakeSubsystem extends SubsystemBase {
     private final PositionMotorIO deployMotor;
-    private final VelocityMotorIO driveMotor;
-    private final AbsEncoderIO deployEncoder;
+    private final PercentMotorIO rollerMotor;
 
     public IntakeSubsystem(
-        AbsEncoderIO deployEncoder, PositionMotorIO deployMotor, VelocityMotorIO driveMotor) {
+        PositionMotorIO deployMotor, PercentMotorIO rollerMotor) {
         this.deployMotor = deployMotor;
-        this.driveMotor = driveMotor;
-        this.deployEncoder = deployEncoder;
+        this.rollerMotor = rollerMotor;
     }
 
-    public void setDeploySetpoint(double deg) {
-        deployMotor.setSetpoint(deg);
-    }
-
-    public void setRollerSpeed(double speedRPS) {
-        driveMotor.setVelocityRps(speedRPS);
+    public void setSetpoints(double rollerPercent, double deployDeg) {
+        rollerMotor.setSetpoint(rollerPercent);
+        System.out.println("~~~~~~~~~SET ROLLER~~~~~~~: "+rollerPercent);
+        deployMotor.setSetpoint(deployDeg);
     }
 
     public boolean isRollerRunning() {
-        return driveMotor.getVelocityRps() > 0.1;
+        return false; // TODO
     }
 
-    public boolean rollerIsAtSpeed(double tolerance) {
-        return driveMotor.isAtSpeed(tolerance);
+    public void setRollerPercent(double percent) {
+        System.out.println("~~~~~~ROLLER POWER~~~~~~"+rollerMotor.getSetpoint());
+        rollerMotor.setPercent(percent);
     }
 
+    public double getDeploySetpoint() {
+        return deployMotor.getSetpoint();
+    }
     public void setDeployPosition() {
         deployMotor.setTargetPositionDegrees(deployMotor.getSetpoint());
     }
@@ -41,19 +40,16 @@ public class IntakeSubsystem extends SubsystemBase {
         deployMotor.setTargetPositionDegrees(degrees);
     }
 
-    public void resetDeployPositionToAbsolute(double offsetRotations) {
-        double motorRotations = deployEncoder.getRotations()-offsetRotations;
-        if (motorRotations <= -0.1) { motorRotations += 1.0; }
+    // public void resetDeployPositionToAbsolute(double offsetRotations) {
+    //     double motorRotations = deployEncoder.getRotations()-offsetRotations;
+    //     if (motorRotations <= -0.1) { motorRotations += 1.0; }
 
-        System.out.println("DEPLOY ZEROED, rotor offset: "+motorRotations);
-        deployMotor.resetToAbsolute(motorRotations);
-    }
+    //     System.out.println("DEPLOY ZEROED, rotor offset: "+motorRotations);
+    //     deployMotor.resetToAbsolute(motorRotations);
+    // }
 
-    public void zeroCurrentDeployPosition() {
-        // TEMPORARY
-        //System.out.print
-        deployMotor.resetToAbsolute(8.86/27.0);
-        //((TalonFX) deployMotor).setPosition(9.28);
+    public void zeroDeployToRotations(double offsetRotations) {
+        deployMotor.resetToRotations(offsetRotations);
     }
 
     public double getDeployCurrentAmps() {
@@ -72,19 +68,15 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void stop() {
-        driveMotor.stop();
+        rollerMotor.stop();
     }
 
     @Override
     public void periodic()
     {
-        deployMotor.logMotorPID(deployEncoder.getRotations());
-        driveMotor.logMotorPID();
-        deployMotor.updateFromTunables();
-        driveMotor.updateFromTunables();
-    }
+        rollerMotor.logMotorPID();
+        deployMotor.logMotorPID();
 
-    public void setEncoderInvert(boolean inverted) {
-        this.deployEncoder.setInverted(inverted);
+        deployMotor.updateFromTunables();
     }
 }

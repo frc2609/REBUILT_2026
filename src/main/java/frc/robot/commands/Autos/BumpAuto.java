@@ -7,7 +7,7 @@ import frc.robot.Constants;
 import frc.robot.commands.AutoPushIntake;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.HoldIntakeDeployed;
-import frc.robot.commands.SetIntakeSpeedRPS;
+import frc.robot.commands.SetRollerPercent;
 import frc.robot.lib.BLine.Path;
 import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;
@@ -33,8 +33,8 @@ public class BumpAuto extends SequentialCommandGroup {
             Commands.deadline(
                 drive.followPath(new Path(toBump)),
                 Commands.sequence(
-                    new SetIntakeSpeedRPS(intake, Constants.Controls.INTAKE_RUN_RPM / 60.0),
-                    new HoldIntakeDeployed(intake, Constants.Controls.INTAKE_DEPLOYED_DEG)
+                    new SetRollerPercent(intake, 1.0),
+                    new HoldIntakeDeployed(intake)
                 )
             ).withTimeout(15.0),
 
@@ -48,15 +48,15 @@ public class BumpAuto extends SequentialCommandGroup {
                     turret::aimIsAtPosition
                 ),
                 
-                new AutoPushIntake(intake, 0, 110.0)
+                new AutoPushIntake(intake)
             ).withTimeout(3.0),
 
             // Follow path while running intake to collect a ball
             Commands.deadline(
                 drive.followPath(new Path(path2Name)),
                 Commands.sequence(
-                    new SetIntakeSpeedRPS(intake, Constants.Controls.INTAKE_RUN_RPM / 60.0),
-                    new HoldIntakeDeployed(intake, Constants.Controls.INTAKE_DEPLOYED_DEG)
+                    new SetRollerPercent(intake, 1.0),
+                    new HoldIntakeDeployed(intake)
                 )
             ).withTimeout(10.0),
 
@@ -69,7 +69,7 @@ public class BumpAuto extends SequentialCommandGroup {
                     ballSim,
                     turret::aimIsAtPosition
                 ),
-                new AutoPushIntake(intake, 0, 110.0)
+                new AutoPushIntake(intake)
             )
         );
     }

@@ -69,7 +69,7 @@ public class DriveCommands {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier,
-      double speedFactor
+      DoubleSupplier speedSupplier
     ) {
     return Commands.run(
         () -> {
@@ -84,6 +84,7 @@ public class DriveCommands {
           omega = Math.copySign(omega * omega, omega);
 
           double maxSpeed = TunerConstants.kLinearSpeedAt12Volts.in(MetersPerSecond);
+          double speedFactor = speedSupplier.getAsDouble();
 
           // Convert to field relative speeds & send command
           ChassisSpeeds speeds =
