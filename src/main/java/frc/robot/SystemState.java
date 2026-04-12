@@ -1,6 +1,7 @@
 package frc.robot;
 
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,18 +31,31 @@ public class SystemState {
 
     private static DriveSubsystem swerve;
     private static TurretSubsystem turret;
+    private static ShotCalculator shotCalc;
+    private static LoggedNetworkNumber headingOffset; 
 
-    // Mechanism Outputs
-
+    private static Pose2d turretPose;
+    private static Translation2d target;
+    private static double targetDist;
+    
+    // Mechanism/Sim Outputs
+    
     public static double turretAngleDeg;
     public static double turretSOTMFF;
-
+    public static double hoodAngleDeg;
     public static double calculatedFlywheelRPM;
+    public static ShotCalculator.LaunchParameters shot;
+    public static Translation3d launchPosSim, launchVelSim; 
 
 
-    public SystemState(DriveSubsystem swerve, TurretSubsystem turret) {
+    public SystemState(
+        DriveSubsystem swerve, TurretSubsystem turret,
+        ShotCalculator shotCalc, LoggedNetworkNumber headingOffset
+    ) {
         SystemState.swerve = swerve;
         SystemState.turret = turret;
+        SystemState.shotCalc = shotCalc;
+        SystemState.headingOffset = headingOffset;
     }
 
     public void updateSOTMState() {
@@ -49,14 +63,14 @@ public class SystemState {
         
         // inverted on purpose, used for physical display and distance calc
         // does not match x and y used in SOTM docs
-        Pose2d turretPose = robotPose.plus(new Transform2d(
+        SystemState.turretPose = robotPose.plus(new Transform2d(
             Constants.shotConfig.launcherOffsetY, 
             Constants.shotConfig.launcherOffsetX, 
             robotPose.getRotation()));
 
         Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
         if (Constants.currentMode == Mode.SIM) { alliance = Alliance.Blue; }
-        Translation2d target, targetForward;
+        Translation2d targetForward;
 
         boolean isLeft = robotPose.getY() > Constants.Field.CENTER_Y;
         SystemState.trenchBlocked = false;
@@ -129,9 +143,7 @@ public class SystemState {
         );
 
         ShotCalculator.LaunchParameters shot = shotCalc.calculate(inputs);
-        double targetDist = turretPose.getTranslation().getDistance(target);
-
-        double turretAngleDeg = shot.driveAngle()
+        SystemState.turretAngleDeg = shot.driveAngle()
             //.minus(Rotation2d.fromDegrees(Constants.Turret.Aim.HEADING_OFFSET_DEG))
             .minus(Rotation2d.fromDegrees(headingOffset.getAsDouble()))
             .minus(swerve.getRotation())
@@ -141,6 +153,23 @@ public class SystemState {
         SystemState.validShotDetected = 
             shot.isValid() && 
             shot.confidence() > Constants.Controls.SHOT_CONFIDENCE_MIN;
+        
+        SystemState.targetDist = turretPose.getTranslation().getDistance(target);
+
+        if (SystemState.validShotDetected &&
+            !SystemState.trenchBlocked
+        ) {
+            // Set hood and flywheel target based on shot 
+            if (targetDist <= Constants.Controls.LOB_DISTANCE) {
+                SystemState.hoodAngleDeg = 0.0;
+                SystemState.calculatedFlywheelRPM = Constants.Controls.FLYWHEEL_LOB_RPM;
+            } else {
+                SystemState.hoodAngleDeg = Constants.Controls.TURRET_HOOD_DEG;
+                SystemState.calculatedFlywheelRPM = shot.rpm();
+            }
+        } else {
+            SystemState.calculatedFlywheelRPM = 0.0;
+        }
     }
 
     public void updateHubActive() {
@@ -148,6 +177,12 @@ public class SystemState {
     }
 
     public void updateSOTMSim() {
+        ChassisSpeeds fieldRelativeSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(
+            swerve.getChassisSpeeds(),
+            swerve.getRotation()
+        );
+
+
         if (Constants.currentMode == Constants.Mode.SIM) {
             double ballSpeed = ProjectileSimulator.rpmToExitVelocity(
                 shot.rpm(), 
@@ -159,31 +194,29 @@ public class SystemState {
                 Constants.simParameters.fixedLaunchAngleDeg()*(Math.PI/180.0), 
                 turretPose.getRotation().getRadians()
             ));
-            Translation3d ballVel = new Translation3d(
-                fieldRelativeSpeed.vxMetersPerSecond, 
-                fieldRelativeSpeed.vyMetersPerSecond, 
-                0
-            ).plus(launchVector);
 
-            flywheel.launchPosSim = new Translation3d(
+            SystemState.launchPosSim = new Translation3d(
                 turretPose.getTranslation().getX(),
                 turretPose.getTranslation().getY(),
                 Constants.simParameters.exitHeightM()
             );
-            flywheel.launchSpeedSim = ballVel;
+            SystemState.launchVelSim = new Translation3d(
+                fieldRelativeSpeed.vxMetersPerSecond, 
+                fieldRelativeSpeed.vyMetersPerSecond, 
+                0
+            ).plus(launchVector);
         }
     }
 
     public void logSystemState() {
-        Logger.recordOutput("SOTM/TurretPose", turretPose);
-        Logger.recordOutput("SOTM/TurretSetpoint", turretAngleDeg);
-        Logger.recordOutput("SOTM/Target", target);
-        Logger.recordOutput("SOTM/TargetDistance", targetDist);
-        Logger.recordOutput("SOTM/Flags/ValidShot", validShot);
-        Logger.recordOutput("SOTM/Flags/HubActive", isHubActive());
-        Logger.recordOutput("SOTM/Flags/TurretInRange", turretInLimits);
+        Logger.recordOutput("SOTM/TurretPose", SystemState.turretPose);
+        Logger.recordOutput("SOTM/TurretSetpoint", SystemState.turretAngleDeg);
+        Logger.recordOutput("SOTM/Target", SystemState.target);
+        Logger.recordOutput("SOTM/TargetDistance", SystemState.targetDist);
+        Logger.recordOutput("SOTM/Flags/ValidShot", SystemState.validShotDetected);
+        Logger.recordOutput("SOTM/Flags/HubActive", SystemState.hubActive);
         Logger.recordOutput("SOTM/Flags/Confidence", shot.confidence());
-        Logger.recordOutput("SOTM/Flags/TrenchBlock", disableShoot);
-        Logger.recordOutput("SOTM/Flags/Passing", passing);
+        Logger.recordOutput("SOTM/Flags/TrenchBlock", SystemState.trenchBlocked);
+        Logger.recordOutput("SOTM/Flags/Passing", SystemState.isPassing);
     }
 }

@@ -181,14 +181,10 @@ public class RobotContainer {
         }
 
         turretHeadingOffsetLogged = new LoggedNetworkNumber("/Tuning/SOTM/HeadingOffset", 180.0);
-        autoAimCommand = new AutoAimTurret(
-            driveSubsystem, turretSubsystem, flywheelSubsystem, 
-            shotCalculator, turretHeadingOffsetLogged
-        );
+        autoAimCommand = new AutoAimTurret(turretSubsystem);
 
         turretSubsystem.setEncoderInvert(true);
         intakeSubsystem.setEncoderInvert(true);
-
             
         // climberSubsystem.resetPositionToAbsolute();
         //intakeSubsystem.resetDeployPositionToAbsolute(Constants.Intake.Deploy.ZERO_OFFSET);
@@ -281,7 +277,11 @@ public class RobotContainer {
             if (current != null && current != autoAimCommand) current.cancel();
         }));
 
-        new Trigger(autoAimCommand::shouldRumble).whileTrue(Commands.startEnd(
+        new Trigger(() -> {
+            return SystemState.validShotDetected && 
+                SystemState.turretInPosition &&
+                !SystemState.trenchBlocked;
+        }).whileTrue(Commands.startEnd(
             () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5),
             () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.0)
         ));
