@@ -100,8 +100,8 @@ public final class Constants {
         VelocityMotorType.CTRE_TALON_FX;
     public static final VelocityMotorType FEED_VELOCITY_MOTOR_TYPE =
         VelocityMotorType.CTRE_TALON_FX;
-    public static final VelocityMotorType INTAKE_ROLLER_VELOCITY_MOTOR_TYPE =
-        VelocityMotorType.CTRE_TALON_FX;
+    public static final PercentMotorType INTAKE_ROLLER_PERCENT_MOTOR_TYPE =
+        PercentMotorType.CTRE_TALON_FX;
     public static final PositionMotorType INTAKE_DEPLOY_POSITION_MOTOR_TYPE =
         PositionMotorType.CTRE_TALON_FX;
     public static final PositionMotorType AGITATOR_VELOCITY_MOTOR_TYPE =
@@ -168,13 +168,8 @@ public final class Constants {
         // RPM values are INPUT RPM, will be geared down
 
 
-        public static final double INTAKE_DEPLOYED_DEG = 0.0;
-        public static final double INTAKE_RETRACT_DEG  = 110.0; // for push
-        
-        public static final double INTAKE_RUN_RPM = 4000.0;
-        public static final double INTAKE_IDLE_RPM = 0.0;
-
-        public static final double CLIMBER_DEPLOYED_DEG = 360.0;
+        public static final double INTAKE_DEPLOYED_DEG = 695.0;
+        public static final double INTAKE_RUN_PERCENT = 1.0;
 
         public static final double TURRET_HOOD_DEG = 15.0;
 
@@ -262,7 +257,7 @@ public final class Constants {
             "followerAligned", false,
             "kP", 0.04,
             "kV", 0.0117,
-            "inverted", false,
+            "inverted", true,
             "statorCurrentLimit", 90.0,
             "statorCurrentLimitEnabled", true
         ));
@@ -273,7 +268,7 @@ public final class Constants {
 
         public static final class Aim {
             public static final double INERTIA = 0.01;
-            public static final double GEAR_RATIO = 2.909;
+            public static final double GEAR_RATIO = 137.5;
             public static final double ENCODER_RATIO = 1.0;
             public static final double RANGE_DEG = 180.0; // 160
             public static final double HEADING_OFFSET_DEG = 180.0; // robot front to turret zero
@@ -390,7 +385,7 @@ public final class Constants {
             "motorId", 20,
             "kP", 0.05,
             "kV", 0.012,
-            "inverted", false,
+            "inverted", true,
             "neutralMode", NeutralMode.COAST,
             "statorCurrentLimit", 120.0,
             "statorCurrentLimitEnabled", true
@@ -409,7 +404,7 @@ public final class Constants {
                 "followerId", 32,
                 "followerAligned", false,
                 "isRioCANBUS",true,
-                "inverted", true,
+                "inverted", false,
                 "kP", 0.032,
                 "kV", 0.0097,
                 "statorCurrentLimit", 50.0,
@@ -445,13 +440,13 @@ public final class Constants {
 
                 // TalonFX outputted rotations
                 config.put("forwardLimitRotations", 
-                    Conversions.degreesToRotations(120.0, GEAR_RATIO)
+                    Conversions.degreesToRotations(700.0, GEAR_RATIO)
                 );
                 config.put("reverseLimitRotations", -1.5);
 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 
-                config.put("inverted", false);
+                config.put("inverted", true);
                 config.put("supplyCurrentLimit", 60.0);
                 config.put("supplyCurrentLimitEnabled", true);
                 config.put("statorCurrentLimit", 80.0);

@@ -29,7 +29,7 @@ import frc.robot.commands.HomeHood;
 import frc.robot.commands.HomeIntake;
 import frc.robot.commands.HoldIntakeDeployed;
 import frc.robot.commands.PushIntake;
-import frc.robot.commands.SetIntakeSpeedRPS;
+import frc.robot.commands.SetRollerPercent;
 import frc.robot.commands.Shoot;
 import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;
@@ -110,9 +110,6 @@ public class RobotContainer {
     private final ShotCalculator shotCalculator;
     private final FuelPhysicsSim ballSim = new FuelPhysicsSim("Sim/Fuel");
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine") ;
-    private AutoShoot autoShootCommand;
-    private SetIntakeSpeedRPS startRollerCommand;
-    private AutoPushIntake autoIntakePushCommand;
 
     // private SlewRateLimiter filterX = new SlewRateLimiter(3.0);
     // private SlewRateLimiter filterY = new SlewRateLimiter(3.0);            
@@ -187,7 +184,7 @@ public class RobotContainer {
             shotCalculator, turretHeadingOffsetLogged
         );
 
-        intakeSubsystem.zeroDeployToRotations(8.97);
+        intakeSubsystem.zeroDeployToRotations(0.0);
         turretSubsystem.zeroCurrentAimPosition();
 
         configureAutoChooser();
@@ -199,9 +196,13 @@ public class RobotContainer {
 
         turretSubsystem.setDefaultCommand(autoAimCommand);
 
-        feedSubsystem.setSetpoints(Constants.Controls.AGITATOR_HOLD_RPM, Constants.Controls.FEED_HOLD_RPM);
-        flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOB_RPM);
-
+        feedSubsystem.setSetpoints(
+            Constants.Controls.AGITATOR_HOLD_RPM, 
+            Constants.Controls.FEED_HOLD_RPM
+        );
+        flywheelSubsystem.setSetpoint(
+            Constants.Controls.FLYWHEEL_LOB_RPM
+        );
         autoShootTrigger.whileTrue(new AutoShoot(
             flywheelSubsystem, 
             feedSubsystem, 
@@ -211,42 +212,34 @@ public class RobotContainer {
             turretSubsystem::aimIsAtPosition,
             autoAimCommand::isPassing
         ));
-
         manualShootTrigger.whileTrue(new Shoot(
             flywheelSubsystem, 
             feedSubsystem, 
             ballSim
         ));
 
-        // TODO: Make intake setpoints
-
-        startIntakeTrigger.onTrue(new SetIntakeSpeedRPS(
-            intakeSubsystem, 
-            Constants.Controls.INTAKE_RUN_RPM / 60.0
-        ));
-        stopIntakeTrigger.onTrue(new SetIntakeSpeedRPS(
-            intakeSubsystem, 
-            Constants.Controls.INTAKE_IDLE_RPM / 60.0
-        ));
-        outtakeTrigger.onTrue(new SetIntakeSpeedRPS(
-            intakeSubsystem, 
-            -Constants.Controls.INTAKE_RUN_RPM / 60.0
-        ));
-
-        intakeSubsystem.setDefaultCommand(new HoldIntakeDeployed(
-            intakeSubsystem, 
+        intakeSubsystem.setSetpoints(
+            Constants.Controls.INTAKE_RUN_PERCENT,
             Constants.Controls.INTAKE_DEPLOYED_DEG
+        );
+        startIntakeTrigger.onTrue(new SetRollerPercent(
+            intakeSubsystem, 1.0
+        ));
+        stopIntakeTrigger.onTrue(new SetRollerPercent(
+            intakeSubsystem, 0.0
+        ));
+        outtakeTrigger.onTrue(new SetRollerPercent(
+            intakeSubsystem, -1.0
+        ));
+        intakeSubsystem.setDefaultCommand(new HoldIntakeDeployed(
+            intakeSubsystem
         ));
         autoIntakeTrigger.whileTrue(new AutoPushIntake(
-            intakeSubsystem,
-            Constants.Controls.INTAKE_DEPLOYED_DEG, 
-            Constants.Controls.INTAKE_RETRACT_DEG
+            intakeSubsystem
         ));
         pushIntakeTrigger.whileTrue(new PushIntake(
             intakeSubsystem, 
-            pushIntakeAxis, 
-            Constants.Controls.INTAKE_DEPLOYED_DEG, 
-            Constants.Controls.INTAKE_RETRACT_DEG
+            pushIntakeAxis
         )
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
     

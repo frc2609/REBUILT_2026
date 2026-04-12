@@ -1,37 +1,38 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 import frc.robot.subsystems.io.motor.PositionMotorIO;
-import frc.robot.subsystems.io.motor.VelocityMotorIO;
+import frc.robot.subsystems.io.motor.PercentMotorIO;
 
 /** Intake Subsystem using velocity control (rotations per second). */
 public class IntakeSubsystem extends SubsystemBase {
     private final PositionMotorIO deployMotor;
-    private final VelocityMotorIO driveMotor;
+    private final PercentMotorIO rollerMotor;
 
     public IntakeSubsystem(
-        PositionMotorIO deployMotor, VelocityMotorIO driveMotor) {
+        PositionMotorIO deployMotor, PercentMotorIO rollerMotor) {
         this.deployMotor = deployMotor;
-        this.driveMotor = driveMotor;
+        this.rollerMotor = rollerMotor;
     }
 
-    public void setDeploySetpoint(double deg) {
-        deployMotor.setSetpoint(deg);
-    }
-
-    public void setRollerSpeed(double speedRPS) {
-        driveMotor.setVelocityRps(speedRPS);
+    public void setSetpoints(double rollerPercent, double deployDeg) {
+        rollerMotor.setSetpoint(rollerPercent);
+        System.out.println("~~~~~~~~~SET ROLLER~~~~~~~: "+rollerPercent);
+        deployMotor.setSetpoint(deployDeg);
     }
 
     public boolean isRollerRunning() {
-        return driveMotor.getVelocityRps() > 0.1;
+        return false; // TODO
     }
 
-    public boolean rollerIsAtSpeed(double tolerance) {
-        return driveMotor.isAtSpeed(tolerance);
+    public void setRollerPercent(double direction) {
+        System.out.println("~~~~~~ROLLER POWER~~~~~~"+rollerMotor.getSetpoint());
+        rollerMotor.setPercent(direction * 1.0);
     }
 
+    public double getDeploySetpoint() {
+        return deployMotor.getSetpoint();
+    }
     public void setDeployPosition() {
         deployMotor.setTargetPositionDegrees(deployMotor.getSetpoint());
     }
@@ -67,14 +68,15 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void stop() {
-        driveMotor.stop();
+        rollerMotor.stop();
     }
 
     @Override
     public void periodic()
     {
-        driveMotor.logMotorPID();
+        rollerMotor.logMotorPID();
+        deployMotor.logMotorPID();
+
         deployMotor.updateFromTunables();
-        driveMotor.updateFromTunables();
     }
 }

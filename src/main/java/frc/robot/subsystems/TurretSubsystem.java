@@ -98,6 +98,7 @@ public class TurretSubsystem extends SubsystemBase {
     {
         //aimMotor.logMotorPID(aimEncoder.getRotations());
         hoodMotor.logMotorPID();
+        aimMotor.logMotorPID();
         aimMotor.updateFromTunables();
         hoodMotor.updateFromTunables();
     }

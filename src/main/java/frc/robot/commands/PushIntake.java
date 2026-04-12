@@ -9,22 +9,18 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class PushIntake extends Command {
     private final IntakeSubsystem intake;
     private Supplier<Double> triggerSupplier;
-    private final double min, max;
     
     public PushIntake(
-        IntakeSubsystem intake, Supplier<Double> triggerSupplier,
-        double minPosition, double maxPosition
+        IntakeSubsystem intake, Supplier<Double> triggerSupplier
     ){
         this.intake = intake; 
         this.triggerSupplier = triggerSupplier;
-        this.min = minPosition;
-        this.max = maxPosition;
         addRequirements(intake);   
     }
     @Override
     public void execute() {
         double triggerValue = triggerSupplier.get();
-        intake.setDeployPosition(MathUtil.interpolate(min, max, triggerValue));
+        intake.setDeployPosition(MathUtil.interpolate(intake.getDeploySetpoint(), 0.0, triggerValue));
     }
     @Override 
     public boolean isFinished(){

@@ -5,6 +5,9 @@ public interface PercentMotorIO {
     void setPercent(double percent);
 
     void logMotorPID();
+
+    void setSetpoint(double setpoint);
+    double getSetpoint();
     
     void stop();
 }
