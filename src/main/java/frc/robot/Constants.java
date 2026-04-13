@@ -444,7 +444,7 @@ public final class Constants {
             public static final int    HOME_CONFIRM_CYCLES = 3;
 
             public static final double HOME_TARGET_DEG = -30.0;
-            public static final double HOME_CURRENT_THRESHOLD_AMPS = 5.0;
+            public static final double HOME_CURRENT_THRESHOLD_AMPS = 3.0;
             public static final double HOME_STALL_MAX_VEL_DEG_PER_SEC = 8.0;
             
             // NOTE: Cuts off at 10 key-value pairs
