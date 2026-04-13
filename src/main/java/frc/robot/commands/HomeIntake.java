@@ -28,7 +28,11 @@ public class HomeIntake extends Command {
     @Override
     public void execute() {
         double current = intake.getDeployCurrentAmps();
-        if (current >= Constants.Intake.Deploy.HOME_CURRENT_THRESHOLD_AMPS) {
+        double velAbs = Math.abs(intake.getDeployVelocityDegPerSec());
+        boolean stalled =
+            current >= Constants.Intake.Deploy.HOME_INTAKE_CURRENT_THRESHOLD_AMPS
+                && velAbs <= Constants.Intake.Deploy.HOME_INTAKE_STALL_MAX_VEL_DEG_PER_SEC;
+        if (stalled) {
             stallCycles++;
         } else {
             stallCycles = 0;
@@ -52,7 +56,12 @@ public class HomeIntake extends Command {
             if (sim) {
                 System.out.println("HomeIntake: sim mode, zeroed without stall");
             } else {
-                System.out.println("HomeIntake: zeroed at stall, current="+ intake.getDeployCurrentAmps() + "A");
+                System.out.println(
+                    "HomeIntake: zeroed at stall, current="
+                        + intake.getDeployCurrentAmps()
+                        + "A vel="
+                        + intake.getDeployVelocityDegPerSec()
+                        + " deg/s");
             }
         } else if (interrupted) {
             System.out.println("HomeIntake: interrupted before stall detected");
