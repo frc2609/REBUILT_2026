@@ -105,11 +105,11 @@ public class TurretSubsystem extends SubsystemBase {
         hoodMotor.updateFromTunables();
 
         Logger.recordOutput(
-            "MechanismOutput/Turret azimuth (deg/s)",
+            "MechanismOutput/Turret azimuth (degs)",
             Conversions.motorRpsToOutputDegPerSec(
                 aimMotor.getRotorVelocityRps(), Constants.Turret.Aim.GEAR_RATIO));
         Logger.recordOutput(
-            "MechanismOutput/Turret hood (deg/s)",
+            "MechanismOutput/Turret hood (degs)",
             Conversions.motorRpsToOutputDegPerSec(
                 hoodMotor.getRotorVelocityRps(), Constants.Turret.Hood.GEAR_RATIO));
     }

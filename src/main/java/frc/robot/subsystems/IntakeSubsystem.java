@@ -88,7 +88,7 @@ public class IntakeSubsystem extends SubsystemBase {
             Conversions.motorRpsToOutputRpm(
                 rollerMotor.getRotorVelocityRps(), Constants.Intake.Roller.GEAR_RATIO));
         Logger.recordOutput(
-            "MechanismOutput/Intake deploy (deg/s)",
+            "MechanismOutput/Intake deploy (degs)",
             Conversions.motorRpsToOutputDegPerSec(
                 deployMotor.getRotorVelocityRps(), Constants.Intake.Deploy.GEAR_RATIO));
     }
