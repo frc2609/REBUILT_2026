@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.HomeHood;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -94,6 +95,9 @@ public class Robot extends LoggedRobot {
         // This must be called from the robot's periodic block in order for anything in
         // the Command-based framework to work.
         CommandScheduler.getInstance().run();
+        robotContainer.state.updateHubActive();
+        robotContainer.state.updateSOTMState();
+        robotContainer.state.logSystemState();
 
         // Return to non-RT thread priority (do not modify the first argument)
         // Threads.setCurrentThreadPriority(false, 10);
@@ -135,13 +139,17 @@ public class Robot extends LoggedRobot {
             autonomousCommand.cancel();
         }
         robotContainer.turretSubsystem.setAimCoastMode(false);
-        CommandScheduler.getInstance().schedule(robotContainer.getHoodHomeCommand());
+        CommandScheduler.getInstance().schedule(new HomeHood(robotContainer.turretSubsystem));
         //CommandScheduler.getInstance().schedule(robotContainer.getIntakeHomeCommand());
     }
 
     /** This function is called periodically during operator control. */
     @Override
-    public void teleopPeriodic() {}
+    public void teleopPeriodic() {
+        robotContainer.state.updateHubActive();
+        robotContainer.state.updateSOTMState();
+        robotContainer.state.logSystemState();
+    }
 
     /** This function is called once when test mode is enabled. */
     @Override
@@ -157,12 +165,25 @@ public class Robot extends LoggedRobot {
     /** This function is called once when the robot is first started up. */
     @Override
     public void simulationInit() {
-        robotContainer.simInit();
+        robotContainer.ballSim.enable();
+        //robotContainer.ballSim.placeFieldBalls();
+
+        robotContainer.ballSim.configureRobot(
+            0.5, 
+            0.5, 
+            0.01,
+            () -> robotContainer.driveSubsystem.getPose(), 
+            () -> robotContainer.driveSubsystem.getChassisSpeeds()
+        );
     }
 
     /** This function is called periodically whilst in simulation. */
     @Override
     public void simulationPeriodic() {
-        robotContainer.updateSim();
+        robotContainer.state.updateHubActive();
+        robotContainer.state.updateSOTMState();
+        robotContainer.state.updateSOTMSim();
+        robotContainer.state.logSystemState();
+        robotContainer.ballSim.tick();
     }
 }

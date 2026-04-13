@@ -26,7 +26,6 @@ import frc.robot.commands.Autos.SprintDoubleAuto;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.HomeHood;
-import frc.robot.commands.HomeIntake;
 import frc.robot.commands.HoldIntakeDeployed;
 import frc.robot.commands.PushIntake;
 import frc.robot.commands.SetIntakeSpeedRPS;
@@ -85,21 +84,12 @@ public class RobotContainer {
     @SuppressWarnings("unused")
     private final Trigger zeroEncodersTrigger = driverController.b();
 
-    // Tuning controls
-
-    // private final Trigger holdAgitatorTrigger = driverController.b();
-    // private final Trigger holdFeedTrigger = driverController.y();
-    // private final Trigger holdFlywheelTrigger = driverController.rightBumper();
-    // private final Trigger setHoodTrigger = driverController.povUp();
-    // private final Trigger setIntakeTrigger = driverController.povDown();
-
     private final RobotFactory robotFactory = new RobotFactory();
     public final TurretSubsystem turretSubsystem;
     public final FlywheelSubsystem flywheelSubsystem;
     public final IntakeSubsystem intakeSubsystem;
     public final DriveSubsystem driveSubsystem;
     public final FeedSubsystem feedSubsystem;
-    // public final ClimberSubsystem climberSubsystem;
     public final LedSubsystem ledSubsystem;
     public final VisionSubsystem visionSubsystem;
     private boolean hasRun;
@@ -107,23 +97,23 @@ public class RobotContainer {
     private final AutoAimTurret autoAimCommand;
     private final LoggedNetworkNumber turretHeadingOffsetLogged;
     private final ShotCalculator shotCalculator;
-    private final FuelPhysicsSim ballSim = new FuelPhysicsSim("Sim/Fuel");
+    public final FuelPhysicsSim ballSim = new FuelPhysicsSim("Sim/Fuel");
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine") ;
     private AutoShoot autoShootCommand;
     private SetIntakeSpeedRPS startRollerCommand;
-    private AutoPushIntake autoIntakePushCommand;
-
-    // private SlewRateLimiter filterX = new SlewRateLimiter(3.0);
-    // private SlewRateLimiter filterY = new SlewRateLimiter(3.0);            
+    private AutoPushIntake autoIntakePushCommand;  
+    
+    public final SystemState state;
                 
     public RobotContainer() {
+
         turretSubsystem = robotFactory.getTurretSubsystem();
         flywheelSubsystem = robotFactory.getFlywheelSubsystem();
         intakeSubsystem = robotFactory.getIntakeSubsystem();
         driveSubsystem = robotFactory.getDriveSubsystem();
         feedSubsystem = robotFactory.getFeedSubsystem();
         visionSubsystem = robotFactory.getVisionSubsystem();
-        // climberSubsystem = robotFactory.getClimberSubsystem();
+
         int quarter = Constants.LedConstants.Length / 4;
         ledSubsystem = new LedSubsystem(
             Constants.LedConstants.Length,
@@ -181,6 +171,8 @@ public class RobotContainer {
         }
 
         turretHeadingOffsetLogged = new LoggedNetworkNumber("/Tuning/SOTM/HeadingOffset", 180.0);
+        state = new SystemState(driveSubsystem, turretSubsystem, shotCalculator, turretHeadingOffsetLogged);
+
         autoAimCommand = new AutoAimTurret(turretSubsystem);
 
         turretSubsystem.setEncoderInvert(true);
@@ -377,24 +369,6 @@ public class RobotContainer {
     }
 
     // Called from Robot.java
-
-    public void simInit() {
-        ballSim.enable();
-        //ballSim.placeFieldBalls();
-
-        ballSim.configureRobot(0.5, 0.5, 0.01,
-            () -> driveSubsystem.getPose(), () -> driveSubsystem.getChassisSpeeds());
-    }
-    public void updateSim() {
-        ballSim.tick();
-    }
-    public Command getHoodHomeCommand() {
-        return new HomeHood(turretSubsystem);
-    }
-
-    // public Command getIntakeHomeCommand() {
-    //     return new HomeIntake(intakeSubsystem);
-    // }
 
     public Command getAutonomousCommand() {
         return autoChooser.get();

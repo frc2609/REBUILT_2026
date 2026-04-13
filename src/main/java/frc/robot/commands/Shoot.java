@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import java.util.function.Consumer;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.SystemState;
@@ -30,7 +28,7 @@ public class Shoot extends Command {
     @Override
     public void execute() {
         if (SystemState.validShotDetected){
-            flywheel.useAutoSpeed();
+            flywheel.setSpeed(SystemState.calculatedFlywheelRPM/60.0);
         } else {
             flywheel.setSpeed();
         }
@@ -40,7 +38,7 @@ public class Shoot extends Command {
 
         if (Constants.currentMode == Constants.Mode.SIM) {
             if (i%4 == 0) {
-                ballSim.launchBall(flywheel.launchPosSim, flywheel.launchSpeedSim, 0.0);
+                ballSim.launchBall(SystemState.launchPosSim, SystemState.launchVelSim, 0.0);
                 i++;
                 return;
             }

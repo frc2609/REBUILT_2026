@@ -1,10 +1,5 @@
 package frc.robot.commands;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.SystemState;
@@ -31,7 +26,7 @@ public class AutoShoot extends Command {
 
     @Override
     public void execute() {
-        flywheel.useAutoSpeed();
+        flywheel.setSpeed(SystemState.calculatedFlywheelRPM/60.0);
 
         if (SystemState.validShotDetected && flywheel.isAtSpeed(
             SystemState.isPassing ? 
@@ -43,7 +38,7 @@ public class AutoShoot extends Command {
 
             if (Constants.currentMode == Constants.Mode.SIM) {
                 if (i%4 == 0) {
-                    ballSim.launchBall(flywheel.launchPosSim, flywheel.launchSpeedSim, 0.0);
+                    ballSim.launchBall(SystemState.launchPosSim, SystemState.launchVelSim, 0.0);
                     i++;
                     return;
                 }
