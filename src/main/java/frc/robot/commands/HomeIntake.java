@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
@@ -23,6 +25,9 @@ public class HomeIntake extends Command {
         timer.reset();
         timer.start();
         intake.setDeployPosition(Constants.Intake.Deploy.HOME_TARGET_DEG);
+        Logger.recordOutput("MechanismOutput/HomeIntake/Running", true);
+        Logger.recordOutput("MechanismOutput/HomeIntake/StalledThisCycle", false);
+        Logger.recordOutput("MechanismOutput/HomeIntake/StallCycles", 0);
     }
 
     @Override
@@ -30,13 +35,15 @@ public class HomeIntake extends Command {
         double current = intake.getDeployCurrentAmps();
         double velAbs = Math.abs(intake.getDeployVelocityDegPerSec());
         boolean stalled =
-            current >= Constants.Intake.Deploy.HOME_INTAKE_CURRENT_THRESHOLD_AMPS
-                && velAbs <= Constants.Intake.Deploy.HOME_INTAKE_STALL_MAX_VEL_DEG_PER_SEC;
+            current >= Constants.Intake.Deploy.HOME_CURRENT_THRESHOLD_AMPS
+                && velAbs <= Constants.Intake.Deploy.HOME_STALL_MAX_VEL_DEG_PER_SEC;
         if (stalled) {
             stallCycles++;
         } else {
             stallCycles = 0;
         }
+        Logger.recordOutput("MechanismOutput/HomeIntake/StalledThisCycle", stalled);
+        Logger.recordOutput("MechanismOutput/HomeIntake/StallCycles", stallCycles);
     }
 
     @Override
@@ -68,6 +75,9 @@ public class HomeIntake extends Command {
         } else {
             System.out.println("HomeIntake: timed out before stall detected, encoder not zeroed");
         }
+        Logger.recordOutput("MechanismOutput/HomeIntake/Running", false);
+        Logger.recordOutput("MechanismOutput/HomeIntake/StalledThisCycle", false);
+        Logger.recordOutput("MechanismOutput/HomeIntake/StallCycles", 0);
         intake.stopDeploy();
     }
 }
