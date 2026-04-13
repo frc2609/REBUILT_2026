@@ -8,4 +8,12 @@ public final class Conversions {
   public static double rotationsToDegrees(double rotations, double gearRatio) {
     return rotations * (360.0 / gearRatio);
   }
+
+  public static double motorRpsToOutputRpm(double motorRps, double gearRatio) {
+    return motorRps * 60.0 / gearRatio;
+  }
+
+  public static double motorRpsToOutputDegPerSec(double motorRps, double gearRatio) {
+    return motorRps * (360.0 / gearRatio);
+  }
 }

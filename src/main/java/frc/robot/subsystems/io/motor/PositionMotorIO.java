@@ -22,6 +22,7 @@ public interface PositionMotorIO {
     void resetToZero();
 
     double getStatorCurrentAmps();
+    double getRotorVelocityRps();
 
     void setCoastMode(boolean coast);
 

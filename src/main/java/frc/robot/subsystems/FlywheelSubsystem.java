@@ -6,6 +6,8 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
+import frc.robot.util.Conversions;
+import frc.robot.util.ProjectileSimulator;
 
 /** Shooter Subsystem using velocity control (rotations per second). */
 public class FlywheelSubsystem extends SubsystemBase {
@@ -69,5 +71,13 @@ public class FlywheelSubsystem extends SubsystemBase {
         flywheelMotor.logMotorPID();
         flywheelMotor.updateFromTunables();
         Logger.recordOutput("SOTM/FlywheelSetpoint", this.autoSpeedRPS*60.0);
+
+        double outputRpm =
+            Conversions.motorRpsToOutputRpm(flywheelMotor.getVelocityRps(), Constants.Flywheel.GEAR_RATIO);
+        Logger.recordOutput("MechanismOutput/Flywheel RPM", outputRpm);
+        Logger.recordOutput(
+            "MechanismOutput/Flywheel rim speed (mps)",
+            ProjectileSimulator.rpmToExitVelocity(
+                outputRpm, Constants.simParameters.wheelDiameterM(), 1.0));
     }
 }

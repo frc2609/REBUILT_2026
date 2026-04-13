@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
+import frc.robot.util.Conversions;
 
 /** Shooter Subsystem using velocity control (rotations per second). */
 public class FeedSubsystem extends SubsystemBase {
@@ -63,6 +64,13 @@ public class FeedSubsystem extends SubsystemBase {
         feedMotor.logMotorPID();
         agitatorMotor.updateFromTunables();
         feedMotor.updateFromTunables();
+
+        Logger.recordOutput(
+            "MechanismOutput/Agitator RPM",
+            Conversions.motorRpsToOutputRpm(agitatorMotor.getVelocityRps(), Constants.Agitator.GEAR_RATIO));
+        Logger.recordOutput(
+            "MechanismOutput/Feed RPM",
+            Conversions.motorRpsToOutputRpm(feedMotor.getVelocityRps(), Constants.Feed.GEAR_RATIO));
 
         if (unjamming) {
             if (unjamTimer.get() > Constants.Agitator.UNJAM_TIME) {

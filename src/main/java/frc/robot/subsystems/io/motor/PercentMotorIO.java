@@ -8,6 +8,8 @@ public interface PercentMotorIO {
 
     void setSetpoint(double setpoint);
     double getSetpoint();
+
+    double getRotorVelocityRps();
     
     void stop();
 }

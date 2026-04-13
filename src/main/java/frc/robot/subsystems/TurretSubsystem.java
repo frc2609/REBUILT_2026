@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.io.motor.PositionMotorIO;
 import frc.robot.Constants;
-import frc.robot.subsystems.io.encoder.AbsEncoderIO;
+import frc.robot.subsystems.io.motor.PositionMotorIO;
+import frc.robot.util.Conversions;
 
 /** Shooter Subsystem using velocity control (rotations per second). */
 public class TurretSubsystem extends SubsystemBase {
@@ -101,5 +103,14 @@ public class TurretSubsystem extends SubsystemBase {
         aimMotor.logMotorPID();
         aimMotor.updateFromTunables();
         hoodMotor.updateFromTunables();
+
+        Logger.recordOutput(
+            "MechanismOutput/Turret azimuth (deg/s)",
+            Conversions.motorRpsToOutputDegPerSec(
+                aimMotor.getRotorVelocityRps(), Constants.Turret.Aim.GEAR_RATIO));
+        Logger.recordOutput(
+            "MechanismOutput/Turret hood (deg/s)",
+            Conversions.motorRpsToOutputDegPerSec(
+                hoodMotor.getRotorVelocityRps(), Constants.Turret.Hood.GEAR_RATIO));
     }
 }

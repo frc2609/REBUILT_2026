@@ -31,6 +31,11 @@ public class CtreTalonFxPercentIO extends CtreTalonFxIO implements PercentMotorI
     }
 
     @Override
+    public double getRotorVelocityRps() {
+        return motor.getVelocity().getValueAsDouble();
+    }
+
+    @Override
     public void stop() {
         motor.stopMotor();
         // if (hasFollower) {
