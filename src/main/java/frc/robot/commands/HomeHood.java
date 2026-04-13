@@ -28,6 +28,7 @@ public class HomeHood extends Command {
     @Override
     public void initialize() {
         stallCycles = 0;
+        timer.reset();
         timer.start();
         turret.setHoodPosition(Constants.Turret.Hood.HOME_TARGET_DEG);
     }
@@ -52,11 +53,19 @@ public class HomeHood extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        if (!interrupted) {
+        boolean stalled = stallCycles >= Constants.Turret.Hood.HOME_CONFIRM_CYCLES;
+        boolean sim = Constants.currentMode == Constants.Mode.SIM;
+        if (!interrupted && (stalled || sim)) {
             turret.zeroHoodPosition();
-            System.out.println("HomeHood: zeroed at stall, current=" + turret.getHoodCurrentAmps() + "A");
-        } else {
+            if (sim) {
+                System.out.println("HomeHood: sim mode, zeroed without stall");
+            } else {
+                System.out.println("HomeHood: zeroed at stall, current=" + turret.getHoodCurrentAmps() + "A");
+            }
+        } else if (interrupted) {
             System.out.println("HomeHood: interrupted before stall detected");
+        } else {
+            System.out.println("HomeHood: timed out before stall detected, encoder not zeroed");
         }
         turret.stop();
     }

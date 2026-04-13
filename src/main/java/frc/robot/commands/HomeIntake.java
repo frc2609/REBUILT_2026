@@ -45,11 +45,19 @@ public class HomeIntake extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        if (!interrupted) {
+        boolean stalled = stallCycles >= Constants.Intake.Deploy.HOME_CONFIRM_CYCLES;
+        boolean sim = Constants.currentMode == Constants.Mode.SIM;
+        if (!interrupted && (stalled || sim)) {
             intake.zeroDeployPosition();
-            System.out.println("HomeIntake: zeroed at stall, current=" + intake.getDeployCurrentAmps() + "A");
-        } else {
+            if (sim) {
+                System.out.println("HomeIntake: sim mode, zeroed without stall");
+            } else {
+                System.out.println("HomeIntake: zeroed at stall, current="+ intake.getDeployCurrentAmps() + "A");
+            }
+        } else if (interrupted) {
             System.out.println("HomeIntake: interrupted before stall detected");
+        } else {
+            System.out.println("HomeIntake: timed out before stall detected, encoder not zeroed");
         }
         intake.stopDeploy();
     }
