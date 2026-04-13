@@ -20,8 +20,12 @@ import frc.robot.commands.AutoAimTurret;
 import frc.robot.commands.AutoPushIntake;
 import frc.robot.commands.Autos.DifferentAuto;
 import frc.robot.commands.Autos.OneCycleAuto;
+import frc.robot.commands.Autos.PathShootIntakeAuto;
+import frc.robot.commands.Autos.PathShootIntakeThenPathAuto;
 import frc.robot.commands.Autos.SprintAuto;
 import frc.robot.commands.Autos.SprintDoubleAuto;
+import frc.robot.lib.BLine.FollowPath;
+import frc.robot.lib.BLine.Path;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.HomeHood;
@@ -308,10 +312,23 @@ public class RobotContainer {
         // makeValid.whileTrue(Commands.run(() -> ledSubsystem.ShotValid(true)));
         // makeValid.whileFalse(Commands.run(() -> ledSubsystem.ShotValid(false)));
         // makeActive.whileTrue(Commands.run(() -> ledSubsystem.HubActive()));
+
+        FollowPath.registerEventTrigger("autoShoot", 
+            new AutoShoot(
+                flywheelSubsystem, 
+                feedSubsystem, 
+                Constants.Controls.FEED_HOLD_RPM / 60.0, 
+                Constants.Controls.AGITATOR_HOLD_RPM / 60.0,
+                ballSim,
+                turretSubsystem::aimIsAtPosition,
+                autoAimCommand::isPassing
+        ));
+
     } 
 
     private void configureAutoChooser() {
         autoChooser.addDefaultOption("None", Commands.none());
+        autoChooser.addOption("Greg Piano", driveSubsystem.followPath(new Path("gregPiano")));
         autoChooser.addOption("Center Back", new SprintAuto(
             "centerback", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
@@ -345,6 +362,21 @@ public class RobotContainer {
         autoChooser.addOption("Right Diff", new DifferentAuto(
             "rightSweep", "rightClose", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
+        autoChooser.addOption("Right Cleanup", new PathShootIntakeAuto(
+            "rightCenterCleanup", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem
+        ));
+        autoChooser.addOption(
+            "cleanThenShoot",
+            new PathShootIntakeThenPathAuto(
+                "rightCenterCleanup",
+                "rightCenterCleanup2",
+                "rightSweep",
+                driveSubsystem,
+                flywheelSubsystem,
+                feedSubsystem,
+                intakeSubsystem,
+                ballSim,
+                turretSubsystem));
         Logger.registerDashboardInput(autoChooser);
         SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
     }

@@ -61,6 +61,10 @@ public class FlywheelSubsystem extends SubsystemBase {
         return isAtSpeed;
     }
 
+    public boolean isAtSpeed(double targetRps, double toleranceRps) {
+        return Math.abs(targetRps - flywheelMotor.getVelocityRps()) < toleranceRps;
+    }
+
     public void stop() {
         flywheelMotor.stop();
     }
