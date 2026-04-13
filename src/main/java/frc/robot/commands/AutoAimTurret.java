@@ -157,10 +157,14 @@ public class AutoAimTurret extends Command {
 
         if (validShot && turretInLimits && !disableShoot) {
             // Set hood and flywheel target based on shot 
-            if (targetDist <= Constants.Controls.LOB_DISTANCE) {
+            if (passing) {
+                turret.setHoodPosition(Constants.Controls.TURRET_HOOD_MAX_DEG);
+                flywheel.setAutoSpeed(shot.rpm()/60.0);
+            }
+            else if (targetDist <= Constants.Controls.LOB_DISTANCE) {
                 turret.setHoodPosition(4.0);
                 flywheel.setAutoSpeed(Constants.Controls.FLYWHEEL_LOB_RPM/60.0);
-            } else {
+            }  else {
                 turret.setHoodPosition(Constants.Controls.TURRET_HOOD_DEG);
                 flywheel.setAutoSpeed(shot.rpm()/60.0);
             }
