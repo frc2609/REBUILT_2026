@@ -60,6 +60,11 @@ public class IntakeSubsystem extends SubsystemBase {
         return deployMotor.getStatorCurrentAmps();
     }
 
+    public double getDeployVelocityDegPerSec() {
+        return Conversions.motorRpsToOutputDegPerSec(
+            deployMotor.getRotorVelocityRps(), Constants.Intake.Deploy.GEAR_RATIO);
+    }
+
     public void zeroDeployPosition() {
         deployMotor.resetToZero();
     }
