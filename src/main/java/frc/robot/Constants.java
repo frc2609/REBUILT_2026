@@ -174,6 +174,7 @@ public final class Constants {
         public static final double INTAKE_SPIT_PERCENT = 0.1;
 
         public static final double TURRET_HOOD_DEG = 15.0;
+        public static final double TURRET_HOOD_MAX_DEG = 25.0;
 
         public static final double TURRET_OVERRIDE_FRONT_DEG = 0.0;
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
@@ -290,7 +291,7 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 137.5;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double RANGE_DEG = 180.0; // 160
+            public static final double RANGE_DEG = 110.0; // 160
             public static final double HEADING_OFFSET_DEG = 180.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
             // MotionMagic trapezoidal profile limits (rotor rotations/sec, /sec^2, /sec^3)
