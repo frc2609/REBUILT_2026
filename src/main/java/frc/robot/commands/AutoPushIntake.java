@@ -22,7 +22,7 @@ public class AutoPushIntake extends Command {
         if (t < 1.0) {
             return 0.0;
         } else {
-            return 0.5+0.5*Math.sin(5.5*(t+0.7));
+            return (0.5+0.5*Math.sin(5.5*(t+0.7)))*0.6;//try without *0.6
         }
     }
 
@@ -32,8 +32,9 @@ public class AutoPushIntake extends Command {
     }
     @Override
     public void execute() {
+        double min = Math.min(intake.getDeploySetpoint(), 600);
         intake.setDeployPosition(
-            MathUtil.interpolate(intake.getDeploySetpoint(), 0.0, curve(timer.get()))
+            MathUtil.interpolate(min, 0.0, curve(timer.get()))
         );
     }
     @Override 
