@@ -25,6 +25,7 @@ import frc.robot.commands.Autos.SprintDoubleAuto;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.HomeHood;
+import frc.robot.commands.HomeIntake;
 import frc.robot.commands.HoldIntakeDeployed;
 import frc.robot.commands.PushIntake;
 import frc.robot.commands.SetRollerPercent;
@@ -365,9 +366,9 @@ public class RobotContainer {
         return new HomeHood(turretSubsystem);
     }
 
-    // public Command getIntakeHomeCommand() {
-    //     return new HomeIntake(intakeSubsystem);
-    // }
+    public Command getIntakeHomeCommand(){
+        return new HomeIntake(intakeSubsystem);
+    }
 
     public Command getAutonomousCommand() {
         return autoChooser.get();
