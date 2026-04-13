@@ -441,13 +441,11 @@ public final class Constants {
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 
             // Homing: drive past the deployed hard stop until current spikes, then zero there
-            public static final double HOME_TARGET_DEG = -30.0;
             public static final int    HOME_CONFIRM_CYCLES = 3;
-            
-            public static final double HOME_HOOD_CURRENT_THRESHOLD_AMPS = 50.0;
 
-            public static final double HOME_INTAKE_CURRENT_THRESHOLD_AMPS = 5.0;
-            public static final double HOME_INTAKE_STALL_MAX_VEL_DEG_PER_SEC = 8.0;
+            public static final double HOME_TARGET_DEG = -30.0;
+            public static final double HOME_CURRENT_THRESHOLD_AMPS = 5.0;
+            public static final double HOME_STALL_MAX_VEL_DEG_PER_SEC = 8.0;
             
             // NOTE: Cuts off at 10 key-value pairs
             public static final Map<String, Object> config = new HashMap<>(Map.of(
@@ -461,7 +459,7 @@ public final class Constants {
                 // config.put("MotionMagicCruiseVelocity", 2.0);
                 // config.put("MotionMagicAcceleration", 1.0);
                 config.put("forwardLimitEnabled", true);
-                config.put("reverseLimitEnabled", true);
+                config.put("reverseLimitEnabled", false);
 
                 // TalonFX outputted rotations
                 config.put("forwardLimitRotations", 
