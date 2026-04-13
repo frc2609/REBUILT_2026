@@ -271,7 +271,6 @@ public class RobotContainer {
 
         new Trigger(() -> {
             return SystemState.validShotDetected && 
-                SystemState.turretInPosition &&
                 !SystemState.trenchBlocked;
         }).whileTrue(Commands.startEnd(
             () -> driverController.getHID().setRumble(RumbleType.kBothRumble, 0.5),

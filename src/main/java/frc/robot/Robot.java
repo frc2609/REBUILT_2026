@@ -184,6 +184,7 @@ public class Robot extends LoggedRobot {
         robotContainer.state.updateSOTMState();
         robotContainer.state.updateSOTMSim();
         robotContainer.state.logSystemState();
+        
         robotContainer.ballSim.tick();
     }
 }

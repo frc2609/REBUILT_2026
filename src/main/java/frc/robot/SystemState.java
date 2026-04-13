@@ -25,7 +25,6 @@ public class SystemState {
     public static boolean 
         validShotDetected = false,
         flywheelAtSpeed = false,
-        turretInPosition = false,
         isPassing = false,
         hubActive = false,
         trenchBlocked = false,
@@ -144,7 +143,7 @@ public class SystemState {
             trimlessTurretAim.getRadians()
         );
 
-        ShotCalculator.LaunchParameters shot = shotCalc.calculate(inputs);
+        shot = shotCalc.calculate(inputs);
         SystemState.turretAngleDeg = shot.driveAngle()
             //.minus(Rotation2d.fromDegrees(Constants.Turret.Aim.HEADING_OFFSET_DEG))
             .minus(Rotation2d.fromDegrees(headingOffset.getAsDouble()))
@@ -277,7 +276,7 @@ public class SystemState {
         Logger.recordOutput("SOTM/TargetDistance", SystemState.targetDist);
         Logger.recordOutput("SOTM/Flags/ValidShot", SystemState.validShotDetected);
         Logger.recordOutput("SOTM/Flags/HubActive", SystemState.hubActive);
-        Logger.recordOutput("SOTM/Flags/Confidence", shot.confidence());
+        Logger.recordOutput("SOTM/Flags/Confidence", SystemState.shot.confidence());
         Logger.recordOutput("SOTM/Flags/TrenchBlock", SystemState.trenchBlocked);
         Logger.recordOutput("SOTM/Flags/Passing", SystemState.isPassing);
     }
