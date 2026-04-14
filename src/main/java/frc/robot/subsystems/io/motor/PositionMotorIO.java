@@ -26,5 +26,7 @@ public interface PositionMotorIO {
 
     void setCoastMode(boolean coast);
 
+    default void restoreConfiguredNeutralMode() {}
+
     void stop();
 }

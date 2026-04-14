@@ -69,4 +69,14 @@ public class CtreTalonFxVelocityIO extends CtreTalonFxIO implements VelocityMoto
         //setpointRps = 0.0;
         motor.stopMotor();
     }
+
+    @Override
+    public void setCoastMode(boolean coast) {
+        super.setCoastMode(coast);
+    }
+
+    @Override
+    public void restoreConfiguredNeutralMode() {
+        super.restoreConfiguredNeutralMode();
+    }
 }

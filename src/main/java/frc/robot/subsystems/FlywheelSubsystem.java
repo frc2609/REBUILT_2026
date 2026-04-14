@@ -69,6 +69,14 @@ public class FlywheelSubsystem extends SubsystemBase {
         flywheelMotor.stop();
     }
 
+    public void setCoastMode(boolean coast) {
+        flywheelMotor.setCoastMode(coast);
+    }
+
+    public void restoreConfiguredNeutralMode() {
+        flywheelMotor.restoreConfiguredNeutralMode();
+    }
+
     @Override
     public void periodic()
     {

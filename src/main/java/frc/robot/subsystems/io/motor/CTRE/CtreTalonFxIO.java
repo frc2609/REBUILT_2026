@@ -9,6 +9,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.configs.SlotConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -16,6 +17,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import frc.robot.Constants;
@@ -218,6 +220,21 @@ public class CtreTalonFxIO {
             followerMotor.getConfigurator().apply(config);
             //followerMotor.setControl(new Follower(this.motorId, followerAligned));
         }
+    }
+
+    public void setCoastMode(boolean coast) {
+        MotorOutputConfigs cfg = new MotorOutputConfigs();
+        motor.getConfigurator().refresh(cfg);
+        cfg.NeutralMode = coast ? NeutralModeValue.Coast : NeutralModeValue.Brake;
+        motor.getConfigurator().apply(cfg);
+        if (hasFollower) {
+            followerMotor.getConfigurator().apply(cfg);
+        }
+    }
+
+    public void restoreConfiguredNeutralMode() {
+        // Re-apply the device config (includes the configured neutral mode).
+        applyConfiguration();
     }
 
     private void copyToOldTunables()

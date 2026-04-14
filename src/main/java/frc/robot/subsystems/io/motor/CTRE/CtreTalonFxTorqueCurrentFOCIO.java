@@ -66,4 +66,14 @@ public class CtreTalonFxTorqueCurrentFOCIO extends CtreTalonFxIO implements Velo
     public void stop() {
         motor.stopMotor();
     }
+
+    @Override
+    public void setCoastMode(boolean coast) {
+        super.setCoastMode(coast);
+    }
+
+    @Override
+    public void restoreConfiguredNeutralMode() {
+        super.restoreConfiguredNeutralMode();
+    }
 }

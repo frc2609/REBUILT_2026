@@ -80,6 +80,16 @@ public class IntakeSubsystem extends SubsystemBase {
         rollerMotor.stop();
     }
 
+    public void setCoastMode(boolean coast) {
+        deployMotor.setCoastMode(coast);
+        rollerMotor.setCoastMode(coast);
+    }
+
+    public void restoreConfiguredNeutralMode() {
+        deployMotor.restoreConfiguredNeutralMode();
+        rollerMotor.restoreConfiguredNeutralMode();
+    }
+
     @Override
     public void periodic()
     {

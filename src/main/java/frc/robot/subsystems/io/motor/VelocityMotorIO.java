@@ -16,6 +16,10 @@ public interface VelocityMotorIO {
     double getStatorCurrent();
     void setIsUnjamSlot(boolean unjam);
 
+    default void setCoastMode(boolean coast) {}
+
+    default void restoreConfiguredNeutralMode() {}
+
     // void set(double percent);
 
     boolean isAtSpeed(double toleranceRps);

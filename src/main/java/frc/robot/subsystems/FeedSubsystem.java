@@ -57,6 +57,16 @@ public class FeedSubsystem extends SubsystemBase {
         feedMotor.stop();
     }
 
+    public void setCoastMode(boolean coast) {
+        agitatorMotor.setCoastMode(coast);
+        feedMotor.setCoastMode(coast);
+    }
+
+    public void restoreConfiguredNeutralMode() {
+        agitatorMotor.restoreConfiguredNeutralMode();
+        feedMotor.restoreConfiguredNeutralMode();
+    }
+
     @Override
     public void periodic()
     {

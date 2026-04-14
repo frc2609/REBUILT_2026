@@ -42,4 +42,14 @@ public class CtreTalonFxPercentIO extends CtreTalonFxIO implements PercentMotorI
         //     followerMotor.stopMotor();
         // }
     }
+
+    @Override
+    public void setCoastMode(boolean coast) {
+        super.setCoastMode(coast);
+    }
+
+    @Override
+    public void restoreConfiguredNeutralMode() {
+        super.restoreConfiguredNeutralMode();
+    }
 }

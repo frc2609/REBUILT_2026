@@ -10,6 +10,10 @@ public interface PercentMotorIO {
     double getSetpoint();
 
     double getRotorVelocityRps();
+
+    default void setCoastMode(boolean coast) {}
+
+    default void restoreConfiguredNeutralMode() {}
     
     void stop();
 }

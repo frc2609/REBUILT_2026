@@ -415,4 +415,31 @@ public class RobotContainer {
 
         ledSubsystem.pattern();
     }
+
+    /** Force all motors into coast while disabled; restore configured modes when enabled. */
+    public void setAllMotorsCoast(boolean coast) {
+        // Turret
+        turretSubsystem.setCoastMode(coast);
+        if (!coast) {
+            turretSubsystem.restoreConfiguredNeutralMode();
+        }
+
+        // Flywheel
+        flywheelSubsystem.setCoastMode(coast);
+        if (!coast) {
+            flywheelSubsystem.restoreConfiguredNeutralMode();
+        }
+
+        // Intake
+        intakeSubsystem.setCoastMode(coast);
+        if (!coast) {
+            intakeSubsystem.restoreConfiguredNeutralMode();
+        }
+
+        // Feed / agitator
+        feedSubsystem.setCoastMode(coast);
+        if (!coast) {
+            feedSubsystem.restoreConfiguredNeutralMode();
+        }
+    }
 }

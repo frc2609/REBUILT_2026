@@ -156,6 +156,11 @@ public class CtreTalonDynamicMotionMagicExpoVoltageIO extends CtreTalonFxIO impl
     }
 
     @Override
+    public void restoreConfiguredNeutralMode() {
+        super.restoreConfiguredNeutralMode();
+    }
+
+    @Override
     public void stop() {
         motor.stopMotor();
         targetDegrees = getPositionDegrees();

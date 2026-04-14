@@ -102,7 +102,7 @@ public class Robot extends LoggedRobot {
     /** This function is called once when the robot is disabled. */
     @Override
     public void disabledInit() {
-        robotContainer.turretSubsystem.setAimCoastMode(true);
+        robotContainer.setAllMotorsCoast(true);
     }
 
     /** This function is called periodically when disabled. */
@@ -114,7 +114,7 @@ public class Robot extends LoggedRobot {
     /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
     @Override
     public void autonomousInit() {
-        robotContainer.turretSubsystem.setAimCoastMode(false);
+        robotContainer.setAllMotorsCoast(false);
         //CommandScheduler.getInstance().schedule(robotContainer.getHoodHomeCommand());
 
         autonomousCommand = robotContainer.getAutonomousCommand();
@@ -134,7 +134,7 @@ public class Robot extends LoggedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }
-        robotContainer.turretSubsystem.setAimCoastMode(false);
+        robotContainer.setAllMotorsCoast(false);
         CommandScheduler.getInstance().schedule(robotContainer.getHoodHomeCommand());
         CommandScheduler.getInstance().schedule(robotContainer.getIntakeHomeCommand());
     }

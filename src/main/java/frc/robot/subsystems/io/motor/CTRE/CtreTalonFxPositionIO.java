@@ -144,6 +144,11 @@ public class CtreTalonFxPositionIO extends CtreTalonFxIO implements PositionMoto
     }
 
     @Override
+    public void restoreConfiguredNeutralMode() {
+        super.restoreConfiguredNeutralMode();
+    }
+
+    @Override
     public void stop() {
         motor.stopMotor();
         // if (hasFollower) {
