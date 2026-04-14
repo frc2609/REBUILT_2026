@@ -391,6 +391,7 @@ public final class Constants {
                 config.put("statorCurrentLimit", 40.0);
                 config.put("statorCurrentLimitEnabled", true);
                 config.put("useClosedLoopFFSign", true);
+                config.put("neutralMode", Constants.NeutralMode.BRAKE);
             }
         }
     }
