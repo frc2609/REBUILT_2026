@@ -184,7 +184,7 @@ public final class Constants {
         public static final double FEED_HOLD_RPM = 6000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
-        public static final double LOB_DISTANCE = 2.0;
+        public static final double LOB_DISTANCE = 2.4;
     }
 
     /** BLine FollowPath PID gains. Path constraints are in deploy/autos/config.json. */
