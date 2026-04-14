@@ -171,7 +171,7 @@ public final class Constants {
 
         public static final double INTAKE_DEPLOYED_DEG = 695.0;
         public static final double INTAKE_RUN_PERCENT = 0.7;
-        public static final double INTAKE_SPIT_PERCENT = 0.1;
+        public static final double INTAKE_SPIT_PERCENT = -0.5;
 
         public static final double TURRET_HOOD_DEG = 15.0;
         public static final double TURRET_HOOD_MAX_DEG = 25.0;
@@ -180,10 +180,10 @@ public final class Constants {
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
         public static final double TURRET_OVERRIDE_LEFT_DEG = -90.0;
 
-        public static final double AGITATOR_HOLD_RPM = 6000.0;
-        public static final double FEED_HOLD_RPM = 6000.0; // max speed
+        public static final double AGITATOR_HOLD_RPM = 5000.0;
+        public static final double FEED_HOLD_RPM = 5000.0; // max speed
 
-        public static final double FLYWHEEL_LOB_RPM = 2200.0;
+        public static final double FLYWHEEL_LOB_RPM = 2000.0;
         public static final double LOB_DISTANCE = 2.4;
     }
 
