@@ -9,6 +9,8 @@ package frc.robot;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -224,7 +226,12 @@ public class RobotContainer {
         intakeSubsystem.setDefaultCommand(new HoldIntakeDeployed(
             intakeSubsystem
         ));
-        autoIntakeTrigger.whileTrue(new AutoPushIntake(
+        autoIntakeTrigger.and(() -> {
+            ChassisSpeeds velocity = driveSubsystem.getChassisSpeeds();
+            double speed = new Translation2d(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond).getNorm();
+            Logger.recordOutput("SpeedScalar", speed);
+            return speed < Constants.Controls.STATIONARY_SPEED;
+        }).whileTrue(new AutoPushIntake(
             intakeSubsystem
         ));
         pushIntakeTrigger.whileTrue(new PushIntake(
