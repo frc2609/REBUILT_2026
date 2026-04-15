@@ -8,14 +8,11 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class AutoPushIntake extends Command {
     private final IntakeSubsystem intake;
     private final Timer timer = new Timer();
-    private final double min, max;
     
     public AutoPushIntake(
-        IntakeSubsystem intake, double minPosition, double maxPosition
+        IntakeSubsystem intake
     ){
         this.intake = intake; 
-        this.min = minPosition;
-        this.max = maxPosition;
         addRequirements(intake);   
     }
 
@@ -36,7 +33,7 @@ public class AutoPushIntake extends Command {
     @Override
     public void execute() {
         intake.setDeployPosition(
-            MathUtil.interpolate(min, max, curve(timer.get()))
+            MathUtil.interpolate(intake.getDeploySetpoint(), 0.0, curve(timer.get()))
         );
     }
     @Override 

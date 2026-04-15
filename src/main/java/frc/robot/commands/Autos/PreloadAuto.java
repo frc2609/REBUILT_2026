@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.HoldIntakeDeployed;
-import frc.robot.commands.SetIntakeSpeedRPS;
 import frc.robot.lib.BLine.Path;
 import frc.robot.subsystems.FeedSubsystem;
 import frc.robot.subsystems.FlywheelSubsystem;

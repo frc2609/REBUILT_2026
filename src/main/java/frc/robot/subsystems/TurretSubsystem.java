@@ -9,15 +9,15 @@ import frc.robot.subsystems.io.encoder.AbsEncoderIO;
 public class TurretSubsystem extends SubsystemBase {
     private final PositionMotorIO aimMotor;
     private final PositionMotorIO hoodMotor;
-    private final AbsEncoderIO aimEncoder;
+    // private final AbsEncoderIO aimEncoder;
 
     public TurretSubsystem(
-        PositionMotorIO aimMotor, PositionMotorIO hoodMotor, 
-        AbsEncoderIO aimEncoder
+        PositionMotorIO aimMotor, PositionMotorIO hoodMotor
+        // AbsEncoderIO aimEncoder
     ) {
         this.aimMotor = aimMotor;
         this.hoodMotor = hoodMotor;
-        this.aimEncoder = aimEncoder;
+        // this.aimEncoder = aimEncoder;
 
         System.out.println("RESET HOOD TO ZERO");
         hoodMotor.resetToZero();
@@ -41,19 +41,19 @@ public class TurretSubsystem extends SubsystemBase {
         return aimMotor.getPositionDegrees();
     }
 
-    public void setEncoderInvert(boolean invert){
-        this.aimEncoder.setInverted(invert);
-    }
-    public void resetAimPositionToAbsolute(double offsetRotations) {
-        if (aimEncoder.getRotations() == 0.0 && 
-            Constants.currentMode != Constants.Mode.SIM
-        ){
-            System.out.println("RETRYING ZERO ON AIM");
-            resetAimPositionToAbsolute(offsetRotations);
-            return;
-        }
-        aimMotor.resetToAbsolute(aimEncoder.getRotations()-offsetRotations);
-    }
+    // public void setEncoderInvert(boolean invert){
+    //     this.aimEncoder.setInverted(invert);
+    // }
+    // public void resetAimPositionToAbsolute(double offsetRotations) {
+    //     if (aimEncoder.getRotations() == 0.0 && 
+    //         Constants.currentMode != Constants.Mode.SIM
+    //     ){
+    //         System.out.println("RETRYING ZERO ON AIM");
+    //         resetAimPositionToAbsolute(offsetRotations);
+    //         return;
+    //     }
+    //     aimMotor.resetToAbsolute(aimEncoder.getRotations()-offsetRotations);
+    // }
 
     public void zeroCurrentAimPosition() {
         aimMotor.resetToZero();
@@ -96,8 +96,9 @@ public class TurretSubsystem extends SubsystemBase {
     @Override
     public void periodic()
     {
-        aimMotor.logMotorPID(aimEncoder.getRotations());
+        //aimMotor.logMotorPID(aimEncoder.getRotations());
         hoodMotor.logMotorPID();
+        aimMotor.logMotorPID();
         aimMotor.updateFromTunables();
         hoodMotor.updateFromTunables();
     }

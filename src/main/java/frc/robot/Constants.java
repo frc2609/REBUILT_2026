@@ -100,8 +100,8 @@ public final class Constants {
         VelocityMotorType.CTRE_TALON_FX;
     public static final VelocityMotorType FEED_VELOCITY_MOTOR_TYPE =
         VelocityMotorType.CTRE_TALON_FX;
-    public static final VelocityMotorType INTAKE_ROLLER_VELOCITY_MOTOR_TYPE =
-        VelocityMotorType.CTRE_TALON_FX;
+    public static final PercentMotorType INTAKE_ROLLER_PERCENT_MOTOR_TYPE =
+        PercentMotorType.CTRE_TALON_FX;
     public static final PositionMotorType INTAKE_DEPLOY_POSITION_MOTOR_TYPE =
         PositionMotorType.CTRE_TALON_FX;
     public static final PositionMotorType AGITATOR_VELOCITY_MOTOR_TYPE =
@@ -163,19 +163,15 @@ public final class Constants {
 
         public static final double TURRET_READY_TOLERANCE = 4.0; // deg
         public static final double FLYWHEEL_PASS_TOLERANCE_RPM = 900.0; // rpm
-        public static final double FLYWHEEL_TOLERANCE_RPM = 100.0; // rpm
+        public static final double FLYWHEEL_TOLERANCE_RPM = 670.0; // rpm
 
         // Rotation values are OUTPUT degrees
         // RPM values are INPUT RPM, will be geared down
 
 
-        public static final double INTAKE_DEPLOYED_DEG = 0.0;
-        public static final double INTAKE_RETRACT_DEG  = 110.0; // for push
-        
-        public static final double INTAKE_RUN_RPM = 4000.0;
-        public static final double INTAKE_IDLE_RPM = 0.0;
-
-        public static final double CLIMBER_DEPLOYED_DEG = 360.0;
+        public static final double INTAKE_DEPLOYED_DEG = 695.0;
+        public static final double INTAKE_RUN_PERCENT = 0.7;
+        public static final double INTAKE_SPIT_PERCENT = 0.1;
 
         public static final double TURRET_HOOD_DEG = 15.0;
 
@@ -183,8 +179,8 @@ public final class Constants {
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
         public static final double TURRET_OVERRIDE_LEFT_DEG = -90.0;
 
-        public static final double AGITATOR_HOLD_RPM = 5000.0;
-        public static final double FEED_HOLD_RPM = 5000.0; // max speed
+        public static final double AGITATOR_HOLD_RPM = 6000.0;
+        public static final double FEED_HOLD_RPM = 6000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
         public static final double LOB_DISTANCE = 2.0;
@@ -216,7 +212,23 @@ public final class Constants {
             1.225,   // air density
             0.376,    // exit height (m), floor to where the ball leaves the shooter
             0.0762,  // flywheel diameter, 0.0762
-            1.95,    // target height (m), 1.83 from game manual
+            1.91,    // target height (m), 1.83 from game manual
+            0.85,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
+            68.0,    // launch angle from horizontal
+            0.001,   // sim timestep
+            1500, 6000, 25, 10.0  // RPM search range, iterations, max sim time
+        );
+
+    public static ProjectileSimulator.SimParameters passingSimParameters = 
+        new ProjectileSimulator.SimParameters(
+            0.215,   // ball mass kg
+            0.1501,  // ball diameter m
+            0.47,    // drag coeff (smooth sphere)
+            0.0,     // Magnus coeff
+            1.225,   // air density
+            0.376,    // exit height (m), floor to where the ball leaves the shooter
+            0.0762,  // flywheel diameter, 0.0762
+            0.0,    // target height (m), 1.83 from game manual
             0.85,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
             68.0,    // launch angle from horizontal
             0.001,   // sim timestep
@@ -225,8 +237,8 @@ public final class Constants {
 
     public static final ShotCalculator.Config shotConfig = new ShotCalculator.Config();
     static {
-        shotConfig.launcherOffsetX = -0.189;  // how far forward the launcher is from robot center (m)
-        shotConfig.launcherOffsetY = -0.144;   // how far left, 0 if centered
+        shotConfig.launcherOffsetX = -0.119;  // how far forward the launcher is from robot center (m)
+        shotConfig.launcherOffsetY = -0.152;   // how far left, 0 if centered
         //shotConfig.shooterAngleOffsetRad = Math.PI; // use LoggedNetworkNumber SOTM/HeadingOffset instead
         shotConfig.phaseDelayMs = 30.0;     // your vision pipeline latency
         shotConfig.mechLatencyMs = 20.0;    // how long the mechanism takes to respond
@@ -239,38 +251,6 @@ public final class Constants {
     }
     
     // Subsystems
-
-    public static final class Climber {
-        public static final int EncoderChannel = 1;
-        public static final double INERTIA = 0.01;
-        public static final double GEAR_RATIO = 45.0;
-        public static final double ENCODER_RATIO = 1.0;
-        public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
-
-        // NOTE: Cuts off at 10 key-value pairs
-        public static final Map<String, Object> config = new HashMap<>(
-            Map.of(
-                "motorId", 40,
-                "kP", 0.0,
-                "kI", 0.0,
-                "kD", 0.0,
-                "kV", 0.0,
-                "kS", 0.0,
-                "forwardLimitEnabled", false,
-                "forwardLimitRotations", 100.0,
-                "reverseLimitEnabled", false,
-                "reverseLimitRotations", 100.0
-        ));
-        static {
-            config.put("inverted", false);
-            config.put("supplyCurrentLimit", 60.0);
-            config.put("supplyCurrentLimitEnabled", true);
-            config.put("statorCurrentLimit", 80.0);
-            config.put("statorCurrentLimitEnabled", true);
-            // config.put("MotionMagicCruiseVelocity", 2.0);
-            // config.put("MotionMagicAcceleration", 1.0);
-        }
-    }
 
     public static final class Feed {
         public static final double INERTIA = 0.01;
@@ -295,7 +275,7 @@ public final class Constants {
             "followerAligned", false,
             "kP", 0.04,
             "kV", 0.0117,
-            "inverted", false,
+            "inverted", true,
             "statorCurrentLimit", 90.0,
             "statorCurrentLimitEnabled", true
         ));
@@ -306,10 +286,9 @@ public final class Constants {
 
         public static final class Aim {
             public static final double INERTIA = 0.01;
-            public static final double GEAR_RATIO = 60.0;
+            public static final double GEAR_RATIO = 137.5;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double ZERO_OFFSET = 0.515; // 0.242 unrestricted
-            public static final double RANGE_DEG = 118.0; // 160
+            public static final double RANGE_DEG = 180.0; // 160
             public static final double HEADING_OFFSET_DEG = 180.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
             // MotionMagic trapezoidal profile limits (rotor rotations/sec, /sec^2, /sec^3)
@@ -340,7 +319,7 @@ public final class Constants {
                     Conversions.degreesToRotations(-RANGE_DEG, GEAR_RATIO));
                 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
-                config.put("inverted", false);
+                config.put("inverted", true);
                 config.put("supplyCurrentLimit", 30.0);
                 config.put("supplyCurrentLimitEnabled", true);
                 config.put("statorCurrentLimit", 30.0);
@@ -403,7 +382,7 @@ public final class Constants {
                 config.put("forwardLimitRotations", 0.92);
                 config.put("reverseLimitRotations", 0.0);
                 
-                config.put("inverted", true);
+                config.put("inverted", false);
                 config.put("supplyCurrentLimit", 40.0);
                 config.put("supplyCurrentLimitEnabled", true);
                 config.put("statorCurrentLimit", 40.0);
@@ -415,7 +394,7 @@ public final class Constants {
 
     public static final class Agitator {
         public static final double INERTIA = 0.001;
-        public static final double GEAR_RATIO = 80.0/9.0;
+        public static final double GEAR_RATIO = 80.0/3.0;
         public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
         public static final double JAM_CURRENT = 100.0; // stator limit before unjam
         public static final double UNJAM_TIME  = 3.0; // seconds
@@ -424,7 +403,7 @@ public final class Constants {
             "motorId", 20,
             "kP", 0.05,
             "kV", 0.012,
-            "inverted", false,
+            "inverted", true,
             "neutralMode", NeutralMode.COAST,
             "statorCurrentLimit", 120.0,
             "statorCurrentLimitEnabled", true
@@ -440,8 +419,10 @@ public final class Constants {
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 31,
+                "followerId", 32,
+                "followerAligned", false,
                 "isRioCANBUS",true,
-                "inverted", true,
+                "inverted", false,
                 "kP", 0.032,
                 "kV", 0.0097,
                 "statorCurrentLimit", 50.0,
@@ -452,7 +433,7 @@ public final class Constants {
         public static final class Deploy {
             public static final double INERTIA = 0.001;
             public static final double ZERO_OFFSET = 0;
-            public static final double GEAR_RATIO = 27.0;
+            public static final double GEAR_RATIO = 12.0;
             public static final double ENCODER_RATIO = 1.0;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 
@@ -477,13 +458,13 @@ public final class Constants {
 
                 // TalonFX outputted rotations
                 config.put("forwardLimitRotations", 
-                    Conversions.degreesToRotations(120.0, GEAR_RATIO)
+                    Conversions.degreesToRotations(700.0, GEAR_RATIO)
                 );
                 config.put("reverseLimitRotations", -1.5);
 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 
-                config.put("inverted", false);
+                config.put("inverted", true);
                 config.put("supplyCurrentLimit", 60.0);
                 config.put("supplyCurrentLimitEnabled", true);
                 config.put("statorCurrentLimit", 80.0);
@@ -548,7 +529,9 @@ public final class Constants {
     }
 
     public static final class LedConstants{
-        public static final int Length = 75;
+        public static final int Length = 100;
         public static final int Port = 0;
+        public static final double travelTime = 1.25;//time to go from one end to the other in seconds
+        public static final int ledGroup = 3;
     }
 }

@@ -4,18 +4,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
 
 /** Holds the shooter at a requested speed (RPS) while scheduled. */
-public class SetIntakeSpeedRPS extends Command {
+public class SetRollerPercent extends Command {
     private final IntakeSubsystem intake;
-    private final double rps;
+    private final double percent;
 
-    public SetIntakeSpeedRPS(IntakeSubsystem intake, double rps) {
+    public SetRollerPercent(IntakeSubsystem intake, double percent) {
         this.intake = intake;
-        this.rps = rps;
+        this.percent = percent;
         addRequirements(intake);
     }
+    
     @Override
     public void execute() {
-        intake.setRollerSpeed(rps);
+        intake.setRollerPercent(percent);
     }
 
     @Override

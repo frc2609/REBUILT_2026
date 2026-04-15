@@ -5,18 +5,16 @@ import frc.robot.subsystems.IntakeSubsystem;
 
 public class HoldIntakeDeployed extends Command {
     private final IntakeSubsystem intake;
-    private double degrees;
     
-    public HoldIntakeDeployed(IntakeSubsystem intake, double degrees){
+    public HoldIntakeDeployed(IntakeSubsystem intake){
         this.intake = intake; 
-        this.degrees = degrees;
         addRequirements(intake);   
     }
 
     @Override
     public void execute() {
         // Dynamic holding (PID slots) can go here
-        intake.setDeployPosition(degrees);
+        intake.setDeployPosition();
     }
 
     @Override 
