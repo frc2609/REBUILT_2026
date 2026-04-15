@@ -161,6 +161,7 @@ public final class Constants {
         public static final double SHOOTING_SPEED_PERCENT = 0.1;
         public static final double UNJAM_FACTOR = 10.0; // kP multiplier when unjamming
         public static final double SHOT_CONFIDENCE_MIN = 50.0; // out of 100
+        public static final double STATIONARY_SPEED = 0.05;
 
         public static final double TURRET_READY_TOLERANCE = 4.0; // deg
         public static final double FLYWHEEL_TOLERANCE_RPM = 670.0; // rpm
