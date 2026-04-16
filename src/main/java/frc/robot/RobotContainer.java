@@ -9,6 +9,8 @@ package frc.robot;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -20,11 +22,16 @@ import frc.robot.commands.AutoAimTurret;
 import frc.robot.commands.AutoPushIntake;
 import frc.robot.commands.Autos.DifferentAuto;
 import frc.robot.commands.Autos.OneCycleAuto;
+import frc.robot.commands.Autos.PathShootIntakeAuto;
+import frc.robot.commands.Autos.PathShootIntakeThenPathAuto;
 import frc.robot.commands.Autos.SprintAuto;
 import frc.robot.commands.Autos.SprintDoubleAuto;
+import frc.robot.lib.BLine.FollowPath;
+import frc.robot.lib.BLine.Path;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.HomeHood;
+import frc.robot.commands.HomeIntake;
 import frc.robot.commands.HoldIntakeDeployed;
 import frc.robot.commands.PushIntake;
 import frc.robot.commands.SetRollerPercent;
@@ -120,7 +127,6 @@ public class RobotContainer {
         driveSubsystem = robotFactory.getDriveSubsystem();
         feedSubsystem = robotFactory.getFeedSubsystem();
         // climberSubsystem = robotFactory.getClimberSubsystem();
-        int quarter = Constants.LedConstants.Length / 4;
         ledSubsystem = new LedSubsystem(
             Constants.LedConstants.Length, 
             Constants.LedConstants.Port,
@@ -165,7 +171,7 @@ public class RobotContainer {
         //     }
         // }
 
-        turretHeadingOffsetLogged = new LoggedNetworkNumber("/Tuning/SOTM/HeadingOffset", 180.0);
+        turretHeadingOffsetLogged = new LoggedNetworkNumber("/Tuning/SOTM/HeadingOffset", Constants.Turret.Aim.HEADING_OFFSET_DEG);
         state = new SystemState(driveSubsystem, turretSubsystem, shotCalculator, turretHeadingOffsetLogged);
 
         autoAimCommand = new AutoAimTurret(turretSubsystem);
@@ -215,7 +221,12 @@ public class RobotContainer {
         intakeSubsystem.setDefaultCommand(new HoldIntakeDeployed(
             intakeSubsystem
         ));
-        autoIntakeTrigger.whileTrue(new AutoPushIntake(
+        autoIntakeTrigger.and(() -> {
+            ChassisSpeeds velocity = driveSubsystem.getChassisSpeeds();
+            double speed = new Translation2d(velocity.vxMetersPerSecond, velocity.vyMetersPerSecond).getNorm();
+            Logger.recordOutput("SpeedScalar", speed);
+            return speed < Constants.Controls.STATIONARY_SPEED;
+        }).whileTrue(new AutoPushIntake(
             intakeSubsystem
         ));
         pushIntakeTrigger.whileTrue(new PushIntake(
@@ -307,10 +318,19 @@ public class RobotContainer {
         // makeValid.whileTrue(Commands.run(() -> ledSubsystem.ShotValid(true)));
         // makeValid.whileFalse(Commands.run(() -> ledSubsystem.ShotValid(false)));
         // makeActive.whileTrue(Commands.run(() -> ledSubsystem.HubActive()));
+
+        FollowPath.registerEventTrigger("autoShoot", 
+            new AutoShoot(
+                flywheelSubsystem, 
+                feedSubsystem, 
+                ballSim
+        ));
+
     } 
 
     private void configureAutoChooser() {
         autoChooser.addDefaultOption("None", Commands.none());
+        autoChooser.addOption("Greg Piano", driveSubsystem.followPath(new Path("gregPiano")));
         autoChooser.addOption("Center Back", new SprintAuto(
             "centerback", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
@@ -344,6 +364,21 @@ public class RobotContainer {
         autoChooser.addOption("Right Diff", new DifferentAuto(
             "rightSweep", "rightClose", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
+        autoChooser.addOption("Right Cleanup", new PathShootIntakeAuto(
+            "rightCenterCleanup", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem
+        ));
+        autoChooser.addOption(
+            "cleanThenShoot",
+            new PathShootIntakeThenPathAuto(
+                "rightCenterCleanup",
+                "rightCenterCleanup2",
+                "rightSweep",
+                driveSubsystem,
+                flywheelSubsystem,
+                feedSubsystem,
+                intakeSubsystem,
+                ballSim,
+                turretSubsystem));
         Logger.registerDashboardInput(autoChooser);
         SmartDashboard.putData("Auto Routine", autoChooser.getSendableChooser());
     }
@@ -361,13 +396,6 @@ public class RobotContainer {
     public void updateSim() {
         ballSim.tick();
     }
-    public Command getHoodHomeCommand() {
-        return new HomeHood(turretSubsystem);
-    }
-
-    // public Command getIntakeHomeCommand() {
-    //     return new HomeIntake(intakeSubsystem);
-    // }
 
     public Command getAutonomousCommand() {
         return autoChooser.get();
@@ -377,9 +405,35 @@ public class RobotContainer {
         if (!ledsHaveRun && ledSubsystem.deployedWait.get() > 5) {
             ledSubsystem.SignalEndDeploy();
             ledsHaveRun = true;
-        }
-        ;
+        };
 
         ledSubsystem.pattern();
+    }
+
+    /** Force all motors into coast while disabled; restore configured modes when enabled. */
+    public void setAllMotorsCoast(boolean coast) {
+        // Turret
+        turretSubsystem.setCoastMode(coast);
+        if (!coast) {
+            turretSubsystem.restoreConfiguredNeutralMode();
+        }
+
+        // Flywheel
+        flywheelSubsystem.setCoastMode(coast);
+        if (!coast) {
+            flywheelSubsystem.restoreConfiguredNeutralMode();
+        }
+
+        // Intake
+        intakeSubsystem.setCoastMode(coast);
+        if (!coast) {
+            intakeSubsystem.restoreConfiguredNeutralMode();
+        }
+
+        // Feed / agitator
+        feedSubsystem.setCoastMode(coast);
+        if (!coast) {
+            feedSubsystem.restoreConfiguredNeutralMode();
+        }
     }
 }

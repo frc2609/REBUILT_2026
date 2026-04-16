@@ -8,6 +8,12 @@ public interface PercentMotorIO {
 
     void setSetpoint(double setpoint);
     double getSetpoint();
+
+    double getRotorVelocityRps();
+
+    default void setCoastMode(boolean coast) {}
+
+    default void restoreConfiguredNeutralMode() {}
     
     void stop();
 }

@@ -4,6 +4,8 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.io.motor.VelocityMotorIO;
+import frc.robot.util.Conversions;
+import frc.robot.util.ProjectileSimulator;
 
 /** Shooter Subsystem using velocity control (rotations per second). */
 public class FlywheelSubsystem extends SubsystemBase {
@@ -38,8 +40,20 @@ public class FlywheelSubsystem extends SubsystemBase {
         return isAtSpeed;
     }
 
+    public boolean isAtSpeed(double targetRps, double toleranceRps) {
+        return Math.abs(targetRps - flywheelMotor.getVelocityRps()) < toleranceRps;
+    }
+
     public void stop() {
         flywheelMotor.stop();
+    }
+
+    public void setCoastMode(boolean coast) {
+        flywheelMotor.setCoastMode(coast);
+    }
+
+    public void restoreConfiguredNeutralMode() {
+        flywheelMotor.restoreConfiguredNeutralMode();
     }
 
     @Override

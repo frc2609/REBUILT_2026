@@ -1,8 +1,12 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.io.motor.PositionMotorIO;
+import frc.robot.Constants;
 import frc.robot.subsystems.io.motor.PercentMotorIO;
+import frc.robot.subsystems.io.motor.PositionMotorIO;
+import frc.robot.util.Conversions;
 
 /** Intake Subsystem using velocity control (rotations per second). */
 public class IntakeSubsystem extends SubsystemBase {
@@ -56,6 +60,11 @@ public class IntakeSubsystem extends SubsystemBase {
         return deployMotor.getStatorCurrentAmps();
     }
 
+    public double getDeployVelocityDegPerSec() {
+        return Conversions.motorRpsToOutputDegPerSec(
+            deployMotor.getRotorVelocityRps(), Constants.Intake.Deploy.GEAR_RATIO);
+    }
+
     public void zeroDeployPosition() {
         deployMotor.resetToZero();
     }
@@ -71,6 +80,16 @@ public class IntakeSubsystem extends SubsystemBase {
         rollerMotor.stop();
     }
 
+    public void setCoastMode(boolean coast) {
+        deployMotor.setCoastMode(coast);
+        rollerMotor.setCoastMode(coast);
+    }
+
+    public void restoreConfiguredNeutralMode() {
+        deployMotor.restoreConfiguredNeutralMode();
+        rollerMotor.restoreConfiguredNeutralMode();
+    }
+
     @Override
     public void periodic()
     {
@@ -78,5 +97,14 @@ public class IntakeSubsystem extends SubsystemBase {
         deployMotor.logMotorPID();
 
         deployMotor.updateFromTunables();
+
+        Logger.recordOutput(
+            "MechanismOutput/Intake roller RPM",
+            Conversions.motorRpsToOutputRpm(
+                rollerMotor.getRotorVelocityRps(), Constants.Intake.Roller.GEAR_RATIO));
+        Logger.recordOutput(
+            "MechanismOutput/Intake deploy (degs per s)",
+            Conversions.motorRpsToOutputDegPerSec(
+                deployMotor.getRotorVelocityRps(), Constants.Intake.Deploy.GEAR_RATIO));
     }
 }

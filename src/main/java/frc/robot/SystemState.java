@@ -130,7 +130,7 @@ public class SystemState {
 
         // do use it when displaying turret
         Rotation2d fieldTurretAim = Rotation2d.fromDegrees(turret.getAimPosition())
-                .plus(Rotation2d.fromDegrees(180.0))
+                .plus(Rotation2d.fromDegrees(Constants.Turret.Aim.HEADING_OFFSET_DEG))
                 .plus(swerve.getRotation());
 
         ShotCalculator.ShotInputs inputs = new ShotCalculator.ShotInputs(
@@ -161,7 +161,10 @@ public class SystemState {
             !SystemState.trenchBlocked
         ) {
             // Set hood and flywheel target based on shot 
-            if (targetDist <= Constants.Controls.LOB_DISTANCE) {
+            if (SystemState.isPassing) {
+                SystemState.hoodAngleDeg = Constants.Controls.TURRET_HOOD_MAX_DEG;
+                SystemState.calculatedFlywheelRPM = shot.rpm()-500.0;
+            } else if (targetDist <= Constants.Controls.LOB_DISTANCE) {
                 SystemState.hoodAngleDeg = 0.0;
                 SystemState.calculatedFlywheelRPM = Constants.Controls.FLYWHEEL_LOB_RPM;
             } else {

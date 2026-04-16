@@ -64,6 +64,7 @@ public final class Constants {
 
     public enum VelocityMotorType {
         CTRE_TALON_FX,
+        CTRE_TALON_FX_FOC,
         REV_SPARK_MAX,
         SIM
     }
@@ -97,7 +98,7 @@ public final class Constants {
         {"kP", "kI", "kD", "kA", "kV", "kS", "kG"};
 
     public static final VelocityMotorType FLYWHEEL_VELOCITY_MOTOR_TYPE =
-        VelocityMotorType.CTRE_TALON_FX;
+        VelocityMotorType.CTRE_TALON_FX_FOC;
     public static final VelocityMotorType FEED_VELOCITY_MOTOR_TYPE =
         VelocityMotorType.CTRE_TALON_FX;
     public static final PercentMotorType INTAKE_ROLLER_PERCENT_MOTOR_TYPE =
@@ -160,6 +161,7 @@ public final class Constants {
         public static final double SHOOTING_SPEED_PERCENT = 0.1;
         public static final double UNJAM_FACTOR = 10.0; // kP multiplier when unjamming
         public static final double SHOT_CONFIDENCE_MIN = 50.0; // out of 100
+        public static final double STATIONARY_SPEED = 0.05;
 
         public static final double TURRET_READY_TOLERANCE = 4.0; // deg
         public static final double FLYWHEEL_PASS_TOLERANCE_RPM = 900.0; // rpm
@@ -171,19 +173,20 @@ public final class Constants {
 
         public static final double INTAKE_DEPLOYED_DEG = 695.0;
         public static final double INTAKE_RUN_PERCENT = 0.7;
-        public static final double INTAKE_SPIT_PERCENT = 0.1;
+        public static final double INTAKE_SPIT_PERCENT = -0.5;
 
         public static final double TURRET_HOOD_DEG = 15.0;
+        public static final double TURRET_HOOD_MAX_DEG = 25.0;
 
         public static final double TURRET_OVERRIDE_FRONT_DEG = 0.0;
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
         public static final double TURRET_OVERRIDE_LEFT_DEG = -90.0;
 
-        public static final double AGITATOR_HOLD_RPM = 6000.0;
-        public static final double FEED_HOLD_RPM = 6000.0; // max speed
+        public static final double AGITATOR_HOLD_RPM = 5000.0;
+        public static final double FEED_HOLD_RPM = 5000.0; // max speed
 
-        public static final double FLYWHEEL_LOB_RPM = 2200.0;
-        public static final double LOB_DISTANCE = 2.0;
+        public static final double FLYWHEEL_LOB_RPM = 2000.0;
+        public static final double LOB_DISTANCE = 2.4;
     }
 
     /** BLine FollowPath PID gains. Path constraints are in deploy/autos/config.json. */
@@ -273,11 +276,13 @@ public final class Constants {
             "motorId", 50,
             "followerId", 51,
             "followerAligned", false,
-            "kP", 0.04,
-            "kV", 0.0117,
-            "inverted", true,
+            "kP", 6767.0,
+            "inverted", currentMode != Mode.SIM,
             "statorCurrentLimit", 90.0,
-            "statorCurrentLimitEnabled", true
+            "statorCurrentLimitEnabled", false,
+            "neutralMode", NeutralMode.COAST,
+            "peakForwardTorqueCurrent", 120.0,
+            "peakReverseTorqueCurrent", 2.0
         ));
     }
 
@@ -289,7 +294,7 @@ public final class Constants {
             public static final double GEAR_RATIO = 137.5;
             public static final double ENCODER_RATIO = 1.0;
             public static final double RANGE_DEG = 180.0; // 160
-            public static final double HEADING_OFFSET_DEG = 180.0; // robot front to turret zero
+            public static final double HEADING_OFFSET_DEG = -90.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
             // MotionMagic trapezoidal profile limits (rotor rotations/sec, /sec^2, /sec^3)
             // Tuned via physics sim: 2.2x faster settling, 0.02° overshoot, lowest energy
@@ -388,6 +393,7 @@ public final class Constants {
                 config.put("statorCurrentLimit", 40.0);
                 config.put("statorCurrentLimitEnabled", true);
                 config.put("useClosedLoopFFSign", true);
+                config.put("neutralMode", Constants.NeutralMode.BRAKE);
             }
         }
     }
@@ -438,9 +444,11 @@ public final class Constants {
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 
             // Homing: drive past the deployed hard stop until current spikes, then zero there
-            public static final double HOME_TARGET_DEG = -30.0;
-            public static final double HOME_CURRENT_THRESHOLD_AMPS = 50.0;
             public static final int    HOME_CONFIRM_CYCLES = 3;
+
+            public static final double HOME_TARGET_DEG = -30.0;
+            public static final double HOME_CURRENT_THRESHOLD_AMPS = 3.0;
+            public static final double HOME_STALL_MAX_VEL_DEG_PER_SEC = 8.0;
             
             // NOTE: Cuts off at 10 key-value pairs
             public static final Map<String, Object> config = new HashMap<>(Map.of(
@@ -454,7 +462,7 @@ public final class Constants {
                 // config.put("MotionMagicCruiseVelocity", 2.0);
                 // config.put("MotionMagicAcceleration", 1.0);
                 config.put("forwardLimitEnabled", true);
-                config.put("reverseLimitEnabled", true);
+                config.put("reverseLimitEnabled", false);
 
                 // TalonFX outputted rotations
                 config.put("forwardLimitRotations", 

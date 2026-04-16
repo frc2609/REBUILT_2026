@@ -29,6 +29,8 @@ public class AutoAimTurret extends Command {
         } else {
             //turret.setAimPosition(0.0);
         }
+
+        turret.setHoodPosition(SystemState.hoodAngleDeg);
     }
 
     @Override

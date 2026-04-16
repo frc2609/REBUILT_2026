@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.HomeHood;
+import frc.robot.commands.HomeIntake;
 
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -106,7 +107,7 @@ public class Robot extends LoggedRobot {
     /** This function is called once when the robot is disabled. */
     @Override
     public void disabledInit() {
-        robotContainer.turretSubsystem.setAimCoastMode(true);
+        robotContainer.setAllMotorsCoast(true);
     }
 
     /** This function is called periodically when disabled. */
@@ -118,9 +119,10 @@ public class Robot extends LoggedRobot {
     /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
     @Override
     public void autonomousInit() {
-        robotContainer.turretSubsystem.setAimCoastMode(false);
-        //CommandScheduler.getInstance().schedule(robotContainer.getHoodHomeCommand());
-
+        robotContainer.setAllMotorsCoast(false);
+        CommandScheduler.getInstance().schedule(new HomeHood(robotContainer.turretSubsystem));
+        CommandScheduler.getInstance().schedule(new HomeIntake(robotContainer.intakeSubsystem));
+        
         autonomousCommand = robotContainer.getAutonomousCommand();
 
         if (autonomousCommand != null) {
@@ -138,9 +140,9 @@ public class Robot extends LoggedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }
-        robotContainer.turretSubsystem.setAimCoastMode(false);
+        robotContainer.setAllMotorsCoast(false);
         CommandScheduler.getInstance().schedule(new HomeHood(robotContainer.turretSubsystem));
-        //CommandScheduler.getInstance().schedule(robotContainer.getIntakeHomeCommand());
+        CommandScheduler.getInstance().schedule(new HomeIntake(robotContainer.intakeSubsystem));
     }
 
     /** This function is called periodically during operator control. */

@@ -22,8 +22,11 @@ public interface PositionMotorIO {
     void resetToZero();
 
     double getStatorCurrentAmps();
+    double getRotorVelocityRps();
 
     void setCoastMode(boolean coast);
+
+    default void restoreConfiguredNeutralMode() {}
 
     void stop();
 }

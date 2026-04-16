@@ -145,11 +145,21 @@ public class CtreTalonDynamicMotionMagicTorqueCurrentFOCIO extends CtreTalonFxIO
     }
 
     @Override
+    public double getRotorVelocityRps() {
+        return motor.getVelocity().getValueAsDouble();
+    }
+
+    @Override
     public void setCoastMode(boolean coast) {
         MotorOutputConfigs cfg = new MotorOutputConfigs();
         motor.getConfigurator().refresh(cfg);
         cfg.NeutralMode = coast ? NeutralModeValue.Coast : NeutralModeValue.Brake;
         motor.getConfigurator().apply(cfg);
+    }
+
+    @Override
+    public void restoreConfiguredNeutralMode() {
+        super.restoreConfiguredNeutralMode();
     }
 
     @Override
