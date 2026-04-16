@@ -13,7 +13,7 @@ public class AutoAimTurret extends Command {
 
     public AutoAimTurret(TurretSubsystem turret) {
         this.turret = turret;
-        kVTarget = new LoggedNetworkNumber("/Tuning/SOTM/turretAimkV", -0.7);
+        kVTarget = new LoggedNetworkNumber("/Tuning/SOTM/turretAimkV", -1.0);
 
         addRequirements(turret);
     }

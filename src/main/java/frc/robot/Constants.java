@@ -176,7 +176,7 @@ public final class Constants {
         public static final double INTAKE_SPIT_PERCENT = -0.5;
 
         public static final double TURRET_HOOD_DEG = 15.0;
-        public static final double TURRET_HOOD_MAX_DEG = 25.0;
+        public static final double TURRET_HOOD_MAX_DEG = 20.0;
 
         public static final double TURRET_OVERRIDE_FRONT_DEG = 0.0;
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
@@ -441,12 +441,13 @@ public final class Constants {
             public static final double ZERO_OFFSET = 0;
             public static final double GEAR_RATIO = 12.0;
             public static final double ENCODER_RATIO = 1.0;
+            public static final double OUT_ROTATIONS = 22.7;
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
 
             // Homing: drive past the deployed hard stop until current spikes, then zero there
             public static final int    HOME_CONFIRM_CYCLES = 3;
 
-            public static final double HOME_TARGET_DEG = -30.0;
+            public static final double HOME_TARGET_DEG = 690.0;
             public static final double HOME_CURRENT_THRESHOLD_AMPS = 3.0;
             public static final double HOME_STALL_MAX_VEL_DEG_PER_SEC = 8.0;
             

@@ -59,7 +59,7 @@ public class HomeIntake extends Command {
         boolean stalled = stallCycles >= Constants.Intake.Deploy.HOME_CONFIRM_CYCLES;
         boolean sim = Constants.currentMode == Constants.Mode.SIM;
         if (!interrupted && (stalled || sim)) {
-            intake.zeroDeployPosition();
+            intake.zeroDeployToRotations(Constants.Intake.Deploy.OUT_ROTATIONS);
             if (sim) {
                 System.out.println("HomeIntake: sim mode, zeroed without stall");
             } else {
