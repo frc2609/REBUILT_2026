@@ -46,7 +46,7 @@ public class AutoShoot extends Command {
         );
 
         if (SystemState.validShotDetected && 
-            SystemState.trenchBlocked &&
+            !SystemState.trenchBlocked &&
             flywheelAtSpeed
         ) {
             agitator.setAgitatorSpeed();
