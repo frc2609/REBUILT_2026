@@ -171,7 +171,7 @@ public class RobotContainer {
         //     }
         // }
 
-        turretHeadingOffsetLogged = new LoggedNetworkNumber("/Tuning/SOTM/HeadingOffset", 180.0);
+        turretHeadingOffsetLogged = new LoggedNetworkNumber("/Tuning/SOTM/HeadingOffset", Constants.Turret.Aim.HEADING_OFFSET_DEG);
         autoAimCommand = new AutoAimTurret(
             driveSubsystem, turretSubsystem, flywheelSubsystem, 
             shotCalculator, turretHeadingOffsetLogged

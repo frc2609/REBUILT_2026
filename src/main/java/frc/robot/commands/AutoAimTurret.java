@@ -120,7 +120,7 @@ public class AutoAimTurret extends Command {
 
         // do use it when displaying turret
         Rotation2d fieldTurretAim = Rotation2d.fromDegrees(turret.getAimPosition())
-                .plus(Rotation2d.fromDegrees(180.0))
+                .plus(Rotation2d.fromDegrees(Constants.Turret.Aim.HEADING_OFFSET_DEG))
                 .plus(swerve.getRotation());
 
         ShotCalculator.ShotInputs inputs = new ShotCalculator.ShotInputs(
