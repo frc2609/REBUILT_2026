@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import com.ctre.phoenix6.CANBus;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -98,7 +99,7 @@ public final class Constants {
         {"kP", "kI", "kD", "kA", "kV", "kS", "kG"};
 
     public static final VelocityMotorType FLYWHEEL_VELOCITY_MOTOR_TYPE =
-        VelocityMotorType.CTRE_TALON_FX_FOC;
+        VelocityMotorType.CTRE_TALON_FX;
     public static final VelocityMotorType FEED_VELOCITY_MOTOR_TYPE =
         VelocityMotorType.CTRE_TALON_FX;
     public static final PercentMotorType INTAKE_ROLLER_PERCENT_MOTOR_TYPE =
@@ -276,14 +277,18 @@ public final class Constants {
             "motorId", 50,
             "followerId", 51,
             "followerAligned", false,
-            "kP", 6767.0,
-            "inverted", currentMode != Mode.SIM,
+            "kP", 0.04,
+            "kV", 0.0117,
             "statorCurrentLimit", 90.0,
             "statorCurrentLimitEnabled", false,
-            "neutralMode", NeutralMode.COAST,
-            "peakForwardTorqueCurrent", 120.0,
-            "peakReverseTorqueCurrent", 2.0
+            "neutralMode", NeutralMode.COAST//,
+            // "peakForwardTorqueCurrent", 120.0,
+            // "peakReverseTorqueCurrent", 2.0
         ));
+        static {
+            // Trapezoidal profile config (used by MotionMagic firmware)
+            config.put("inverted", currentMode != Mode.SIM);
+        }
     }
 
     public static final class Turret {
