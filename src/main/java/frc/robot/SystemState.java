@@ -161,15 +161,11 @@ public class SystemState {
         
         SystemState.targetDist = turretPose.getTranslation().getDistance(target);
 
-        if (SystemState.trenchBlocked) {
-            SystemState.calculatedFlywheelRPM = 0.0;
-            SystemState.hoodAngleDeg = 0.0;
-        } else if (SystemState.validShotDetected) {
+        if (SystemState.validShotDetected && 
+            !SystemState.trenchBlocked
+        ) {
             // Set hood and flywheel target based on shot 
-            if (SystemState.isPassing) {
-                SystemState.hoodAngleDeg = Constants.Controls.TURRET_HOOD_MAX_DEG;
-                SystemState.calculatedFlywheelRPM = shot.rpm();
-            } else if (targetDist <= Constants.Controls.LOB_DISTANCE) {
+            if (targetDist <= Constants.Controls.LOB_DISTANCE) {
                 SystemState.hoodAngleDeg = 0.0;
                 SystemState.calculatedFlywheelRPM = Constants.Controls.FLYWHEEL_LOB_RPM;
             } else {

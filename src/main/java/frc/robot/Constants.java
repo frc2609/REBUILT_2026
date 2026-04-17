@@ -177,14 +177,14 @@ public final class Constants {
         public static final double INTAKE_SPIT_PERCENT = -0.5;
 
         public static final double TURRET_HOOD_DEG = 15.0;
-        public static final double TURRET_HOOD_MAX_DEG = 25.0;
+        public static final double TURRET_HOOD_MAX_DEG = 15.0;
 
         public static final double TURRET_OVERRIDE_FRONT_DEG = 0.0;
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 170.0;
         public static final double TURRET_OVERRIDE_LEFT_DEG = -170.0;
 
         public static final double AGITATOR_HOLD_RPM = 5000.0;
-        public static final double FEED_HOLD_RPM = 6000.0; // max speed
+        public static final double FEED_HOLD_RPM = 5000.0;
 
         public static final double FLYWHEEL_LOB_RPM = 2000.0;
         public static final double LOB_DISTANCE = 2.0;
@@ -214,7 +214,7 @@ public final class Constants {
             0.47,    // drag coeff (smooth sphere)
             0.0,     // Magnus coeff
             1.225,   // air density
-            0.376,    // exit height (m), floor to where the ball leaves the shooter
+            0.353,    // exit height (m), floor to where the ball leaves the shooter
             0.0762,  // flywheel diameter, 0.0762
             1.91,    // target height (m), 1.83 from game manual
             0.85,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
