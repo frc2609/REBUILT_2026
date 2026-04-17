@@ -33,7 +33,7 @@ public class SystemState {
     private static DriveSubsystem swerve;
     private static TurretSubsystem turret;
     private static ShotCalculator shotCalc;
-    private static LoggedNetworkNumber headingOffset; 
+    private static LoggedNetworkNumber headingOffset, adjustableAngle; 
 
     private static Pose2d turretPose;
     private static Translation2d target;
@@ -57,6 +57,8 @@ public class SystemState {
         SystemState.turret = turret;
         SystemState.shotCalc = shotCalc;
         SystemState.headingOffset = headingOffset;
+
+        SystemState.adjustableAngle = new LoggedNetworkNumber("SOTM/HoodAngle/", 15.0);
     }
 
     public void updateSOTMState() {
@@ -81,7 +83,8 @@ public class SystemState {
                 SystemState.isPassing = false;
                 target = Constants.Field.BLUE_HUB;
                 targetForward = new Translation2d(1,0);
-                if (robotPose.getX() > Constants.Field.BLUE_ZONE_X) {
+                if (robotPose.getX() > Constants.Field.BLUE_ZONE_X ||
+                    turretPose.getX() > Constants.Field.BLUE_ZONE_X-0.2) {
                     SystemState.trenchBlocked = true;
                 } else {
                     SystemState.trenchBlocked = false;
@@ -101,7 +104,8 @@ public class SystemState {
                 SystemState.isPassing = false;
                 target = Constants.Field.RED_HUB;
                 targetForward = new Translation2d(-1,0);
-                if (robotPose.getX() < Constants.Field.RED_ZONE_X) {
+                if (robotPose.getX() < Constants.Field.RED_ZONE_X ||
+                    turretPose.getX() < Constants.Field.RED_ZONE_X + 0.2) {
                     SystemState.trenchBlocked = true;
                 } else {
                     SystemState.trenchBlocked = false;
@@ -157,9 +161,10 @@ public class SystemState {
         
         SystemState.targetDist = turretPose.getTranslation().getDistance(target);
 
-        if (SystemState.validShotDetected &&
-            !SystemState.trenchBlocked
-        ) {
+        if (SystemState.trenchBlocked) {
+            SystemState.calculatedFlywheelRPM = 0.0;
+            SystemState.hoodAngleDeg = 0.0;
+        } else if (SystemState.validShotDetected) {
             // Set hood and flywheel target based on shot 
             if (SystemState.isPassing) {
                 SystemState.hoodAngleDeg = Constants.Controls.TURRET_HOOD_MAX_DEG;
@@ -168,7 +173,7 @@ public class SystemState {
                 SystemState.hoodAngleDeg = 0.0;
                 SystemState.calculatedFlywheelRPM = Constants.Controls.FLYWHEEL_LOB_RPM;
             } else {
-                SystemState.hoodAngleDeg = Constants.Controls.TURRET_HOOD_DEG;
+                SystemState.hoodAngleDeg = adjustableAngle.get();
                 SystemState.calculatedFlywheelRPM = shot.rpm();
             }
         } else {

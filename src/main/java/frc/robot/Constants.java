@@ -177,7 +177,7 @@ public final class Constants {
         public static final double INTAKE_SPIT_PERCENT = -0.5;
 
         public static final double TURRET_HOOD_DEG = 15.0;
-        public static final double TURRET_HOOD_MAX_DEG = 20.0;
+        public static final double TURRET_HOOD_MAX_DEG = 25.0;
 
         public static final double TURRET_OVERRIDE_FRONT_DEG = 0.0;
         public static final double TURRET_OVERRIDE_RIGHT_DEG = 170.0;
