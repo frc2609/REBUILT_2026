@@ -165,7 +165,7 @@ public final class Constants {
 
         public static final double TURRET_READY_TOLERANCE = 4.0; // deg
         public static final double FLYWHEEL_PASS_TOLERANCE_RPM = 900.0; // rpm
-        public static final double FLYWHEEL_TOLERANCE_RPM = 670.0; // rpm
+        public static final double FLYWHEEL_TOLERANCE_RPM = 100.0; // rpm
 
         // Rotation values are OUTPUT degrees
         // RPM values are INPUT RPM, will be geared down
@@ -179,14 +179,14 @@ public final class Constants {
         public static final double TURRET_HOOD_MAX_DEG = 20.0;
 
         public static final double TURRET_OVERRIDE_FRONT_DEG = 0.0;
-        public static final double TURRET_OVERRIDE_RIGHT_DEG = 90.0;
-        public static final double TURRET_OVERRIDE_LEFT_DEG = -90.0;
+        public static final double TURRET_OVERRIDE_RIGHT_DEG = 170.0;
+        public static final double TURRET_OVERRIDE_LEFT_DEG = -170.0;
 
         public static final double AGITATOR_HOLD_RPM = 5000.0;
         public static final double FEED_HOLD_RPM = 6000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2000.0;
-        public static final double LOB_DISTANCE = 2.4;
+        public static final double LOB_DISTANCE = 2.0;
     }
 
     /** BLine FollowPath PID gains. Path constraints are in deploy/autos/config.json. */
@@ -298,15 +298,16 @@ public final class Constants {
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
             // MotionMagic trapezoidal profile limits (rotor rotations/sec, /sec^2, /sec^3)
             // Tuned via physics sim: 2.2x faster settling, 0.02° overshoot, lowest energy
-            public static final double MAX_VELOCITY = 100.0;   // rotor rot/s (~600 deg/s mechanism)
-            public static final double MAX_ACCEL = 400.0;      // rotor rot/s^2
+            public static final double MAX_VELOCITY = 200.0;   // rotor rot/s (~600 deg/s mechanism)
+            public static final double MAX_ACCEL = 500.0;      // rotor rot/s^2
 
             public static final Map<String, Object> config = new HashMap<>(Map.of(
                 "motorId", 53,
-                "kP", 0.8,
-                "kD", 0.02,
+                "kP", 5.0,
+                "kD", 0.03,
                 "kS", 0.005
             ));
+
             static {
                 // Trapezoidal profile config (used by MotionMagic firmware)
                 config.put("MotionMagicCruiseVelocity", MAX_VELOCITY);

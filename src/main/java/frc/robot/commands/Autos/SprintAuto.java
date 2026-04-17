@@ -41,7 +41,7 @@ public class SprintAuto extends SequentialCommandGroup {
             new ParallelCommandGroup(
                 new AutoShoot(flywheel, feed, ballSim),
                 new AutoPushIntake(intake)
-            ).withTimeout(4.0)
+            ).withTimeout(5.0)
         );
     }
 }
