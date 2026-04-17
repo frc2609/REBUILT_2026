@@ -22,7 +22,7 @@ public class AutoPushIntake extends Command {
         if (t < 1.0) {
             return 0.0;
         } else {
-            return (0.5+0.5*Math.sin(5.5*(t+0.7)))*0.6;//try without *0.6
+            return 0.3+0.3*Math.sin(2.5*(t+0.7));
         }
     }
 

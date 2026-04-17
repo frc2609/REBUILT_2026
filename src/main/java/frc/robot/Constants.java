@@ -183,7 +183,7 @@ public final class Constants {
         public static final double TURRET_OVERRIDE_LEFT_DEG = -90.0;
 
         public static final double AGITATOR_HOLD_RPM = 5000.0;
-        public static final double FEED_HOLD_RPM = 5000.0; // max speed
+        public static final double FEED_HOLD_RPM = 6000.0; // max speed
 
         public static final double FLYWHEEL_LOB_RPM = 2000.0;
         public static final double LOB_DISTANCE = 2.4;
@@ -233,7 +233,7 @@ public final class Constants {
             0.0762,  // flywheel diameter, 0.0762
             0.0,    // target height (m), 1.83 from game manual
             0.85,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
-            68.0,    // launch angle from horizontal
+            58.0,    // launch angle from horizontal
             0.001,   // sim timestep
             1500, 6000, 25, 10.0  // RPM search range, iterations, max sim time
         );

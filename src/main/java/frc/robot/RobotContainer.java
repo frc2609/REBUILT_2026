@@ -113,7 +113,7 @@ public class RobotContainer {
 
     private final AutoAimTurret autoAimCommand;
     private final LoggedNetworkNumber turretHeadingOffsetLogged;
-    private final ShotCalculator shotCalculator;
+    private final ShotCalculator shotCalculator, passCalculator;
     public final FuelPhysicsSim ballSim = new FuelPhysicsSim("Sim/Fuel");
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine") ;
     
@@ -138,13 +138,14 @@ public class RobotContainer {
         // SOTM Setup
 
         ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
-        //ProjectileSimulator passingSim = new ProjectileSimulator(Constants.passingSimParameters);
-
         ShotLUT lut = sim.generateShotLUT();
-        //ShotLUT passingLut = passingSim.generateVariableAngleShotLUT(61.0, 85.0, 6.0);
-        
         this.shotCalculator = new ShotCalculator(Constants.shotConfig);
         this.shotCalculator.loadShotLUT(lut);
+
+        ProjectileSimulator passingSim = new ProjectileSimulator(Constants.passingSimParameters);
+        ShotLUT passingLut = passingSim.generateShotLUT();
+        this.passCalculator = new ShotCalculator(Constants.shotConfig);
+        this.passCalculator.loadShotLUT(passingLut);        
 
         // transition between shooting and passing eventually.
         //this.shotCalculator.loadShotLUT(passingLut);

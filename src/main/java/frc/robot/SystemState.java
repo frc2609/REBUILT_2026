@@ -163,7 +163,7 @@ public class SystemState {
             // Set hood and flywheel target based on shot 
             if (SystemState.isPassing) {
                 SystemState.hoodAngleDeg = Constants.Controls.TURRET_HOOD_MAX_DEG;
-                SystemState.calculatedFlywheelRPM = shot.rpm()-500.0;
+                SystemState.calculatedFlywheelRPM = shot.rpm();
             } else if (targetDist <= Constants.Controls.LOB_DISTANCE) {
                 SystemState.hoodAngleDeg = 0.0;
                 SystemState.calculatedFlywheelRPM = Constants.Controls.FLYWHEEL_LOB_RPM;
