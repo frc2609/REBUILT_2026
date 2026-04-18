@@ -165,7 +165,7 @@ public final class Constants {
         public static final double STATIONARY_SPEED = 0.05;
 
         public static final double TURRET_READY_TOLERANCE = 4.0; // deg
-        public static final double FLYWHEEL_PASS_TOLERANCE_RPM = 900.0; // rpm
+        public static final double FLYWHEEL_PASS_TOLERANCE_RPM = 50.0; // rpm
         public static final double FLYWHEEL_TOLERANCE_RPM = 100.0; // rpm
 
         // Rotation values are OUTPUT degrees
@@ -528,7 +528,7 @@ public final class Constants {
     }
 
     public static final class LedConstants{
-        public static final int Length = 120;
+        public static final int Length = 84;
         public static final int Port = 0;
         public static final double travelTime = 1.25;//time to go from one end to the other in seconds
         public static final int ledGroup = 3;
