@@ -280,7 +280,7 @@ public final class Constants {
             "kP", 0.04,
             "kV", 0.0117,
             "statorCurrentLimit", 90.0,
-            "statorCurrentLimitEnabled", false,
+            "statorCurrentLimitEnabled", true,
             "neutralMode", NeutralMode.COAST//,
             // "peakForwardTorqueCurrent", 120.0,
             // "peakReverseTorqueCurrent", 2.0
