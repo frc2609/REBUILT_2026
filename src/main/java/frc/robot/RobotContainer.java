@@ -79,6 +79,7 @@ public class RobotContainer {
     private final Trigger startIntakeTrigger = driverController.a();
     private final Trigger stopIntakeTrigger = driverController.start();
     private final Trigger outtakeTrigger = driverController.b();
+    private final Trigger barfTrigger = driverController.y();
     
     private final Trigger turretOverrideFrontTrigger = driverController.povUp();
     private final Trigger turretOverrideRightTrigger = driverController.povRight();
@@ -220,6 +221,9 @@ public class RobotContainer {
         outtakeTrigger.onTrue(new SetRollerPercent(
             intakeSubsystem, Constants.Controls.INTAKE_SPIT_PERCENT
         ));
+        barfTrigger.onTrue(new SetRollerPercent(
+            intakeSubsystem, -1.0
+        ));
         intakeSubsystem.setDefaultCommand(new HoldIntakeDeployed(
             intakeSubsystem
         ));
@@ -316,10 +320,17 @@ public class RobotContainer {
         xTrigger.onTrue(Commands.runOnce(driveSubsystem::stopWithX, driveSubsystem));
         resetGyroTrigger.onTrue(
             Commands.runOnce(driveSubsystem::zeroHeading, driveSubsystem).ignoringDisable(true));
-    
-        // makeValid.whileTrue(Commands.run(() -> ledSubsystem.ShotValid(true)));
-        // makeValid.whileFalse(Commands.run(() -> ledSubsystem.ShotValid(false)));
-        // makeActive.whileTrue(Commands.run(() -> ledSubsystem.HubActive()));
+            
+        Trigger makeValid = new Trigger(() -> {
+            return SystemState.validShotDetected;
+        });
+        Trigger makeActive = new Trigger(() -> {
+            return SystemState.hubActive;
+        });
+
+        makeValid.whileTrue(Commands.run(() -> ledSubsystem.ShotValid(true)));
+        makeValid.whileFalse(Commands.run(() -> ledSubsystem.ShotValid(false)));
+        makeActive.whileTrue(Commands.run(() -> ledSubsystem.HubActive()));
 
         FollowPath.registerEventTrigger("autoShoot", 
             new AutoShoot(

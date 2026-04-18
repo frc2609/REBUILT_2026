@@ -45,7 +45,7 @@ public class DifferentAuto extends SequentialCommandGroup {
                     new SetRollerPercent(intake, -0.5).withTimeout(1.0),
                     new AutoPushIntake(intake)
                 )
-            ).withTimeout(8.0),
+            ).withTimeout(4.0),
 
             // Follow path while running intake to collect a ball
             Commands.deadline(
