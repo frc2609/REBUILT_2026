@@ -207,7 +207,7 @@ public final class Constants {
 
     // On the fly settings 
 
-    public static ProjectileSimulator.SimParameters simParameters = 
+    public static final ProjectileSimulator.SimParameters simParameters = 
         new ProjectileSimulator.SimParameters(
             0.215,   // ball mass kg
             0.1501,  // ball diameter m
@@ -219,22 +219,6 @@ public final class Constants {
             1.91,    // target height (m), 1.83 from game manual
             0.85,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
             68.0,    // launch angle from horizontal
-            0.001,   // sim timestep
-            1500, 6000, 25, 10.0  // RPM search range, iterations, max sim time
-        );
-
-    public static ProjectileSimulator.SimParameters passingSimParameters = 
-        new ProjectileSimulator.SimParameters(
-            0.215,   // ball mass kg
-            0.1501,  // ball diameter m
-            0.47,    // drag coeff (smooth sphere)
-            0.0,     // Magnus coeff
-            1.225,   // air density
-            0.376,    // exit height (m), floor to where the ball leaves the shooter
-            0.0762,  // flywheel diameter, 0.0762
-            0.0,    // target height (m), 1.83 from game manual
-            0.85,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
-            58.0,    // launch angle from horizontal
             0.001,   // sim timestep
             1500, 6000, 25, 10.0  // RPM search range, iterations, max sim time
         );
