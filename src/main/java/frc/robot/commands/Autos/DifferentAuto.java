@@ -41,8 +41,11 @@ public class DifferentAuto extends SequentialCommandGroup {
             // Shoot collected ball
             new ParallelCommandGroup(
                 new AutoShoot(flywheel, feed, ballSim),
-                new AutoPushIntake(intake)
-            ).withTimeout(3.0),
+                new SequentialCommandGroup(
+                    new SetRollerPercent(intake, -0.5).withTimeout(1.0),
+                    new AutoPushIntake(intake)
+                )
+            ).withTimeout(8.0),
 
             // Follow path while running intake to collect a ball
             Commands.deadline(
@@ -56,8 +59,11 @@ public class DifferentAuto extends SequentialCommandGroup {
             // Shoot collected ball
             new ParallelCommandGroup(
                 new AutoShoot(flywheel, feed, ballSim),
-                new AutoPushIntake(intake)
-            )
+                new SequentialCommandGroup(
+                    new SetRollerPercent(intake, -0.5).withTimeout(1.0),
+                    new AutoPushIntake(intake)
+                )
+            ).withTimeout(3.5)
         );
     }
 }
