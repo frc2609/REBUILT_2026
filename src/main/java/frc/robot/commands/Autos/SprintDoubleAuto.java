@@ -40,7 +40,8 @@ public class SprintDoubleAuto extends SequentialCommandGroup {
             // Shoot collected ball
             new ParallelCommandGroup(
                 new AutoShoot(flywheel, feed, ballSim),
-                new AutoPushIntake(intake)
+                new AutoPushIntake(intake),
+                new SetRollerPercent(intake, -0.5).withTimeout(1.0)
             ).withTimeout(3.5),
 
             // Follow path while running intake to collect a ball
@@ -55,7 +56,8 @@ public class SprintDoubleAuto extends SequentialCommandGroup {
             // Shoot collected ball
             new ParallelCommandGroup(
                 new AutoShoot(flywheel, feed, ballSim),
-                new AutoPushIntake(intake)
+                new AutoPushIntake(intake),
+                new SetRollerPercent(intake, -0.5).withTimeout(1.0)
             ).withTimeout(3.5)
         );
     }

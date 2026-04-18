@@ -46,6 +46,8 @@ import frc.robot.util.FuelPhysicsSim;
 import frc.robot.util.ProjectileSimulator;
 import frc.robot.util.ShotCalculator;
 import frc.robot.util.ShotLUT;
+import frc.robot.util.ProjectileSimulator.GeneratedLUT;
+
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
@@ -113,7 +115,7 @@ public class RobotContainer {
 
     private final AutoAimTurret autoAimCommand;
     private final LoggedNetworkNumber turretHeadingOffsetLogged;
-    private final ShotCalculator shotCalculator, passCalculator;
+    private final ShotCalculator shotCalculator;
     public final FuelPhysicsSim ballSim = new FuelPhysicsSim("Sim/Fuel");
     private final LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("Auto Routine") ;
     
@@ -138,14 +140,13 @@ public class RobotContainer {
         // SOTM Setup
 
         ProjectileSimulator sim = new ProjectileSimulator(Constants.simParameters);
-        ShotLUT lut = sim.generateShotLUT();
+        GeneratedLUT lut = sim.generateLUT(2.0, 20.0, 0.5);
         this.shotCalculator = new ShotCalculator(Constants.shotConfig);
-        this.shotCalculator.loadShotLUT(lut);
 
-        ProjectileSimulator passingSim = new ProjectileSimulator(Constants.passingSimParameters);
-        ShotLUT passingLut = passingSim.generateShotLUT();
-        this.passCalculator = new ShotCalculator(Constants.shotConfig);
-        this.passCalculator.loadShotLUT(passingLut);        
+        // ProjectileSimulator passingSim = new ProjectileSimulator(Constants.passingSimParameters);
+        // ShotLUT passingLut = passingSim.generateShotLUT();
+        // this.passCalculator = new ShotCalculator(Constants.shotConfig);
+        // this.passCalculator.loadShotLUT(passingLut);        
 
         // transition between shooting and passing eventually.
         //this.shotCalculator.loadShotLUT(passingLut);
@@ -164,13 +165,13 @@ public class RobotContainer {
         // lut.put(3.0, 3500, 38.0, 0.78);
         // shotCalc.loadShotLUT(lut);
 
-        // for (var entry : lut.entries()) {
-        //     if (entry.reachable()) {
-        //         System.out.printf("%.2fm -> %.0f RPM, %.3fs TOF%n",
-        //             entry.distanceM(), entry.rpm(), entry.tof());
-        //         shotCalculator.loadLUTEntry(entry.distanceM(), entry.rpm(), entry.tof());
-        //     }
-        // }
+        for (var entry : lut.entries()) {
+            if (entry.reachable()) {
+                System.out.printf("%.2fm -> %.0f RPM, %.3fs TOF%n",
+                    entry.distanceM(), entry.rpm(), entry.tof());
+                shotCalculator.loadLUTEntry(entry.distanceM(), entry.rpm(), entry.tof());
+            }
+        }
 
         turretHeadingOffsetLogged = new LoggedNetworkNumber("/Tuning/SOTM/HeadingOffset", Constants.Turret.Aim.HEADING_OFFSET_DEG);
         state = new SystemState(driveSubsystem, turretSubsystem, shotCalculator, turretHeadingOffsetLogged);
