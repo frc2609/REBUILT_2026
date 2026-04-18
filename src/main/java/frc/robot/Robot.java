@@ -30,6 +30,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
     private Command autonomousCommand;
     private RobotContainer robotContainer;
+    private Boolean wasInAuto = false;
 
     public Robot() {
     // Load AprilTag field layout eagerly so it doesn't stall later init
@@ -119,6 +120,7 @@ public class Robot extends LoggedRobot {
     /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
     @Override
     public void autonomousInit() {
+        wasInAuto = true;
         robotContainer.setAllMotorsCoast(false);
         CommandScheduler.getInstance().schedule(new HomeHood(robotContainer.turretSubsystem));
         CommandScheduler.getInstance().schedule(new HomeIntake(robotContainer.intakeSubsystem));
@@ -140,7 +142,9 @@ public class Robot extends LoggedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }
-        robotContainer.setAllMotorsCoast(false);
+        if (!wasInAuto) {
+            robotContainer.setAllMotorsCoast(false);
+        }
         CommandScheduler.getInstance().schedule(new HomeHood(robotContainer.turretSubsystem));
         CommandScheduler.getInstance().schedule(new HomeIntake(robotContainer.intakeSubsystem));
     }
