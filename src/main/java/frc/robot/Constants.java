@@ -99,7 +99,7 @@ public final class Constants {
         {"kP", "kI", "kD", "kA", "kV", "kS", "kG"};
 
     public static final VelocityMotorType FLYWHEEL_VELOCITY_MOTOR_TYPE =
-        VelocityMotorType.CTRE_TALON_FX;
+        VelocityMotorType.CTRE_TALON_FX_FOC;
     public static final VelocityMotorType FEED_VELOCITY_MOTOR_TYPE =
         VelocityMotorType.CTRE_TALON_FX;
     public static final PercentMotorType INTAKE_ROLLER_PERCENT_MOTOR_TYPE =
@@ -261,17 +261,18 @@ public final class Constants {
             "motorId", 50,
             "followerId", 51,
             "followerAligned", false,
-            "kP", 0.04,
-            "kV", 0.0117,
-            "statorCurrentLimit", 90.0,
-            "statorCurrentLimitEnabled", true,
-            "neutralMode", NeutralMode.COAST//,
-            // "peakForwardTorqueCurrent", 120.0,
-            // "peakReverseTorqueCurrent", 2.0
+            "kP", 110.0,
+            "kS", 14.9,
+            "kV", 0.170,
+            "peakForwardTorqueCurrent", 97.0,
+            "peakReverseTorqueCurrent", 0.0
         ));
         static {
             // Trapezoidal profile config (used by MotionMagic firmware)
             config.put("inverted", currentMode != Mode.SIM);
+            config.put("neutralMode", NeutralMode.COAST);
+            config.put("statorCurrentLimit", 94.0);
+            config.put("statorCurrentLimitEnabled", true);
         }
     }
 
