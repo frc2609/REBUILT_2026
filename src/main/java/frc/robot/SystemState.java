@@ -58,7 +58,7 @@ public class SystemState {
         SystemState.shotCalc = shotCalc;
         SystemState.headingOffset = headingOffset;
 
-        SystemState.flywheelTolerance = new LoggedNetworkNumber("SOTM/PassTolerance", Constants.Controls.FLYWHEEL_PASS_TOLERANCE_RPM/60.0);
+        SystemState.flywheelTolerance = new LoggedNetworkNumber("SOTM/PassTolerance", Constants.Controls.FLYWHEEL_PASS_TOLERANCE_RPM);
         SystemState.adjustableAngle = new LoggedNetworkNumber("SOTM/HoodAngle/", 15.0);
     }
 
