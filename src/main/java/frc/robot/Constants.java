@@ -165,7 +165,7 @@ public final class Constants {
         public static final double STATIONARY_SPEED = 0.05;
 
         public static final double TURRET_READY_TOLERANCE = 4.0; // deg
-        public static final double FLYWHEEL_PASS_TOLERANCE_RPM = 50.0; // rpm
+        public static final double FLYWHEEL_PASS_TOLERANCE_RPM = 300.0; // rpm
         public static final double FLYWHEEL_TOLERANCE_RPM = 100.0; // rpm
 
         // Rotation values are OUTPUT degrees
@@ -217,8 +217,8 @@ public final class Constants {
             0.353,    // exit height (m), floor to where the ball leaves the shooter
             0.0762,  // flywheel diameter, 0.0762
             1.91,    // target height (m), 1.83 from game manual
-            0.85,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
-            68.0,    // launch angle from horizontal
+            0.9,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
+            71.0,    // launch angle from horizontal
             0.001,   // sim timestep
             1500, 6000, 25, 10.0  // RPM search range, iterations, max sim time
         );
@@ -262,10 +262,10 @@ public final class Constants {
             "followerId", 51,
             "followerAligned", false,
             "kP", 110.0,
-            "kS", 14.9,
-            "kV", 0.170,
+            "kS", 14.47,
+            "kV", 0.17769,
             "peakForwardTorqueCurrent", 97.0,
-            "peakReverseTorqueCurrent", 0.0
+            "peakReverseTorqueCurrent", -10.0
         ));
         static {
             // Trapezoidal profile config (used by MotionMagic firmware)
