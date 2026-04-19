@@ -82,7 +82,7 @@ public class LedSubsystem extends SubsystemBase {
                 if (isValidShot) {
                     generateLeds(i, 60, 255, 10);
                 } else{
-                    generateLeds(i, 100, 255, 10);
+                    generateLeds(i, 0, 255, 10);
                 }
             }
         }
@@ -94,9 +94,9 @@ public class LedSubsystem extends SubsystemBase {
         for (int i = 0; i<groupedLength;i++) {
             if (i%2==1){
                 if (isHubActive()) {
-                    generateLeds(i, 60, 255, 10);
-                } else{
                     generateLeds(i, 30, 255, 10);
+                } else{
+                    generateLeds(i, 150, 255, 10);
                 }
             }
         }
