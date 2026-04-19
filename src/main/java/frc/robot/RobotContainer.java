@@ -368,6 +368,9 @@ public class RobotContainer {
         autoChooser.addOption("Right Sprint", new SprintAuto(
             "rightSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));
+            autoChooser.addOption("Depot Sprint", new SprintAuto(
+            "toDepot", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
+        ));
         autoChooser.addOption("Left SprintD", new SprintDoubleAuto(
             "leftSweep", driveSubsystem, flywheelSubsystem, feedSubsystem, intakeSubsystem, ballSim, turretSubsystem
         ));

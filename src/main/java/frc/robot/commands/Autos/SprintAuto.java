@@ -35,7 +35,7 @@ public class SprintAuto extends SequentialCommandGroup {
                     new SetRollerPercent(intake, 1.0),
                     new HoldIntakeDeployed(intake)
                 )
-            ).withTimeout(6.0),
+            ).withTimeout(10.0),
 
             // Shoot collected ball
             new ParallelCommandGroup(
