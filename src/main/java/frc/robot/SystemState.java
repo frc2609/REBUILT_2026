@@ -33,7 +33,7 @@ public class SystemState {
     private static DriveSubsystem swerve;
     private static TurretSubsystem turret;
     private static ShotCalculator shotCalc;
-    private static LoggedNetworkNumber headingOffset, adjustableAngle; 
+    public static LoggedNetworkNumber headingOffset, adjustableAngle, flywheelTolerance; 
 
     private static Pose2d turretPose;
     private static Translation2d target;
@@ -58,6 +58,7 @@ public class SystemState {
         SystemState.shotCalc = shotCalc;
         SystemState.headingOffset = headingOffset;
 
+        SystemState.flywheelTolerance = new LoggedNetworkNumber("SOTM/PassTolerance", Constants.Controls.FLYWHEEL_PASS_TOLERANCE_RPM/60.0);
         SystemState.adjustableAngle = new LoggedNetworkNumber("SOTM/HoodAngle/", 15.0);
     }
 

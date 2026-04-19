@@ -92,6 +92,8 @@ public class RobotContainer {
     private final Trigger aimRightTrigger = operatorController.povRight();
     private final Trigger resetRpmTrigger = operatorController.back();
     private final Trigger resetAimTrigger = operatorController.start();
+    private final Trigger tolHighTrigger = operatorController.a();
+    private final Trigger tolLowTrigger = operatorController.b();
 
     //private final Trigger zeroEncodersTrigger = driverController.b();
 
@@ -245,6 +247,10 @@ public class RobotContainer {
         rpmUpTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(50)));
         rpmDownTrigger.onTrue(Commands.runOnce(() -> shotCalculator.adjustOffset(-50)));
         resetRpmTrigger.onTrue(Commands.runOnce(() -> shotCalculator.resetOffset()));
+
+        // Tolerance toggle
+        tolHighTrigger.onTrue(Commands.runOnce(() -> SystemState.flywheelTolerance.set(900)));
+        tolLowTrigger.onTrue(Commands.runOnce(() -> SystemState.flywheelTolerance.set(300)));
         
         // Aim angle trim (POV left/right)
         aimLeftTrigger.onTrue(Commands.runOnce(() -> {
