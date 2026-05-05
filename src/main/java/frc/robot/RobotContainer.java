@@ -61,6 +61,8 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+    private final Boolean demoMode = true;
+    private boolean demoAutoMovementEnabled = false;
 
     private final CommandXboxController driverController = new CommandXboxController(
             Constants.Controls.DRIVER_CONTROLLER_PORT);
@@ -70,7 +72,8 @@ public class RobotContainer {
     private final Trigger xTrigger = driverController.x();
     private final Trigger resetGyroTrigger = driverController.back();
 
-    private final Trigger autoShootTrigger = driverController.rightTrigger(0.1);
+    private final Trigger 
+    autoShootTrigger = driverController.rightTrigger(0.1);
     private final Trigger autoIntakeTrigger = driverController.rightTrigger(0.95);
     private final Trigger manualShootTrigger = driverController.rightBumper();
 
@@ -188,7 +191,128 @@ public class RobotContainer {
         configureBindings();
     }
     
-    private void configureBindings() {        
+    private void configureBindings() {   
+        if (demoMode){
+            configureDemoControls();
+        } else {
+            configureMainControls();
+        }
+    }
+
+    private void configureDemoControls() {
+        final double demoDriveSpeedScale = 0.25;
+        final double demoIntakePercent = 0.20;
+        final double demoTurretSweepSeconds = 5;
+        final double demoIntakeDeploySweepSeconds = 8.0;
+        final double demoFlywheelRpm = 700.0;
+        final double demoAgitatorRpm = 5000.0;
+        final double demoFeedRpm = 5000.0;
+        final Trigger demoAutoMovementEnabledTrigger = new Trigger(() -> demoAutoMovementEnabled);
+
+        intakeSubsystem.setSetpoints(
+            Constants.Controls.INTAKE_RUN_PERCENT,
+            Constants.Controls.INTAKE_DEPLOYED_DEG
+        );
+        
+        manualShootTrigger.onTrue(Commands.runOnce(() -> {
+            demoAutoMovementEnabled = !demoAutoMovementEnabled;
+        }));
+
+        demoAutoMovementEnabledTrigger.whileTrue(
+            Commands.repeatingSequence(
+                Commands.runOnce(
+                    () -> intakeSubsystem.setDeployPosition(700),
+                    intakeSubsystem
+                ).withTimeout(2),
+                Commands.waitSeconds(demoIntakeDeploySweepSeconds),
+                Commands.runOnce(
+                    () -> intakeSubsystem.setDeployPosition(1350),
+                    intakeSubsystem
+                ).withTimeout(2),
+                Commands.waitSeconds(demoIntakeDeploySweepSeconds)
+            )
+        );
+        demoAutoMovementEnabledTrigger.onFalse(Commands.runOnce(
+            () -> intakeSubsystem.setDeployPosition(1350),
+            intakeSubsystem
+        ));
+
+        startIntakeTrigger.onTrue(
+            Commands.runOnce(() -> intakeSubsystem.setRollerPercent(demoIntakePercent), intakeSubsystem)
+        ).onFalse(
+            Commands.runOnce(() -> intakeSubsystem.setRollerPercent(0.0), intakeSubsystem)
+        );
+
+        feedSubsystem.setSetpoints(
+            demoAgitatorRpm,
+            demoFeedRpm
+        );
+        flywheelSubsystem.setSetpoint(
+            demoFlywheelRpm
+        );
+        autoShootTrigger.whileTrue(
+            Commands.parallel(
+                Commands.runOnce(
+                    () -> intakeSubsystem.setDeployPosition(950),
+                    intakeSubsystem
+                ),    
+                Commands.runEnd(
+                    () -> {
+                        flywheelSubsystem.setSpeed();
+                        feedSubsystem.setAgitatorSpeed();
+                        feedSubsystem.setFeedSpeed();
+                    },
+                    () -> {
+                        flywheelSubsystem.stop();
+                        feedSubsystem.stop();
+                    },
+                    flywheelSubsystem,
+                    feedSubsystem
+                )
+            )).onFalse(
+            Commands.runOnce(
+                    () -> intakeSubsystem.setDeployPosition(1350
+                    ),
+                    intakeSubsystem
+                )
+        );
+
+        demoAutoMovementEnabledTrigger.whileTrue(
+            Commands.repeatingSequence(
+                Commands.runOnce(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_LEFT_DEG),
+                        turretSubsystem),
+                Commands.waitSeconds(demoTurretSweepSeconds),
+                Commands.runOnce(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_RIGHT_DEG),
+                        turretSubsystem),
+                Commands.waitSeconds(demoTurretSweepSeconds)
+            )
+        );
+        demoAutoMovementEnabledTrigger.onFalse(Commands.runOnce(
+            () -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_FRONT_DEG),
+            turretSubsystem
+        ));
+
+        driveSubsystem.setDefaultCommand(
+            DriveCommands.joystickDrive(
+                driveSubsystem,
+                () -> -driverController.getLeftY(),
+                () -> -driverController.getLeftX(),
+                () -> -driverController.getRightX(),
+                () -> demoDriveSpeedScale
+            )
+        );
+        turretOverrideFrontTrigger.onTrue(
+            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_FRONT_DEG),
+                turretSubsystem));
+        turretOverrideRightTrigger.onTrue(
+            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_RIGHT_DEG),
+                turretSubsystem));
+        turretOverrideLeftTrigger.onTrue(
+            Commands.run(() -> turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_LEFT_DEG),
+                turretSubsystem));
+    }
+
+    private void configureMainControls() {
         // Main controls
 
         turretSubsystem.setDefaultCommand(autoAimCommand);
@@ -344,7 +468,6 @@ public class RobotContainer {
                 feedSubsystem, 
                 ballSim
         ));
-
     } 
 
     private void configureAutoChooser() {
