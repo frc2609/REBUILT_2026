@@ -31,8 +31,10 @@ import frc.robot.subsystems.io.motor.CTRE.Sim.SimDynamicMotionMagicVoltageIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimPercentMotorIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimPositionMotorIO;
 import frc.robot.subsystems.io.motor.CTRE.Sim.SimVelocityMotorIO;
+import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
@@ -395,14 +397,39 @@ public class RobotFactory {
                 )
             };
         case REAL:
-            // Limelight needs gyro rotation for MegaTag2 
+            // One entry per slot, in the same order as Constants.Vision
+            // cameraStdDevFactors. Which software is behind each is a single
+            // word in Constants.Vision.<slot>.kind - change it there, not here.
             return new VisionIO[] {
-                new VisionIOLimelight(Constants.Vision.Left.name, driveSubsystem::getRotation),
-                new VisionIOLimelight(Constants.Vision.Right.name, driveSubsystem::getRotation),
-                new VisionIOLimelight(Constants.Vision.Front.name, driveSubsystem::getRotation)
+                realVisionIO(Constants.Vision.Left.kind,
+                             Constants.Vision.Left.name,
+                             Constants.Vision.Left.fromRobot),
+                realVisionIO(Constants.Vision.Right.kind,
+                             Constants.Vision.Right.name,
+                             Constants.Vision.Right.fromRobot),
+                realVisionIO(Constants.Vision.Front.kind,
+                             Constants.Vision.Front.name,
+                             Constants.Vision.Front.fromRobot)
             };
         default:
             throw new IllegalStateException("Unsupported mode");
+        }
+    }
+
+    /**
+     * One real camera. PhotonVision takes the robot-to-camera transform and
+     * does its own solve on the coprocessor; a Limelight instead needs the
+     * gyro rotation published to it for MegaTag 2, and its transform is
+     * configured in the Limelight itself rather than passed here.
+     */
+    private VisionIO realVisionIO(Constants.Vision.Kind kind, String name, Transform3d fromRobot) {
+        switch (kind) {
+        case PHOTONVISION:
+            return new VisionIOPhotonVision(name, fromRobot);
+        case LIMELIGHT:
+            return new VisionIOLimelight(name, driveSubsystem::getRotation);
+        default:
+            throw new IllegalStateException("Unsupported camera kind: " + kind);
         }
     }
 }
