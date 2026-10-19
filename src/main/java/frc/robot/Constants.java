@@ -473,6 +473,19 @@ public final class Constants {
     }
 
     public static final class Vision {
+        /**
+         * Which software is behind a camera. Switching one of these swaps the
+         * implementation RobotFactory builds for that slot and nothing else -
+         * VisionSubsystem treats every camera the same way regardless.
+         *
+         * The two are not interchangeable in what they contribute. A Limelight
+         * producing MegaTag 2 gives position only: angularStdDevMegatag2Factor
+         * below is infinite, so its heading is discarded, and it depends on the
+         * gyro rotation we publish to it. A PhotonVision camera does a full 3D
+         * solve and contributes heading as well.
+         */
+        public enum Kind { PHOTONVISION, LIMELIGHT }
+
         public static final AprilTagFieldLayout aprilTagLayout =
             AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
@@ -485,7 +498,11 @@ public final class Constants {
         public static double linearStdDevBaseline = 0.06; // Meters
         public static double angularStdDevBaseline = 0.06; // Radians
 
-        public static double[] cameraStdDevFactors = {1.0, 1.0};
+        // One per camera, in the same order RobotFactory builds them. Indexed
+        // by camera, and the indexing is bounds-guarded - so a short array does
+        // not fail, it silently leaves the last cameras unweighted. Three
+        // entries for three cameras. Raise a camera's factor to trust it less.
+        public static double[] cameraStdDevFactors = {1.0, 1.0, 1.0};
 
         // Multipliers to apply for MegaTag 2 observations
         public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
@@ -493,7 +510,13 @@ public final class Constants {
             Double.POSITIVE_INFINITY; // No rotation data available
 
         public static final class Left {
-            public static final String name = "limelight-left";
+            // PhotonVision nickname, exactly as it appears in the PV UI.
+            // TODO at the school: the slot is Left but the camera is still
+            // nicknamed front_left from the pre-season bench. Rename it in
+            // PhotonVision AND in camera/config/config.yaml if you want these
+            // to read sensibly - the string has to match the nickname.
+            public static final Kind kind = Kind.PHOTONVISION;
+            public static final String name = "front_left";
             // User: x=13in(left), y=-10.5in(back), z=8in(up), pitch=10deg(up), yaw=left(90deg)
             public static final Transform3d fromRobot = new Transform3d(
                 new Translation3d(
@@ -504,7 +527,9 @@ public final class Constants {
         }
 
         public static final class Right {
-            public static final String name = "limelight-right";
+            public static final Kind kind = Kind.PHOTONVISION;
+            public static final String name = "rear";       // see the note on Left
+
             // User: x=-13in(right), y=-10.375in(back), z=6in(up), pitch=10deg(up), yaw=right(-90deg)
             public static final Transform3d fromRobot = new Transform3d(
                 new Translation3d(
@@ -515,6 +540,9 @@ public final class Constants {
         }
 
         public static final class Front {
+            // Stays a Limelight: this string is the Limelight's own
+            // NetworkTables table name, set by its hostname. Not a nickname.
+            public static final Kind kind = Kind.LIMELIGHT;
             public static final String name = "limelight-front";
             // User: x=0(center), y=2.75in(forward), z=16.25in(up), pitch=0(deg), yaw=forward(0deg)
             public static final Transform3d fromRobot = new Transform3d(
