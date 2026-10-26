@@ -149,7 +149,17 @@ public class VisionSubsystem extends SubsystemBase {
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
       }
 
+      double nearest = Double.NaN;
+      for (var o : inputs[cameraIndex].poseObservations){
+        if (Double.isNaN(nearest) || o.averageTagDistance() < nearest) {
+          nearest = o.averageTagDistance();
+        }
+      }
+
       // Log camera metadata
+      Logger.recordOutput(
+          "Vision/Camera" + Integer.toString(cameraIndex) + "/NearestInMeters",
+          nearest);
       Logger.recordOutput(
           "Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
           tagPoses.toArray(new Pose3d[0]));
