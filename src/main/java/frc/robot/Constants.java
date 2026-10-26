@@ -510,13 +510,10 @@ public final class Constants {
             Double.POSITIVE_INFINITY; // No rotation data available
 
         public static final class Left {
-            // PhotonVision nickname, exactly as it appears in the PV UI.
-            // TODO at the school: the slot is Left but the camera is still
-            // nicknamed front_left from the pre-season bench. Rename it in
-            // PhotonVision AND in camera/config/config.yaml if you want these
-            // to read sensibly - the string has to match the nickname.
+            // Thriftiest Cam. PhotonVision nickname, exactly as it appears in
+            // the PV UI and in pi_vision/config/config.yaml - all three must match.
             public static final Kind kind = Kind.PHOTONVISION;
-            public static final String name = "front_left";
+            public static final String name = "left";
             // User: x=13in(left), y=-10.5in(back), z=8in(up), pitch=10deg(up), yaw=left(90deg)
             public static final Transform3d fromRobot = new Transform3d(
                 new Translation3d(
@@ -528,7 +525,7 @@ public final class Constants {
 
         public static final class Right {
             public static final Kind kind = Kind.PHOTONVISION;
-            public static final String name = "rear";       // see the note on Left
+            public static final String name = "right";      // see the note on Left
 
             // User: x=-13in(right), y=-10.375in(back), z=6in(up), pitch=10deg(up), yaw=right(-90deg)
             public static final Transform3d fromRobot = new Transform3d(
