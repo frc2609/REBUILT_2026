@@ -274,7 +274,7 @@ public final class Constants {
             "followerAligned", false,
             "kP", 0.04,
             "kV", 0.0117,
-            "inverted", true,
+            "inverted", false,
             "statorCurrentLimit", 90.0,
             "statorCurrentLimitEnabled", true
         ));
@@ -287,7 +287,8 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 137.5;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double RANGE_DEG = 180.0; // 160
+            public static final double REVERSE_RANGE_DEG = -160.0; // 160
+            public static final double FORWARD_RANGE_DEG = 35.0; // 160
             public static final double HEADING_OFFSET_DEG = 180.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
             // MotionMagic trapezoidal profile limits (rotor rotations/sec, /sec^2, /sec^3)
@@ -312,10 +313,10 @@ public final class Constants {
 
                 config.put("forwardLimitEnabled", true);
                 config.put("forwardLimitRotations",
-                    Conversions.degreesToRotations(RANGE_DEG, GEAR_RATIO));
+                    Conversions.degreesToRotations(FORWARD_RANGE_DEG, GEAR_RATIO));
                 config.put("reverseLimitEnabled", true);
                 config.put("reverseLimitRotations",
-                    Conversions.degreesToRotations(-RANGE_DEG, GEAR_RATIO));
+                    Conversions.degreesToRotations(REVERSE_RANGE_DEG, GEAR_RATIO));
                 
                 config.put("neutralMode", Constants.NeutralMode.BRAKE);
                 config.put("inverted", true);
@@ -342,10 +343,10 @@ public final class Constants {
 
                 configFOC.put("forwardLimitEnabled", true);
                 configFOC.put("forwardLimitRotations",
-                    Conversions.degreesToRotations(RANGE_DEG, GEAR_RATIO));
+                    Conversions.degreesToRotations(FORWARD_RANGE_DEG, GEAR_RATIO));
                 configFOC.put("reverseLimitEnabled", true);
                 configFOC.put("reverseLimitRotations",
-                    Conversions.degreesToRotations(-RANGE_DEG, GEAR_RATIO));
+                    Conversions.degreesToRotations(REVERSE_RANGE_DEG, GEAR_RATIO));
 
                 configFOC.put("neutralMode", Constants.NeutralMode.BRAKE);
                 configFOC.put("inverted", false);
@@ -511,31 +512,27 @@ public final class Constants {
 
         public static final class Left {
             // PhotonVision nickname, exactly as it appears in the PV UI.
-            // TODO at the school: the slot is Left but the camera is still
-            // nicknamed front_left from the pre-season bench. Rename it in
-            // PhotonVision AND in camera/config/config.yaml if you want these
-            // to read sensibly - the string has to match the nickname.
             public static final Kind kind = Kind.PHOTONVISION;
-            public static final String name = "front_left";
+            public static final String name = "left";
             // User: x=13in(left), y=-10.5in(back), z=8in(up), pitch=10deg(up), yaw=left(90deg)
             public static final Transform3d fromRobot = new Transform3d(
                 new Translation3d(
-                    Units.inchesToMeters(-10.5),  // WPILib X = user Y (forward)
-                    Units.inchesToMeters(13.0),   // WPILib Y = user X (left)
-                    Units.inchesToMeters(8.0)),   // WPILib Z = user Z (up)
+                    Units.inchesToMeters(-11),  // WPILib X = user Y (forward)
+                    Units.inchesToMeters(12.75),   // WPILib Y = user X (left)
+                    Units.inchesToMeters(8.125)),   // WPILib Z = user Z (up)
                 new Rotation3d(0.0, Units.degreesToRadians(-10.0), Math.PI / 2.0));
         }
 
         public static final class Right {
             public static final Kind kind = Kind.PHOTONVISION;
-            public static final String name = "rear";       // see the note on Left
+            public static final String name = "right";       // see the note on Left
 
             // User: x=-13in(right), y=-10.375in(back), z=6in(up), pitch=10deg(up), yaw=right(-90deg)
             public static final Transform3d fromRobot = new Transform3d(
                 new Translation3d(
-                    Units.inchesToMeters(-10.375), // WPILib X = user Y (forward)
-                    Units.inchesToMeters(-13.0),   // WPILib Y = user X (left, negative=right)
-                    Units.inchesToMeters(6.0)),    // WPILib Z = user Z (up)
+                    Units.inchesToMeters(-11),        // WPILib X = user Y (forward)
+                    Units.inchesToMeters(-12.75),          // WPILib Y = user X (left, negative=right)
+                    Units.inchesToMeters(8.125)),    // WPILib Z = user Z (up)
                 new Rotation3d(0.0, Units.degreesToRadians(-10.0), -Math.PI / 2.0));
         }
 
@@ -548,9 +545,9 @@ public final class Constants {
             public static final Transform3d fromRobot = new Transform3d(
                 new Translation3d(
                     Units.inchesToMeters(2.75),    // WPILib X = user Y (forward)
-                    0.0,                           // WPILib Y = user X (center)
+                    0.0,                                // WPILib Y = user X (center)
                     Units.inchesToMeters(16.25)),  // WPILib Z = user Z (up)
-                new Rotation3d(0.0, 0.0, 0.0));
+                new Rotation3d(0.0, 10.0, 0.0));
         }
 
     }
