@@ -24,7 +24,7 @@ public class GyroIOPigeon2 implements GyroIO {
   /** Set true to negate yaw (reverses rotation direction). */
   private static final boolean INVERT_YAW = false;
   /** Add this to raw yaw in degrees (e.g. 180 if Pigeon is mounted 180° rotated). */
-  private static final double YAW_OFFSET_DEGREES = 180.0;
+  private static final double YAW_OFFSET_DEGREES = 0;
 
   private final Pigeon2 pigeon =
       new Pigeon2(TunerConstants.DrivetrainConstants.Pigeon2Id, TunerConstants.kCANBus);
