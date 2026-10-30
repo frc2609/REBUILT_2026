@@ -56,14 +56,7 @@ public class RobotFactory {
             buildGyroIO(), buildModuleIO()
         );
         visionSubsystem = new VisionSubsystem(
-            driveSubsystem::addVisionMeasurement,
-            driveSubsystem::getPose,
-            new Transform3d[] {
-                Constants.Vision.Left.fromRobot,
-                Constants.Vision.Right.fromRobot,
-                Constants.Vision.Front.fromRobot
-            },
-            buildVisionIO()
+            driveSubsystem::addVisionMeasurement, buildVisionIO()
         );
         turretSubsystem = new TurretSubsystem(
             buildTurretAimIO(), buildTurretHoodIO() //buildTurretEncoderIO()

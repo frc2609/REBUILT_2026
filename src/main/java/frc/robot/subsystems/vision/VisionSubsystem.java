@@ -16,7 +16,6 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
@@ -26,31 +25,18 @@ import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionSubsystem extends SubsystemBase {
   private final VisionConsumer consumer;
-  private final Supplier<Pose2d> poseSupplier;
-  private final Transform3d[] robotToCameras;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
   private final Debouncer targetDebouncer = new Debouncer(0.3, DebounceType.kFalling);
   private boolean anyTargetDebounced = false;
 
-  /**
-   * @param poseSupplier Current robot pose, used only to log where each camera is on the field.
-   * @param robotToCameras One per camera, in the same order as io. Logging only.
-   */
-  public VisionSubsystem(
-      VisionConsumer consumer,
-      Supplier<Pose2d> poseSupplier,
-      Transform3d[] robotToCameras,
-      VisionIO... io) {
+  public VisionSubsystem(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
-    this.poseSupplier = poseSupplier;
-    this.robotToCameras = robotToCameras;
     this.io = io;
 
     // Initialize inputs
@@ -198,15 +184,6 @@ public class VisionSubsystem extends SubsystemBase {
       if (cameraInputs.tagIds.length > 0) { rawHasTarget = true; break; }
     }
     anyTargetDebounced = targetDebouncer.calculate(rawHasTarget);
-
-    // Log camera mounting positions on the field. In AdvantageScope, show as
-    // Axes on a 3D field to check each robot-to-camera transform.
-    Pose3d robotPose = new Pose3d(poseSupplier.get());
-    Pose3d[] cameraPoses = new Pose3d[robotToCameras.length];
-    for (int i = 0; i < robotToCameras.length; i++) {
-      cameraPoses[i] = robotPose.transformBy(robotToCameras[i]);
-    }
-    Logger.recordOutput("Vision/Summary/CameraPoses", cameraPoses);
 
     // Log summary data
     Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
