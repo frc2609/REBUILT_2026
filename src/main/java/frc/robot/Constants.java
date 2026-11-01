@@ -213,7 +213,7 @@ public final class Constants {
             0.376,    // exit height (m), floor to where the ball leaves the shooter
             0.0762,  // flywheel diameter, 0.0762
             1.91,    // target height (m), 1.83 from game manual
-            0.7,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
+            0.80,     // slip factor (0=no grip, 1=perfect), tune this on the real robot
             68.0,    // launch angle from horizontal
             0.001,   // sim timestep
             1500, 6000, 25, 10.0  // RPM search range, iterations, max sim time
@@ -288,7 +288,7 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 137.5;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double REVERSE_RANGE_DEG = -175.0; // 160
+            public static final double REVERSE_RANGE_DEG = -170.0; // 160
             public static final double FORWARD_RANGE_DEG = 55.0; // 160
             public static final double HEADING_OFFSET_DEG = 180.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;
