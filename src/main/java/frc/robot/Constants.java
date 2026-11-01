@@ -170,7 +170,8 @@ public final class Constants {
 
         public static final double INTAKE_DEPLOYED_DEG = 695.0;
         public static final double INTAKE_RUN_PERCENT = 0.7;
-        public static final double INTAKE_SPIT_PERCENT = 0.1;
+        public static final double INTAKE_SPIT_PERCENT = -0.2;
+
 
         public static final double TURRET_HOOD_DEG = 15.0;
 
