@@ -63,7 +63,6 @@ public class RobotContainer {
     private final Trigger xTrigger = driverController.x();
     private final Trigger resetGyroTrigger = driverController.back();
     private final Trigger flywheelSpeedTrigger = driverController.y();
-    private boolean demoHighPower = false;
     private final LoggedNetworkNumber demoDriveSpeed =
         new LoggedNetworkNumber("/Tuning/Demo/DriveSpeed", Constants.Controls.DEMO_DRIVE_SPEED);
     private final LoggedNetworkNumber demoFlywheelLowRPM =
@@ -198,10 +197,10 @@ public class RobotContainer {
             Constants.Controls.FEED_HOLD_RPM
         );
         
-        // Demo shot power: Y toggles low/high. Both RPMs are editable live in Elastic
-        // under /Tuning/Demo, and the active one is pushed to the flywheel every loop.
-        flywheelSpeedTrigger.onTrue(Commands.runOnce(() -> demoHighPower = !demoHighPower));
+        // Demo shot power: low by default, high only while Y is held. Both RPMs are
+        // editable live in Elastic under /Tuning/Demo, applied to the flywheel every loop.
         CommandScheduler.getInstance().getDefaultButtonLoop().bind(() -> {
+            boolean demoHighPower = flywheelSpeedTrigger.getAsBoolean();
             double rpm = demoHighPower ? demoFlywheelHighRPM.get() : demoFlywheelLowRPM.get();
             flywheelSubsystem.setSetpoint(rpm);
             Logger.recordOutput("Demo/HighPower", demoHighPower);
