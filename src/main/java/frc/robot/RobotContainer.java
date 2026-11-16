@@ -9,9 +9,11 @@ package frc.robot;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -61,7 +63,13 @@ public class RobotContainer {
     private final Trigger xTrigger = driverController.x();
     private final Trigger resetGyroTrigger = driverController.back();
     private final Trigger flywheelSpeedTrigger = driverController.y();
-    private boolean turretDemoMode = true; 
+    private boolean demoHighPower = false;
+    private final LoggedNetworkNumber demoDriveSpeed =
+        new LoggedNetworkNumber("/Tuning/Demo/DriveSpeed", Constants.Controls.DEMO_DRIVE_SPEED);
+    private final LoggedNetworkNumber demoFlywheelLowRPM =
+        new LoggedNetworkNumber("/Tuning/Demo/FlywheelLowRPM", Constants.Controls.FLYWHEEL_LOW_RPM);
+    private final LoggedNetworkNumber demoFlywheelHighRPM =
+        new LoggedNetworkNumber("/Tuning/Demo/FlywheelHighRPM", Constants.Controls.FLYWHEEL_HIGH_RPM);
     private final Trigger autoShootTrigger = driverController.rightTrigger(0.1);
     private final Trigger autoIntakeTrigger = driverController.rightTrigger(0.95);
     private final Trigger manualShootTrigger = driverController.rightBumper();
@@ -190,16 +198,14 @@ public class RobotContainer {
             Constants.Controls.FEED_HOLD_RPM
         );
         
-        flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOW_RPM);
-
-        flywheelSpeedTrigger.onTrue(Commands.runOnce(() -> {
-            if (turretDemoMode) {
-                flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOW_RPM);
-            } else {
-                flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_HIGH_RPM);
-            }
-            turretDemoMode = !turretDemoMode;
-        }));
+        // Demo shot power: Y toggles low/high. Both RPMs are editable live in Elastic
+        // under /Tuning/Demo, and the active one is pushed to the flywheel every loop.
+        flywheelSpeedTrigger.onTrue(Commands.runOnce(() -> demoHighPower = !demoHighPower));
+        CommandScheduler.getInstance().getDefaultButtonLoop().bind(() -> {
+            double rpm = demoHighPower ? demoFlywheelHighRPM.get() : demoFlywheelLowRPM.get();
+            flywheelSubsystem.setSetpoint(rpm);
+            Logger.recordOutput("Demo/HighPower", demoHighPower);
+        });
         // flywheelSubsystem.setSetpoint(
         //     Constants.Controls.FLYWHEEL_LOB_RPM
         // );
@@ -302,7 +308,7 @@ public class RobotContainer {
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
                 () -> {
-                    double speed = Constants.Controls.DEMO_DRIVE_SPEED;
+                    double speed = MathUtil.clamp(demoDriveSpeed.get(), 0.0, 1.0);
                     // if (autoShootTrigger.getAsBoolean()) {
                     //     speed = 0.3;
                     //     if (!autoAimCommand.isPassing()){
