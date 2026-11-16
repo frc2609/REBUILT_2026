@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
 import com.ctre.phoenix6.CANBus;
@@ -184,6 +185,9 @@ public final class Constants {
 
         public static final double FLYWHEEL_LOB_RPM = 2200.0;
         public static final double LOB_DISTANCE = 2.0;
+        public static final double FLYWHEEL_LOW_RPM = 800;
+        public static final double FLYWHEEL_HIGH_RPM = 1500;
+        public static final double DEMO_DRIVE_SPEED = 0.4;
     }
 
     /** BLine FollowPath PID gains. Path constraints are in deploy/autos/config.json. */
@@ -288,7 +292,7 @@ public final class Constants {
             public static final double INERTIA = 0.01;
             public static final double GEAR_RATIO = 137.5;
             public static final double ENCODER_RATIO = 1.0;
-            public static final double REVERSE_RANGE_DEG = -130.0; // 160
+            public static final double REVERSE_RANGE_DEG = -90.0; // 160
             public static final double FORWARD_RANGE_DEG = 30.0; // 160
             public static final double HEADING_OFFSET_DEG = 180.0; // robot front to turret zero
             public static final SimMotor SIM_MOTOR = SimMotor.KRAKEN_X60;

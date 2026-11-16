@@ -60,7 +60,8 @@ public class RobotContainer {
 
     private final Trigger xTrigger = driverController.x();
     private final Trigger resetGyroTrigger = driverController.back();
-
+    private final Trigger flywheelSpeedTrigger = driverController.y();
+    private boolean turretDemoMode = true; 
     private final Trigger autoShootTrigger = driverController.rightTrigger(0.1);
     private final Trigger autoIntakeTrigger = driverController.rightTrigger(0.95);
     private final Trigger manualShootTrigger = driverController.rightBumper();
@@ -180,15 +181,28 @@ public class RobotContainer {
     private void configureBindings() {        
         // Main controls
 
-        turretSubsystem.setDefaultCommand(autoAimCommand);
+        turretSubsystem.setDefaultCommand(Commands.run(() -> 
+            turretSubsystem.setAimPosition(Constants.Controls.TURRET_OVERRIDE_FRONT_DEG),turretSubsystem)
+        );
 
         feedSubsystem.setSetpoints(
             Constants.Controls.AGITATOR_HOLD_RPM, 
             Constants.Controls.FEED_HOLD_RPM
         );
-        flywheelSubsystem.setSetpoint(
-            Constants.Controls.FLYWHEEL_LOB_RPM
-        );
+        
+        flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOW_RPM);
+
+        flywheelSpeedTrigger.onTrue(Commands.runOnce(() -> {
+            if (turretDemoMode) {
+                flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_LOW_RPM);
+            } else {
+                flywheelSubsystem.setSetpoint(Constants.Controls.FLYWHEEL_HIGH_RPM);
+            }
+            turretDemoMode = !turretDemoMode;
+        }));
+        // flywheelSubsystem.setSetpoint(
+        //     Constants.Controls.FLYWHEEL_LOB_RPM
+        // );
         autoShootTrigger.whileTrue(new AutoShoot(
             flywheelSubsystem, 
             feedSubsystem, 
@@ -216,9 +230,9 @@ public class RobotContainer {
         outtakeTrigger.onTrue(new SetRollerPercent(
             intakeSubsystem, Constants.Controls.INTAKE_SPIT_PERCENT
         ));
-        intakeSubsystem.setDefaultCommand(new HoldIntakeDeployed(
-            intakeSubsystem
-        ));
+        // intakeSubsystem.setDefaultCommand(new HoldIntakeDeployed(
+        //     intakeSubsystem
+        // ));
         autoIntakeTrigger.whileTrue(new AutoPushIntake(
             intakeSubsystem
         ));
@@ -288,13 +302,13 @@ public class RobotContainer {
                 () -> -driverController.getLeftX(),
                 () -> -driverController.getRightX(),
                 () -> {
-                    double speed = 1.0;
-                    if (autoShootTrigger.getAsBoolean()) {
-                        speed = 0.3;
-                        if (!autoAimCommand.isPassing()){
-                            speed = 0.15;
-                        }
-                    }
+                    double speed = Constants.Controls.DEMO_DRIVE_SPEED;
+                    // if (autoShootTrigger.getAsBoolean()) {
+                    //     speed = 0.3;
+                    //     if (!autoAimCommand.isPassing()){
+                    //         speed = 0.15;
+                    //     }
+                    // }
                     return speed;
                 }
             )
